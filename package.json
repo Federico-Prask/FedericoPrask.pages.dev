@@ -34,7 +34,7 @@
   "devEngines": {
     "packageManager": {
       "name": "npm",
-      "version": "10.9.2",
+      "version": "10.9.0",
       "onFail": "download"
     }
   }
