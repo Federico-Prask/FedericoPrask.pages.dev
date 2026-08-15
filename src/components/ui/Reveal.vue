@@ -30,8 +30,8 @@ onBeforeUnmount(() => io?.disconnect());
 <template>
   <div
     ref="el"
-    class="reveal"
-    :class="{ 'is-visible': visible }"
+    v-bind="$attrs"
+    :class="['reveal', { 'is-visible': visible }]"
     :style="delay ? { transitionDelay: `${delay}ms` } : undefined"
   >
     <slot />
