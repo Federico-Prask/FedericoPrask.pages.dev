@@ -170,7 +170,7 @@ const terminal = computed(() =>
                 <dt class="text-accent-ink dark:text-accent-ink-d">{{
                   locale === 'zh' ? '获奖' : 'AWARDS'
                 }}</dt>
-                <dd>{{ locale === 'zh' ? '20 余载' : '20+ yrs' }}</dd>
+                <dd>{{ locale === 'zh' ? '20 余项' : '20+ awards' }}</dd>
               </div>
             </dl>
           </Reveal>

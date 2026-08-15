@@ -1,0 +1,5 @@
+Contact: mailto:federico.workspace@gmail.com
+Expires: 2027-08-15T00:00:00.000Z
+Preferred-Languages: zh, en
+Canonical: https://FedericoPrask.pages.dev/.well-known/security.txt
+Policy: https://FedericoPrask.pages.dev/robots.txt

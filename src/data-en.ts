@@ -9,10 +9,10 @@ export const en: Content = {
   meta: {
     title: "Coder { Federico Prask }",
     name: "Federico Prask",
-    handle: "@yourname",
+    handle: "@Federico-Prask",
     role: "Student",
     tagline: "student · creativity · tech",
-    email: "hello@yourdomain.com",
+    email: "federico.workspace@gmail.com",
     location: "Changsha, CN",
     status: "Working",
     since: 2016,
@@ -86,7 +86,7 @@ export const en: Content = {
       desc: "Official website of LSGJOI",
       tags: ["Vue", "WebSocket", "Vite", "Tailwind CSS"],
       demo: "#",
-      source: "https://github.com/yourname",
+      source: "https://github.com/Federico-Prask",
     },
     {
       title: "G2501",
@@ -94,7 +94,7 @@ export const en: Content = {
       desc: "Class website of G2501",
       tags: ["React", "Vite+"],
       demo: "#",
-      source: "https://github.com/yourname",
+      source: "https://github.com/Federico-Prask",
     },
     {
       title: "Word Memorizer (Ver3.0)",
@@ -102,7 +102,7 @@ export const en: Content = {
       desc: "A vocabulary memorization app that theoretically works on most Linux distributions",
       tags: ["C++", "Learn", "GTK", "Vocabulary"],
       demo: "#",
-      source: "https://github.com/yourname",
+      source: "https://github.com/Federico-Prask",
     },
     {
       title: "Future Project",

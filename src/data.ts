@@ -68,7 +68,7 @@ export const zh: Content = {
   meta: {
     title: "Federico Prask",
     name: "Federico Prask",
-    handle: "@yourname", // TODO: 你的昵称
+    handle: "@Federico-Prask",
     role: "学生",
     tagline: "学生 · 创意 · 技术",
     email: "federico.workspace@gmail.com", 
@@ -133,7 +133,7 @@ export const zh: Content = {
       desc: "LSGJOI 的官方站",
       tags: ["Vue", "WebSocket", "Vite", "Tailwind CSS"],
       demo: "#",
-      source: "https://github.com/yourname",
+      source: "https://github.com/Federico-Prask",
     },
     {
       title: "G2501",
@@ -141,7 +141,7 @@ export const zh: Content = {
       desc: "G2501班的班级网站",
       tags: ["React", "Vite+"],
       demo: "#",
-      source: "https://github.com/yourname",
+      source: "https://github.com/Federico-Prask",
     },
     {
       title: "Word Memorizer (Ver3.0)",
@@ -149,7 +149,7 @@ export const zh: Content = {
       desc: "一个理论上适用于绝大多数 Linux 发行版的单词背记软件",
       tags: ["C++", "Learn", "GTK", "Vocabulary"],
       demo: "#",
-      source: "https://github.com/yourname",
+      source: "https://github.com/Federico-Prask",
     },
     {
       title: "未来项目",
