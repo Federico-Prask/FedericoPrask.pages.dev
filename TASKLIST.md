@@ -92,12 +92,15 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Crossfade the normal Logo into the SVG construction annotation when K0's SVG animation completes.
 - [x] Reuse the exact source paths for the complete FP monogram and rounded background-plate frame as solid outlines.
 - [x] Derive eighteen separate dashed guide paths from the original horizontal/vertical segments: four plate segments and fourteen monogram segments; align each guide to the exact source coordinate and extend it to the corresponding edge-to-edge boundary of the original 256 × 256 Logo frame; do not add unrelated background-grid lines.
-- [x] Add one `[ x , y ]` coordinate label at the original start point of every guide; rotate vertical labels by 90 degrees, including their brackets; render them in the active theme color without a text outline or halo.
+- [x] Add one `[ x , y ]` coordinate label at the original start point of every guide; for vertical guides rotate only the square brackets while keeping numbers and commas horizontal; render labels in the active theme color without a text outline or halo.
 - [x] Add Force anchor nodes and solid tangent/control handles at all eight rounded corners: four on the plate and four on the FP monogram.
 - [x] Keep Force values and a visible “Force” text label out of the annotation.
 - [x] Keep the annotation still after K1; do not use a timeout to start K2.
 - [ ] Visually verify that the complete FP outline, all eighteen guides, coordinate labels and Force handles remain visible throughout the K1 waiting state.
 - [ ] Visually verify that the normal filled Logo is fully gone at the end of the crossfade.
+- [ ] Visually verify butt-ended dashed guides are thinner than the solid Logo outline.
+- [ ] Visually verify that only square brackets rotate on vertical-guide labels; numbers and commas remain horizontal.
+- [ ] Resolve all coordinate-label collisions at the actual rendered size, including the lower-edge pair.
 - [ ] Visually tune K1 dashed-line rhythm, coordinate-label positions, handle scale and crossfade timing in the browser.
 
 ## 4. Phase 2 — First-scroll transition
