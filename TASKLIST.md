@@ -98,7 +98,7 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Keep the annotation still after K1; do not use a timeout to start K2.
 - [ ] Visually verify that the complete FP outline, all eighteen guides, coordinate labels and Force handles remain visible throughout the K1 waiting state.
 - [ ] Visually verify that the normal filled Logo is fully gone at the end of the crossfade.
-- [ ] Visually verify the 2.2px solid Logo outline remains clearly heavier than the 0.65px butt-ended dashed guides.
+- [ ] Visually verify the rounded plate frame and FP monogram have matching 2px solid outline widths, both clearly heavier than the 0.65px butt-ended dashed guides.
 - [ ] Visually verify that vertical-guide labels use five separate horizontal lines in the order `[`, x-coordinate, comma, y-coordinate, `]`, with visibly larger unrotated square brackets.
 - [ ] Resolve all coordinate-label collisions at the actual rendered size, including the lower-edge pair.
 - [ ] Visually tune K1 dashed-line rhythm, coordinate-label positions, handle scale and crossfade timing in the browser.
