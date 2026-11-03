@@ -1,41 +1,74 @@
 <script setup lang="ts">
-import { useI18n } from "./composables/useI18n";
-import TopBar from "./components/TopBar.vue";
-import Hero from "./components/Hero.vue";
-import Ticker from "./components/Ticker.vue";
-import About from "./components/About.vue";
-import Stack from "./components/Stack.vue";
-import Projects from "./components/Projects.vue";
-import Experience from "./components/Experience.vue";
-import Contact from "./components/Contact.vue";
-import Footer from "./components/Footer.vue";
-
-const { locale } = useI18n();
+import TitlePage from "./components/TitlePage.vue";
 </script>
 
 <template>
-  <div
-    class="min-h-screen overflow-x-clip bg-paper font-sans text-ink antialiased dark:bg-paper-d dark:text-ink-d"
-  >
-    <a
-      href="#main"
-      class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:border focus:border-line focus:bg-paper focus:px-4 focus:py-2 focus:font-mono focus:text-xs"
-    >
-      {{ locale === 'zh' ? '跳到主要内容' : 'Skip to content' }}
-    </a>
+  <a class="skip-link" href="#main-content">
+    Skip to content
+  </a>
 
-    <TopBar />
-
-    <main id="main">
-      <Hero />
-      <Ticker />
-      <About />
-      <Stack />
-      <Projects />
-      <Experience />
-      <Contact />
-    </main>
-
-    <Footer />
-  </div>
+  <main id="main-content">
+    <TitlePage />
+  </main>
 </template>
+
+<style>
+:root {
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  min-height: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100svh;
+  margin: 0;
+}
+
+#root,
+#main-content {
+  min-height: 100svh;
+}
+
+.skip-link {
+  position: fixed;
+  z-index: 10;
+  inset-block-start: 1rem;
+  inset-inline-start: 1rem;
+  padding: 0.65rem 0.85rem;
+  transform: translateY(-180%);
+  background: var(--site-page-background);
+  color: var(--site-text-primary);
+  font: 0.75rem var(--font-technical);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+</style>
