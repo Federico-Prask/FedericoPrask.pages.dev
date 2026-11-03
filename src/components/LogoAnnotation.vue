@@ -18,24 +18,24 @@ import LogoMark from "./LogoMark.vue";
 
     <!-- Only source-derived horizontal and vertical segments become persistent dashed guides. -->
     <g id="annotation-persistent-guides" class="axis-guides" data-k2-disposition="preserve">
-      <path id="guide-plate-h-01" data-source="plate" data-axis="h" data-start="56,0" d="M 56 -7 L 200 -7" />
-      <path id="guide-plate-v-01" data-source="plate" data-axis="v" data-start="256,56" d="M 263 56 L 263 200" />
-      <path id="guide-plate-h-02" data-source="plate" data-axis="h" data-start="200,256" d="M 200 263 L 56 263" />
-      <path id="guide-plate-v-02" data-source="plate" data-axis="v" data-start="0,200" d="M -7 200 L -7 56" />
-      <path id="guide-mono-h-01" data-source="monogram" data-axis="h" data-start="52,40" d="M 52 33 L 153 33" />
-      <path id="guide-mono-v-01" data-source="monogram" data-axis="v" data-start="219,106" d="M 226 106 L 226 125" />
-      <path id="guide-mono-v-02" data-source="monogram" data-axis="v" data-start="153,191" d="M 160 191 L 160 256" />
-      <path id="guide-mono-h-02" data-source="monogram" data-axis="h" data-start="153,256" d="M 153 263 L 121 263" />
-      <path id="guide-mono-v-03" data-source="monogram" data-axis="v" data-start="121,256" d="M 114 256 L 114 159" />
-      <path id="guide-mono-h-03" data-source="monogram" data-axis="h" data-start="121,159" d="M 121 152 L 153 152" />
-      <path id="guide-mono-v-04" data-source="monogram" data-axis="v" data-start="187,125" d="M 180 125 L 180 106" />
-      <path id="guide-mono-h-04" data-source="monogram" data-axis="h" data-start="153,72" d="M 153 79 L 86 79" />
-      <path id="guide-mono-v-05" data-source="monogram" data-axis="v" data-start="86,72" d="M 93 72 L 93 102" />
-      <path id="guide-mono-h-05" data-source="monogram" data-axis="h" data-start="86,102" d="M 86 95 L 148 95" />
-      <path id="guide-mono-v-06" data-source="monogram" data-axis="v" data-start="148,102" d="M 155 102 L 155 131" />
-      <path id="guide-mono-h-06" data-source="monogram" data-axis="h" data-start="148,131" d="M 148 138 L 86 138" />
-      <path id="guide-mono-v-07" data-source="monogram" data-axis="v" data-start="86,131" d="M 93 131 L 93 199" />
-      <path id="guide-mono-h-07" data-source="monogram" data-axis="h" data-start="86,199" d="M 86 206 L 52 206" />
+      <path id="guide-plate-h-01" data-source="plate" data-axis="h" data-start="56,0" d="M 0 0 L 256 0" />
+      <path id="guide-plate-v-01" data-source="plate" data-axis="v" data-start="256,56" d="M 256 0 L 256 256" />
+      <path id="guide-plate-h-02" data-source="plate" data-axis="h" data-start="200,256" d="M 0 256 L 256 256" />
+      <path id="guide-plate-v-02" data-source="plate" data-axis="v" data-start="0,200" d="M 0 0 L 0 256" />
+      <path id="guide-mono-h-01" data-source="monogram" data-axis="h" data-start="52,40" d="M 0 40 L 256 40" />
+      <path id="guide-mono-v-01" data-source="monogram" data-axis="v" data-start="219,106" d="M 219 0 L 219 256" />
+      <path id="guide-mono-v-02" data-source="monogram" data-axis="v" data-start="153,191" d="M 153 0 L 153 256" />
+      <path id="guide-mono-h-02" data-source="monogram" data-axis="h" data-start="153,256" d="M 0 256 L 256 256" />
+      <path id="guide-mono-v-03" data-source="monogram" data-axis="v" data-start="121,256" d="M 121 0 L 121 256" />
+      <path id="guide-mono-h-03" data-source="monogram" data-axis="h" data-start="121,159" d="M 0 159 L 256 159" />
+      <path id="guide-mono-v-04" data-source="monogram" data-axis="v" data-start="187,125" d="M 187 0 L 187 256" />
+      <path id="guide-mono-h-04" data-source="monogram" data-axis="h" data-start="153,72" d="M 0 72 L 256 72" />
+      <path id="guide-mono-v-05" data-source="monogram" data-axis="v" data-start="86,72" d="M 86 0 L 86 256" />
+      <path id="guide-mono-h-05" data-source="monogram" data-axis="h" data-start="86,102" d="M 0 102 L 256 102" />
+      <path id="guide-mono-v-06" data-source="monogram" data-axis="v" data-start="148,102" d="M 148 0 L 148 256" />
+      <path id="guide-mono-h-06" data-source="monogram" data-axis="h" data-start="148,131" d="M 0 131 L 256 131" />
+      <path id="guide-mono-v-07" data-source="monogram" data-axis="v" data-start="86,131" d="M 86 0 L 86 256" />
+      <path id="guide-mono-h-07" data-source="monogram" data-axis="h" data-start="86,199" d="M 0 199 L 256 199" />
     </g>
 
     <!-- Coordinates identify the original start point of each guide. Vertical labels rotate as a whole. -->
@@ -114,7 +114,6 @@ import LogoMark from "./LogoMark.vue";
   stroke-width: 0.85;
   stroke-dasharray: 2.6 4.2;
   stroke-linecap: round;
-  opacity: 0.68;
   vector-effect: non-scaling-stroke;
 }
 
