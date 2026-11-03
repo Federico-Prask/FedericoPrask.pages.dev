@@ -183,7 +183,7 @@ The Title Page uses a left/right composition:
 
 The left side presents the owner's name and the website designation. The name is the principal typographic anchor.
 
-The right side is reserved for the owner's Logo. The Logo asset has not yet been supplied. Keep the intended area and animation capability in the design, but do not substitute an invented mark.
+The right side uses the supplied Logo asset at `public/images/fp-logo.svg`. The SVG has a `0 0 256 256` viewBox and contains two primary paths: a white rounded-square background and a black FP monogram. Preserve this source geometry; do not redraw or substitute the mark.
 
 The letter **F** described in Section 5 is an explanatory example for SVG annotation behavior, not approval to use a fabricated F mark as the final Logo.
 
@@ -320,7 +320,7 @@ This is a crossfade:
 
 Both occupy the same visual region. They must not remain simultaneously fully visible.
 
-At the end of the crossfade, the normal Logo is completely gone. Only the SVG annotation remains.
+At the end of the crossfade, the normal Logo is completely gone. The SVG annotation remains, including the F outline, x/y annotations, Force handles and reference lines. The F outline must not disappear at the end of K1; it remains visible throughout the waiting state and is removed only when K2 begins.
 
 ### 5.3 SVG example and shape
 
@@ -333,7 +333,7 @@ The shape uses outline-only construction:
 - The outline is a vector path.
 - The annotation includes five horizontal reference dashed lines and four vertical reference dashed lines.
 
-The final Logo geometry is not supplied yet. Do not assume that the example F is the final mark.
+The supplied Logo is an FP monogram. The F remains the explanatory shape used in the annotation specification unless a later design decision explicitly changes the annotated geometry. The source asset is available at `public/images/fp-logo.svg`.
 
 ### 5.4 Coordinate annotations
 
@@ -368,7 +368,7 @@ At this point:
 - The Title Page is still fully present.
 - The left-side text remains unchanged.
 - The normal Logo is no longer visible.
-- The SVG annotation remains visible.
+- The SVG annotation remains visible, including the F outline.
 - The x/y position annotations remain visible.
 - The Force nodes and tangent handles remain visible.
 - The annotation does not morph or move before the first downward scroll.
@@ -698,7 +698,7 @@ They may overlap in time when the design specifies synchronization, but they sho
 
 | Stage | Name | Main action | Important constraint |
 |---|---|---|---|
-| K0 | Logo Reveal | Logo extends into view | Do not invent a Logo asset |
+| K0 | Logo Reveal | Supplied FP Logo extends into view | Use `public/images/fp-logo.svg`; preserve its source geometry |
 | K1 | SVG Annotation | Logo crossfades into vector annotation | Logo and annotation are not both fully visible |
 | K2 | First Scroll | First downward scroll removes temporary annotations; original guide lines move and expand; Part titles appear | One-time trigger; not scroll-progress-driven |
 | K3 | Part Framework & Theme Transition | Side boundaries move inward; titles/rules shrink; all colors transition | Layout and theme transition are synchronized |
@@ -941,7 +941,7 @@ SVG
 └── temporary-force-handles
 ```
 
-The exact path data and IDs will depend on the final Logo. The critical requirement is that the guide lines that survive K2 are the original visible lines from K1.
+The Logo source geometry is available at `public/images/fp-logo.svg`. The annotation geometry and IDs still need to be authored. The critical requirement is that the guide lines that survive K2 are the original visible lines from K1.
 
 ### 14.4 Part components
 
@@ -1256,7 +1256,7 @@ Not yet completed:
 
 ### 19.2 Phase 1 — Title Page
 
-**Status: first structural implementation created; Logo and visual review pending.**
+**Status: first structural implementation created; supplied Logo asset is now available; animation and visual review pending.**
 
 Implemented:
 
@@ -1271,7 +1271,8 @@ Implemented:
 
 Not yet completed:
 
-- Actual Logo asset and its vector path.
+- Integrate the supplied `public/images/fp-logo.svg` into the Title Page.
+- Prepare its SVG structure for K0/K1 animation while preserving the original paths.
 - K0 Logo reveal.
 - K1 Logo-to-SVG annotation crossfade.
 - SVG annotation geometry and line continuity.
@@ -1298,4 +1299,4 @@ Source files have been fetched again from the target branch after the changes, a
 
 ### 19.5 Next implementation step
 
-Continue Phase 1 visual calibration and then prepare the SVG annotation/Logo reveal architecture. The actual Logo asset is a required input for final K0/K1 geometry. Until it is supplied, do not create a substitute Logo or claim that K0/K1 are complete.
+Continue Phase 1 visual calibration, then integrate `public/images/fp-logo.svg` and prepare the SVG annotation/Logo reveal architecture. The asset is available, but K0/K1 are not implemented or verified yet.
