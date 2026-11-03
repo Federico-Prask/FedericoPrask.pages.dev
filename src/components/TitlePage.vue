@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from "../composables/useI18n";
 import { useTheme } from "../composables/useTheme";
+import LogoMark from "./LogoMark.vue";
 
 const { locale, setLocale } = useI18n();
 const { pref, resolved, cycle } = useTheme();
@@ -57,15 +58,7 @@ const { pref, resolved, cycle } = useTheme();
       </div>
 
       <div class="title-page__mark-space">
-        <img
-          class="title-page__logo"
-          src="/images/fp-logo.svg"
-          alt="FP monogram"
-          width="256"
-          height="256"
-          decoding="async"
-          fetchpriority="high"
-        />
+        <LogoMark />
       </div>
     </div>
   </section>
@@ -185,17 +178,10 @@ const { pref, resolved, cycle } = useTheme();
 
 .title-page__mark-space {
   display: grid;
+  width: min(100%, 25rem);
   min-width: 0;
   min-height: min(42vw, 34rem);
   place-items: center;
-}
-
-.title-page__logo {
-  display: block;
-  width: min(100%, 25rem);
-  max-height: min(66svh, 25rem);
-  aspect-ratio: 1;
-  object-fit: contain;
 }
 
 @media (max-width: 760px) {
@@ -219,12 +205,9 @@ const { pref, resolved, cycle } = useTheme();
   }
 
   .title-page__mark-space {
-    min-height: clamp(8rem, 24svh, 12rem);
-  }
-
-  .title-page__logo {
     width: clamp(8rem, 28vw, 11rem);
-    max-height: 12rem;
+    min-height: clamp(8rem, 24svh, 12rem);
+    justify-self: center;
   }
 }
 
