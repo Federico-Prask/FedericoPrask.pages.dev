@@ -182,6 +182,12 @@ The active application is a deliberately small Vue page. The old page compositio
 - [ ] Check console output and asset loading.
 - [ ] Re-test after final responsive and performance refinements.
 
+### K0/K1 handoff correction
+
+- [x] Bind the K0 completion listener directly to the final monogram-fill path and retain the animation-name guard.
+- [ ] Verify locally that K0 crossfades into the complete K1 annotation and that the normal Logo is fully gone.
+- [ ] Verify the F outline, all nine persistent guides, x/y annotations and Force handles remain visible in the K1 waiting state.
+
 ## 8. Current next actions
 
 1. Run the local app and inspect the opacity-and-blur plate entrance, reverse contour trace, final fill and K1 handoff; decide whether the contour trace matches the intended F-to-P growth.
