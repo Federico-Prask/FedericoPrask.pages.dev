@@ -1,6 +1,4 @@
-import { computed, ref } from "vue";
-import { zh, type Content } from "../data";
-import { en } from "../data-en";
+import { ref } from "vue";
 
 export type Locale = "zh" | "en";
 
@@ -8,40 +6,33 @@ const KEY = "co-locale";
 
 function readInitial(): Locale {
   try {
-    const v = localStorage.getItem(KEY);
-    if (v === "zh" || v === "en") return v;
+    const value = localStorage.getItem(KEY);
+    if (value === "zh" || value === "en") return value;
   } catch {
-    /* ignore */
+    /* Storage may be unavailable in restricted browsing contexts. */
   }
-  return "zh"; // 默认中文
+  return "zh";
 }
 
-// 模块级单例，所有组件共享同一语言状态
 const locale = ref<Locale>(readInitial());
 
-function apply() {
+function applyLocale() {
   try {
     localStorage.setItem(KEY, locale.value);
   } catch {
-    /* ignore */
+    /* The language still works for the current session without persistence. */
   }
+
   document.documentElement.lang = locale.value === "zh" ? "zh-CN" : "en";
 }
 
-apply();
+applyLocale();
 
 export function useI18n() {
-  const t = computed<Content>(() => (locale.value === "zh" ? zh : en));
+  function setLocale(nextLocale: Locale) {
+    locale.value = nextLocale;
+    applyLocale();
+  }
 
-  const setLocale = (l: Locale) => {
-    locale.value = l;
-    apply();
-  };
-
-  const toggleLocale = () => {
-    locale.value = locale.value === "zh" ? "en" : "zh";
-    apply();
-  };
-
-  return { locale, t, setLocale, toggleLocale };
+  return { locale, setLocale };
 }
