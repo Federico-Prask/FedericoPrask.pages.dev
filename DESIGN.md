@@ -351,7 +351,7 @@ Every dashed guide has one coordinate label at its source segment's **starting p
 - The numbers identify the original Logo path coordinates, not screen or viewport positions.
 - Coordinate labels use the active theme foreground color directly. Do not add a background-colored stroke, outline or halo around the text in either theme.
 
-Coordinate labels must be laid out so no two labels overlap. When labels compete for the same space, adjust their offsets and use separate rows where necessary while keeping each label associated with its source point. In particular, the two labels on the lower edge must not occupy the same row. Do not replace these point coordinates with generic `x` / `y` axis labels.
+Coordinate labels must be treated as one layout of eighteen rendered annotations. Calculate their text bounding boxes using the active technical font and the larger bracket size; check horizontal-to-horizontal and horizontal-to-vertical collisions, not merely the baseline positions. Reposition conflicting labels with separate rows or offsets while preserving each label's association with its source point. Keep a visible clearance between distinct labels, and ensure the two lower-edge labels do not occupy the same row. Do not replace these point coordinates with generic `x` / `y` axis labels.
 
 ### 5.5 Force annotation
 
