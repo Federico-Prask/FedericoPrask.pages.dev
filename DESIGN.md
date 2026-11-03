@@ -1,7 +1,7 @@
 # DESIGN.md — Personal Website Redesign
 
 > **Document status:** Active design specification  
-> **Target branch:** `redesign/intro-transition`  
+> **Target branch:** `dev`  
 > **Project:** Federico Prask — Personal Website  
 > **Last updated:** 2026-11-03  
 >
