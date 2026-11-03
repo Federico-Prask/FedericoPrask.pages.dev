@@ -107,9 +107,9 @@ The active application is a deliberately small Vue page. The old page compositio
 
 ### 4.1 K2 — Guide conversion
 
-- [ ] Trigger K2 on the first downward user scroll only.
-- [ ] Make the trigger one-shot; upward scrolling must not reverse or replay it.
-- [ ] Remove coordinate labels, Force nodes, Force handles and the complete original FP Logo outline when K2 begins.
+- [x] Trigger K2 on the first downward user scroll only after the K1 Logo annotation has reached its waiting state; support wheel, upward finger-swipe, and keyboard downward-navigation input.
+- [x] Make the trigger one-shot; upward scrolling must not reverse or replay it.
+- [x] Fade out and then hide coordinate labels, Force nodes, Force handles and the complete original FP Logo outline when K2 begins, while leaving the original persistent guide group untouched.
 - [ ] Preserve the original designated SVG guide-line elements; do not replace them with newly created borders.
 - [ ] Move the surviving guides to the bottom boundary of the entire Title Page composition.
 - [ ] Expand guide spacing horizontally with the specified fast Out Cubic character.
