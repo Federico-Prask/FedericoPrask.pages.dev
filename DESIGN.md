@@ -309,20 +309,26 @@ The exact reveal direction, extension distance, duration and easing are not yet 
 
 The Logo is the initial visual focus on the right side of the Title Page.
 
-**Implementation starting point (provisional):** use a left-to-right clipping reveal over the undistorted original SVG. This is a first motion pass, not a final direction or timing decision. Tune it in the browser before treating the motion values as settled.
+**Implementation starting point (provisional):** use a left-to-right clipping reveal over the undistorted original SVG. The current first pass uses a 1.35-second Out Cubic-like curve with a 350 ms initial delay. These are tuning values, not final decisions.
+
+K0 completion is detected from the Logo SVG's `animationend` event. K1 begins from that event; it must not depend on a hard-coded timer that can drift from the actual reveal.
 
 ### 5.2 K1 — SVG Annotation
 
 After the Logo reveal, the normal Logo transitions into an SVG construction annotation.
 
-This is a crossfade:
+This is a crossfade, started automatically when K0's reveal animation finishes:
 
 - Normal Logo opacity: 100% → 0%.
 - SVG annotation opacity: 0% → 100%.
 
-Both occupy the same visual region. They must not remain simultaneously fully visible.
+Both occupy the same 256 × 256 visual region and remain geometrically undistorted. They must not remain simultaneously fully visible.
+
+The initial crossfade implementation uses a 700 ms opacity transition. Treat this as a provisional value for browser tuning.
 
 At the end of the crossfade, the normal Logo is completely gone. The SVG annotation remains, including the F outline, x/y annotations, Force handles and reference lines. The F outline must not disappear at the end of K1; it remains visible throughout the waiting state and is removed only when K2 begins.
+
+K1 completion changes the presentation to a static waiting state. There is no K1 completion timer and no automatic continuation into K2.
 
 ### 5.3 SVG example and shape
 
@@ -333,7 +339,9 @@ The shape uses outline-only construction:
 - No background fill.
 - A rounded corner is used where the example's upper-left corner would otherwise be sharp.
 - The outline is a vector path.
+- The upper-left corner is rounded with a smooth cubic curve.
 - The annotation includes five horizontal reference dashed lines and four vertical reference dashed lines.
+- The nine guide paths are grouped separately from temporary construction details. Their SVG path elements are the persistent elements carried into K2.
 
 The supplied Logo is an FP monogram. The F remains the explanatory shape used in the annotation specification unless a later design decision explicitly changes the annotated geometry. The source asset is available at `public/images/fp-logo.svg`.
 
@@ -346,7 +354,7 @@ The SVG annotation includes position labels:
 
 These are structural annotations, not content labels.
 
-The exact label placement, typography, leader-line geometry and numeric formatting are not fixed.
+The exact label placement, typography, leader-line geometry and numeric formatting are not fixed. The first implementation uses small x/y labels with dimension ticks; their positions and proportions remain provisional.
 
 ### 5.5 Force annotation
 
@@ -360,6 +368,8 @@ Requirements:
 - Do not add a separate visible “Force” text label.
 
 The purpose is to show the force/handle relationship visually, not to turn the right side into a technical dashboard.
+
+The first implementation exposes two tangent handles for the rounded upper-left cubic corner. Their connector lines and control points are grouped separately from the persistent guides and are removed when K2 begins.
 
 ### 5.6 K1 waiting state
 
@@ -376,6 +386,8 @@ At this point:
 - The annotation does not morph or move before the first downward scroll.
 
 This waiting state is important. Do not start the layout transformation automatically after an arbitrary timeout.
+
+**Reduced-motion starting behavior (provisional):** users requesting reduced motion enter directly into the static K1 waiting composition. K0 and the K1 crossfade are skipped. This avoids delaying access to the annotated state while respecting the motion preference; verify this behavior during accessibility review.
 
 ---
 
@@ -1266,6 +1278,11 @@ Implemented:
 - Title Page targets `100svh`.
 - Left area contains the name “Federico Prask” and the website designation.
 - Right area displays the supplied `public/images/fp-logo.svg` without modifying its source geometry.
+- Added `src/components/LogoMark.vue` with an event-driven K0 reveal.
+- Added `src/components/LogoAnnotation.vue` with persistent guide paths and separate temporary construction groups.
+- K0 now hands off to K1 through the actual SVG animation completion event.
+- K1 crossfades the normal Logo out and the annotation in, then remains still.
+- Reduced-motion users start in the static K1 waiting composition.
 - Added `src/components/LogoMark.vue` with inline background and monogram groups preserving the original path elements.
 - Added the first provisional left-to-right clip-path extension reveal for K0.
 - Added a reduced-motion fallback that shows the full Logo immediately.
@@ -1276,11 +1293,9 @@ Implemented:
 
 Not yet completed:
 
-- Build the animation-ready SVG presentation around the supplied asset while preserving the original path data and fills.
-- K0 Logo reveal.
-- K1 Logo-to-SVG annotation crossfade.
-- SVG annotation geometry and line continuity.
-- Final visual review at desktop, tablet and mobile sizes.
+- Tune K0 and K1 timing, geometry, contrast and visual balance in a local browser.
+- Implement K2 using the original nine persistent SVG guide paths.
+- Verify the complete sequence at desktop, tablet and mobile sizes.
 
 ### 19.3 Application entry and active files
 
@@ -1288,7 +1303,9 @@ The active application is intentionally small:
 
 - `src/main.ts` — imports the global stylesheet and mounts the Vue application.
 - `src/App.vue` — minimal application shell.
-- `src/components/TitlePage.vue` — full-viewport opening composition and controls.
+- `src/components/TitlePage.vue` — full-viewport opening composition, settings and K0/K1 sequence controller.
+- `src/components/LogoMark.vue` — original FP Logo geometry and K0 reveal.
+- `src/components/LogoAnnotation.vue` — K1 construction overlay and persistent guide paths.
 - `src/styles/design-tokens.css` — semantic visual tokens.
 - `src/index.css` — Tailwind import and global base layer.
 - `src/composables/useI18n.ts` — lightweight shared locale state and persistence.
@@ -1304,4 +1321,4 @@ Source files have been fetched again from the target branch after the changes, a
 
 ### 19.5 Next implementation step
 
-Implement K0 using the supplied `public/images/fp-logo.svg`, then prepare the K1 annotation layer. Keep the source Logo paths intact; K0/K1 and the SVG annotation are not implemented or verified yet.
+Calibrate the K0/K1 sequence in a local browser, then implement K2 against the explicit persistent-guide groups in `LogoAnnotation.vue`. K0 and K1 are implemented in source but have not been locally built or visually verified.
