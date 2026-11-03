@@ -63,20 +63,21 @@ The active application is a deliberately small Vue page. The old page compositio
 
 ### 3.1 SVG preparation
 
-- [ ] Replace the static `<img>` presentation with an SVG component that can expose individual vector layers to animation.
-- [ ] Preserve the original `0 0 256 256` viewBox.
-- [ ] Preserve the source white rounded-square path exactly.
-- [ ] Preserve the source black FP monogram path exactly.
-- [ ] Add stable IDs / grouping around the existing paths without redrawing the Logo.
+- [x] Replace the static `<img>` presentation with `LogoMark.vue`, an inline SVG component with separately addressable vector layers.
+- [x] Preserve the original `0 0 256 256` viewBox.
+- [x] Preserve the source white rounded-square path exactly.
+- [x] Preserve the source black FP monogram path exactly.
+- [x] Add stable IDs / grouping around the existing paths without redrawing the Logo.
 - [ ] Keep the explanatory F-outline annotation as a separate construction layer; do not replace the FP Logo with an invented final mark.
 - [ ] Define explicit groups for persistent guide lines and temporary annotation elements.
 
 ### 3.2 K0 — Logo Reveal
 
-- [ ] Implement the extension-based reveal described in `DESIGN.md`.
+- [x] Implement the first provisional left-to-right clipping reveal described in `DESIGN.md`.
 - [ ] Tune direction, distance, duration and easing through browser iteration.
-- [ ] Keep the Logo aligned within the right side of the Title Page.
+- [x] Keep the Logo aligned within the right side of the Title Page.
 - [ ] Verify the reveal in Light and Dark modes and at narrow viewport widths.
+- [x] Make the Logo resolve immediately to its final visible state when reduced motion is requested.
 
 ### 3.3 K1 — SVG Annotation
 
@@ -174,7 +175,7 @@ The active application is a deliberately small Vue page. The old page compositio
 
 ## 8. Current next actions
 
-1. Build the inline/controlled SVG component from the supplied Logo while preserving both original path geometries.
-2. Implement K0 as an isolated, reviewable step.
+1. Review and calibrate the K0 reveal in a local browser, including reduced-motion behavior and responsive sizes.
+2. Implement K1 annotation as a separate layer; keep the F outline visible until K2 begins.
 3. Update this file and `DESIGN.md` after each completed implementation slice.
 4. Do not mark a task complete until its source and relevant behavior have been checked.
