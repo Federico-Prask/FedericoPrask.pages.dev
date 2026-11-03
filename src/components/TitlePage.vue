@@ -200,7 +200,7 @@ function handleAnnotationFadeEnd(event: TransitionEvent) {
   font-family: var(--font-heading);
   font-size: clamp(4.25rem, 10.4vw, 9.75rem);
   font-weight: 600;
-  letter-spacing: -0.085em;
+  letter-spacing: -0.035em;
   line-height: 0.84;
 }
 
