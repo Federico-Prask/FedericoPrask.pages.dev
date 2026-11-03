@@ -185,8 +185,6 @@ The left side presents the owner's name and the website designation. The name is
 
 The right side displays the supplied Logo asset at `public/images/fp-logo.svg`. The SVG has a `0 0 256 256` viewBox and exactly two path elements: a white rounded-square background and a black FP monogram. The source paths currently have no animation-specific IDs or grouping. Preserve both path geometries and their fills; any animation wrapper or IDs must be added without redrawing or changing the mark.
 
-The letter **F** described in Section 5 is an explanatory example for SVG annotation behavior, not approval to use a fabricated F mark as the final Logo.
-
 ### 3.4 Typography
 
 **Confirmed title-font constraints:**
@@ -316,61 +314,56 @@ The exact duration, easing, stroke-growth pacing and technical masking strategy 
 
 ### 5.2 K1 — SVG Annotation
 
-After the Logo reveal, the normal Logo transitions into an SVG construction annotation.
+After the Logo reveal, the normal Logo transitions into a construction view of the **complete supplied FP Logo**. The annotation must be derived from the actual FP monogram and its rounded-square background plate. It must never substitute a standalone F or a newly invented approximation.
 
 This is a crossfade, started automatically when K0's reveal animation finishes:
 
 - Normal Logo opacity: 100% → 0%.
 - SVG annotation opacity: 0% → 100%.
 
-Both occupy the same 256 × 256 visual region and remain geometrically undistorted. They must not remain simultaneously fully visible.
+Both occupy the same 256 × 256 visual region and remain geometrically undistorted. They must not remain simultaneously fully visible. The initial crossfade implementation uses a 700 ms opacity transition; treat this as a provisional value for browser tuning.
 
-The initial crossfade implementation uses a 700 ms opacity transition. Treat this as a provisional value for browser tuning.
-
-At the end of the crossfade, the normal Logo is completely gone. The SVG annotation remains, including the F outline, x/y annotations, Force handles and reference lines. The F outline must not disappear at the end of K1; it remains visible throughout the waiting state and is removed only when K2 begins.
+At the end of the crossfade, the normal filled Logo is completely gone. The complete source-derived FP outline, including the rounded background-plate frame, the dashed axis guides, coordinate labels and Force handles, remains visible throughout the K1 waiting state. These construction elements are removed or retained only according to their explicit K2 grouping.
 
 K1 completion changes the presentation to a static waiting state. There is no K1 completion timer and no automatic continuation into K2.
 
-### 5.3 SVG example and shape
+### 5.3 Original Logo outline and axis guides
 
-The current annotation description uses an **F** as an example of a vector shape.
+The construction view reuses the exact source path geometry from the supplied Logo:
 
-The shape uses outline-only construction:
+- The rounded-square background plate is shown as a **solid outline**.
+- The complete FP monogram is shown as a **solid outline**, preserving both its outer and inner contours.
+- The source fills are omitted in this construction view; no replacement F shape is drawn.
 
-- No background fill.
-- A rounded corner is used where the example's upper-left corner would otherwise be sharp.
-- The outline is a vector path.
-- The upper-left corner is rounded with a smooth cubic curve.
-- The annotation includes five horizontal reference dashed lines and four vertical reference dashed lines.
-- The nine guide paths are grouped separately from temporary construction details. Their SVG path elements are the persistent elements carried into K2.
+Every horizontal or vertical straight segment in those original paths receives one corresponding **dashed guide line**. The current source geometry contains eighteen such segments: four on the background plate and fourteen on the FP monogram. Each guide remains a separate SVG element with a stable ID.
 
-The supplied Logo is an FP monogram. The F remains the explanatory shape used in the annotation specification unless a later design decision explicitly changes the annotated geometry. The source asset is available at `public/images/fp-logo.svg`.
+The guide set is selective, not a background grid: no evenly spaced rows, columns or unrelated grid lines may be added. In the first implementation, each guide is offset slightly perpendicular to its source segment so the dashed line remains visually distinct from the solid Logo outline. The offset and line contrast remain subject to browser review.
+
+The eighteen guide paths are the persistent elements carried into K2. The original Logo outline, coordinate labels and Force handles are temporary construction elements and are removed when K2 begins.
 
 ### 5.4 Coordinate annotations
 
-The SVG annotation includes position labels:
+Every dashed guide has one coordinate label at its source segment's **starting point**, expressed in the Logo's original 256 × 256 viewBox coordinate system:
 
-- `x` identifies the corresponding horizontal position / boundary.
-- `y` identifies the corresponding vertical position / boundary.
+- Use the bracketed format `[ x , y ]`.
+- Labels associated with horizontal segments remain horizontal.
+- Labels associated with vertical segments rotate as a whole by 90 degrees; the brackets rotate with the coordinate text.
+- The numbers identify the original Logo path coordinates, not screen or viewport positions.
 
-These are structural annotations, not content labels.
-
-The exact label placement, typography, leader-line geometry and numeric formatting are not fixed. The first implementation uses small x/y labels with dimension ticks; their positions and proportions remain provisional.
+The exact label offset, font size and collision handling remain subject to visual calibration. Do not replace these point coordinates with generic `x` / `y` axis labels.
 
 ### 5.5 Force annotation
 
-Force is represented visually through vector-node tangent or handle geometry.
+Force handles mark the rounded curve corners in the actual Logo geometry:
 
-Requirements:
+- Mark all four rounded corners of the background plate.
+- Mark all four curved transitions in the FP monogram.
+- A solid connector joins each curve anchor to its corresponding tangent/control point.
+- Anchor nodes and control points remain visually distinct.
+- Force connector lines are **solid**, never dashed.
+- Do not display numeric Force values or a separate visible “Force” text label.
 
-- A handle connects to its corresponding vector node.
-- The handle resembles a tangent/control handle, using dashed line treatment where appropriate.
-- Do not display numeric Force values.
-- Do not add a separate visible “Force” text label.
-
-The purpose is to show the force/handle relationship visually, not to turn the right side into a technical dashboard.
-
-The first implementation exposes two tangent handles for the rounded upper-left cubic corner. Their connector lines and control points are grouped separately from the persistent guides and are removed when K2 begins.
+Handle directions and lengths must follow the curve tangents and curvature. They are construction handles, not decorative rays or a generic set of corner markers.
 
 ### 5.6 K1 waiting state
 
@@ -378,19 +371,15 @@ After K1 finishes, the scene remains still while waiting for the first downward 
 
 At this point:
 
-- The Title Page is still fully present.
-- The left-side text remains unchanged.
-- The normal Logo is no longer visible.
-- The SVG annotation remains visible, including the F outline.
-- The x/y position annotations remain visible.
-- The Force nodes and tangent handles remain visible.
+- The Title Page and left-side text remain unchanged.
+- The normal filled Logo is no longer visible.
+- The complete original FP Logo outline remains visible, including the rounded background-plate frame.
+- All eighteen source-derived dashed guides remain visible, with their coordinate labels at the corresponding segment starts.
+- The eight rounded corners retain their Force nodes and solid tangent/control handles.
+- No background grid is present.
 - The annotation does not morph or move before the first downward scroll.
 
 This waiting state is important. Do not start the layout transformation automatically after an arbitrary timeout.
-
-**Reduced-motion starting behavior (provisional):** users requesting reduced motion enter directly into the static K1 waiting composition. K0 and the K1 crossfade are skipped. This avoids delaying access to the annotated state while respecting the motion preference; verify this behavior during accessibility review.
-
----
 
 ## 6. First-scroll transition: K2
 
@@ -956,7 +945,7 @@ SVG
 └── temporary-force-handles
 ```
 
-The Logo source geometry is available at `public/images/fp-logo.svg`. The annotation geometry and IDs still need to be authored. The critical requirement is that the guide lines that survive K2 are the original visible lines from K1.
+The Logo source geometry is available at `public/images/fp-logo.svg`. The annotation now reuses the supplied FP Logo geometry. Its eighteen dashed guide paths are the original visible K1 elements that survive into K2; browser verification is still required.
 
 ### 14.4 Part components
 
@@ -1297,7 +1286,7 @@ Implemented:
 Not yet completed:
 
 - Tune K0 and K1 timing, geometry, contrast and visual balance in a local browser.
-- Implement K2 using the original nine persistent SVG guide paths.
+- Implement K2 using the original eighteen persistent SVG guide paths.
 - Verify the complete sequence at desktop, tablet and mobile sizes.
 
 ### 19.3 Application entry and active files
