@@ -7,7 +7,7 @@ const { pref, resolved, cycle } = useTheme();
 </script>
 
 <template>
-  <section class="title-page" aria-labelledby="page-title">
+  <section id="title-page" class="title-page" aria-labelledby="page-title">
     <div class="title-page__controls" role="group" :aria-label="locale === 'zh' ? '页面设置' : 'Page settings'">
       <div class="title-page__language" role="group" :aria-label="locale === 'zh' ? '语言' : 'Language'">
         <button
