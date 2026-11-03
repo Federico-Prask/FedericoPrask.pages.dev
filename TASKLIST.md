@@ -99,8 +99,8 @@ The active application is a deliberately small Vue page. The old page compositio
 - [ ] Visually verify that the complete FP outline, all nineteen guides, coordinate labels and Force handles remain visible throughout the K1 waiting state.
 - [ ] Visually verify that the normal filled Logo is fully gone at the end of the crossfade.
 - [ ] Visually verify the rounded plate frame and FP monogram have matching 1.7px solid outline widths, both clearly heavier than the 0.65px butt-ended dashed guides.
-- [ ] Verify in the browser that all nineteen coordinate labels remain collision-free with the actual loaded technical font, at the rendered K1 Logo size.
-- [x] Calculate the coordinate-label text bounds and reposition the colliding labels; the conservative monospace estimate now has zero label-to-label intersections and approximately 4 SVG units of minimum clearance. Browser/font-metric verification remains pending.
+- [ ] Verify in the browser that all nineteen coordinate labels remain clear of one another and of the rounded background-plate outline, with the actual loaded technical font and at the rendered K1 Logo size.
+- [x] Calculate the coordinate-label text bounds and reposition the colliding labels; the conservative monospace estimate now has zero label-to-label intersections and approximately 3.62 SVG units of minimum clearance; the left/right plate labels are inset to clear the frame strokes. Browser/font-metric verification remains pending.
 - [ ] Visually tune K1 dashed-line rhythm, coordinate-label positions, handle scale and crossfade timing in the browser.
 
 ## 4. Phase 2 — First-scroll transition
