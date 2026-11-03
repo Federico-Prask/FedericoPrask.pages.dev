@@ -349,6 +349,7 @@ Every dashed guide has one coordinate label at its source segment's **starting p
 - Labels associated with horizontal segments remain horizontal.
 - Labels associated with vertical segments rotate as a whole by 90 degrees; the brackets rotate with the coordinate text.
 - The numbers identify the original Logo path coordinates, not screen or viewport positions.
+- Coordinate labels use the active theme foreground color directly. Do not add a background-colored stroke, outline or halo around the text in either theme.
 
 The exact label offset, font size and collision handling remain subject to visual calibration. Do not replace these point coordinates with generic `x` / `y` axis labels.
 
