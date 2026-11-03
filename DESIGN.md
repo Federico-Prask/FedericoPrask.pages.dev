@@ -1344,7 +1344,7 @@ Provisional timing: plate 820ms after 180ms delay; contour trace 1,650ms after 1
 
 The K0 plate entrance uses a simultaneous opacity-and-focus transition: opacity rises from 0 to 1 while blur decreases from 24px to 1px over the same duration and easing. This is a whole-plate soft-focus entrance, not a gradient mask or a moving clip edge. The original SVG path geometry and fill remain unchanged.
 
-In Light mode, the normal Logo is inverted as a whole so its white plate becomes dark and its black monogram becomes light; in Dark mode, the source colors are retained. The inversion is applied to the normal Logo layer only, not the separate construction annotation.
+In Light mode, the normal Logo is inverted as a whole so its white plate becomes dark and its black monogram becomes light; in Dark mode, the source colors are retained. The inversion is applied to the normal Logo layer only, not the separate construction annotation. Its filter transition is 100ms.
 
 The Logo sizing is also being decoupled from small viewport-width changes. Desktop layout gives the Logo column a larger minimum width and reduces the viewport-proportional inter-column gap; the Logo itself uses a bounded responsive size. Narrow layouts use a wider viewport-relative range with a larger minimum and maximum than the previous 28vw rule. These are first-pass CSS values and require browser review at desktop, intermediate and narrow widths.
 
