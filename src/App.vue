@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import TitlePage from "./components/TitlePage.vue";
+import { useI18n } from "./composables/useI18n";
+
+const { locale } = useI18n();
 </script>
 
 <template>
   <a class="skip-link" href="#main-content">
-    Skip to content
+    {{ locale === 'zh' ? '跳至正文' : 'Skip to content' }}
   </a>
 
   <main id="main-content">
