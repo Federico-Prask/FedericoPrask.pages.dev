@@ -109,7 +109,7 @@ import LogoMark from "./LogoMark.vue";
 
 .axis-guides {
   fill: none;
-  stroke: var(--site-hero-foreground);
+  stroke: var(--site-brand);
   stroke-width: 0.85;
   stroke-dasharray: 2.6 4.2;
   stroke-linecap: round;
