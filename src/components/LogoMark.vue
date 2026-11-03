@@ -108,7 +108,7 @@ function onRevealAnimationEnd() {
 .fp-logo--outline .fp-logo__plate path {
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.1;
+  stroke-width: 2.2;
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
 }
