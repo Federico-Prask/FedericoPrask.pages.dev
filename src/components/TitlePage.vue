@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 import { useI18n } from "../composables/useI18n";
 import { useTheme } from "../composables/useTheme";
 import LogoMark from "./LogoMark.vue";
@@ -16,6 +16,65 @@ const prefersReducedMotion =
 
 const logoStage = ref<LogoStage>(prefersReducedMotion ? "waiting" : "reveal");
 
+const k2Started = ref(false);
+let touchStartY: number | null = null;
+
+function beginK2() {
+  if (k2Started.value || logoStage.value !== "waiting") return;
+  k2Started.value = true;
+}
+
+function handleWheel(event: WheelEvent) {
+  if (event.deltaY > 0) beginK2();
+}
+
+function handleTouchStart(event: TouchEvent) {
+  touchStartY = event.touches[0]?.clientY ?? null;
+}
+
+function handleTouchMove(event: TouchEvent) {
+  const currentY = event.touches[0]?.clientY;
+  if (touchStartY !== null && currentY !== undefined && touchStartY - currentY > 8) {
+    beginK2();
+  }
+  touchStartY = currentY ?? null;
+}
+
+function handleTouchEnd() {
+  touchStartY = null;
+}
+
+function isInteractiveTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  return Boolean(target.closest("button, a, input, textarea, select, [contenteditable='true']"));
+}
+
+function handleKeydown(event: KeyboardEvent) {
+  if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+  if (isInteractiveTarget(event.target)) return;
+  if (event.key === "ArrowDown" || event.key === "PageDown" || event.key === " " || event.key === "End") {
+    beginK2();
+  }
+}
+
+onMounted(() => {
+  window.addEventListener("wheel", handleWheel, { passive: true });
+  window.addEventListener("touchstart", handleTouchStart, { passive: true });
+  window.addEventListener("touchmove", handleTouchMove, { passive: true });
+  window.addEventListener("touchend", handleTouchEnd, { passive: true });
+  window.addEventListener("touchcancel", handleTouchEnd, { passive: true });
+  window.addEventListener("keydown", handleKeydown);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("wheel", handleWheel);
+  window.removeEventListener("touchstart", handleTouchStart);
+  window.removeEventListener("touchmove", handleTouchMove);
+  window.removeEventListener("touchend", handleTouchEnd);
+  window.removeEventListener("touchcancel", handleTouchEnd);
+  window.removeEventListener("keydown", handleKeydown);
+});
+
 function handleLogoRevealEnd() {
   if (logoStage.value === "reveal") {
     logoStage.value = "crossfade";
@@ -30,7 +89,7 @@ function handleAnnotationFadeEnd(event: TransitionEvent) {
 </script>
 
 <template>
-  <section id="title-page" class="title-page" aria-labelledby="page-title">
+  <section id="title-page" class="title-page" :class="{ 'has-started-k2': k2Started }" aria-labelledby="page-title">
     <div class="title-page__controls" role="group" :aria-label="locale === 'zh' ? '页面设置' : 'Page settings'">
       <div class="title-page__language" role="group" :aria-label="locale === 'zh' ? '语言' : 'Language'">
         <button
@@ -99,7 +158,7 @@ function handleAnnotationFadeEnd(event: TransitionEvent) {
             :aria-hidden="logoStage === 'reveal'"
             @transitionend.self="handleAnnotationFadeEnd"
           >
-            <LogoAnnotation />
+            <LogoAnnotation :k2-started="k2Started" />
           </div>
         </div>
       </div>
