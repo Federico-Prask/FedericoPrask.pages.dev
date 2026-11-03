@@ -347,7 +347,7 @@ Every dashed guide has one coordinate label at its source segment's **starting p
 
 - Use the bracketed format `[ x , y ]`.
 - Labels associated with horizontal segments remain horizontal.
-- Labels associated with vertical segments use a three-line vertical arrangement: the opening square bracket, the complete coordinate pair, then the closing square bracket. The coordinate pair itself stays on one horizontal line; its numbers, comma and spaces are never rotated. Each square bracket is a separate SVG text element and is rotated explicitly with an SVG transform of 90 degrees around its own position; do not rely on the SVG text `rotate` character-list attribute. The two bracket glyphs use a larger font size than the coordinate text.
+- Labels associated with vertical segments use a five-line arrangement: opening square bracket, x-coordinate, comma, y-coordinate, closing square bracket. Each item occupies its own line, in the exact order `[`, `x`, `,`, `y`, `]`. All glyphs remain in their normal horizontal orientation: neither bracket is rotated, and the x-coordinate, comma and y-coordinate are not combined onto one line. The two square-bracket glyphs use a larger font size than the coordinate text.
 - The numbers identify the original Logo path coordinates, not screen or viewport positions.
 - Coordinate labels use the active theme foreground color directly. Do not add a background-colored stroke, outline or halo around the text in either theme.
 
