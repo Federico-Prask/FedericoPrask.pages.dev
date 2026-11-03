@@ -337,7 +337,7 @@ The construction view reuses the exact source path geometry from the supplied Lo
 
 Every horizontal or vertical straight segment in those original paths receives one corresponding **dashed guide line**. The current source geometry contains eighteen such segments: four on the background plate and fourteen on the FP monogram. Each guide remains a separate SVG element with a stable ID.
 
-The guide set is selective, not a background grid: no evenly spaced rows, columns or unrelated grid lines may be added. In the first implementation, each guide is offset slightly perpendicular to its source segment so the dashed line remains visually distinct from the solid Logo outline. The offset and line contrast remain subject to browser review.
+The guide set is selective, not a background grid: no evenly spaced rows, columns or unrelated grid lines may be added. Each guide lies exactly on its source segment's original horizontal or vertical coordinate, with **no perpendicular offset**. A horizontal guide spans the full original Logo viewBox width (`x = 0` through `x = 256`); a vertical guide spans its full original height (`y = 0` through `y = 256`). The guides therefore extend to the boundaries of the Logo's own 256 × 256 frame and never enlarge that frame. Each guide uses the active theme foreground color (`currentColor`) at full opacity. Where a guide coincides with the solid Logo outline, the underlying outline remains solid; the dashed rhythm is visible along the guide's extension beyond the Logo segment.
 
 The eighteen guide paths are the persistent elements carried into K2. The original Logo outline, coordinate labels and Force handles are temporary construction elements and are removed when K2 begins.
 
