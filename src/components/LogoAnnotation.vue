@@ -70,7 +70,7 @@ import LogoMark from "./LogoMark.vue";
         <text x="158" y="197.5" text-anchor="middle">191</text>
         <text class="coordinate-bracket" x="158" y="204" text-anchor="middle" transform="rotate(90 158 204)">]</text>
       </g>
-      <text class="coordinate-label" data-guide-ref="guide-mono-h-02" x="153" y="282" text-anchor="end">[ 153 , 256 ]</text>
+      <text class="coordinate-label" data-guide-ref="guide-mono-h-02" x="153" y="285" text-anchor="end">[ 153 , 256 ]</text>
       <g class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-mono-v-03">
         <text class="coordinate-bracket" x="126" y="225" text-anchor="middle" transform="rotate(90 126 225)">[</text>
         <text x="126" y="231.5" text-anchor="middle">121</text>
@@ -94,7 +94,7 @@ import LogoMark from "./LogoMark.vue";
         <text x="92" y="78.5" text-anchor="middle">72</text>
         <text class="coordinate-bracket" x="92" y="85" text-anchor="middle" transform="rotate(90 92 85)">]</text>
       </g>
-      <text class="coordinate-label" data-guide-ref="guide-mono-h-05" x="86" y="96" text-anchor="start">[ 86 , 102 ]</text>
+      <text class="coordinate-label" data-guide-ref="guide-mono-h-05" x="86" y="98" text-anchor="start">[ 86 , 102 ]</text>
       <g class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-mono-v-06">
         <text class="coordinate-bracket" x="153" y="89" text-anchor="middle" transform="rotate(90 153 89)">[</text>
         <text x="153" y="95.5" text-anchor="middle">148</text>
@@ -102,7 +102,7 @@ import LogoMark from "./LogoMark.vue";
         <text x="153" y="108.5" text-anchor="middle">102</text>
         <text class="coordinate-bracket" x="153" y="115" text-anchor="middle" transform="rotate(90 153 115)">]</text>
       </g>
-      <text class="coordinate-label" data-guide-ref="guide-mono-h-06" x="148" y="147" text-anchor="end">[ 148 , 131 ]</text>
+      <text class="coordinate-label" data-guide-ref="guide-mono-h-06" x="152" y="147" text-anchor="end">[ 148 , 131 ]</text>
       <g class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-mono-v-07">
         <text class="coordinate-bracket" x="92" y="118" text-anchor="middle" transform="rotate(90 92 118)">[</text>
         <text x="92" y="124.5" text-anchor="middle">86</text>
