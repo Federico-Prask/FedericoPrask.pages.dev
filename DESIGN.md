@@ -1322,6 +1322,19 @@ Source files have been fetched again from the target branch after the changes, a
 
 **A local Vite production build and browser visual review have not yet been run.** Do not report the current implementation as build-verified or visually approved.
 
-### 19.5 Next implementation step
+### 19.5 Current K0 source implementation
 
-Replace the obsolete K0 left-to-right clip with the two-stage reveal specified in Section 5.1, then calibrate K0/K1 in a local browser. After the revised K0 is stable, implement K2 against the explicit persistent-guide groups in `LogoAnnotation.vue`. K0 and K1 source behavior has not yet been locally build-verified or visually approved.
+The obsolete left-to-right clip has been replaced with a first source-level implementation of the two-stage reveal:
+
+- The original white plate path is revealed bottom-to-top using an inset clip.
+- The original black monogram path is retained unchanged and duplicated into two SVG layers: a no-fill trace layer and the final filled layer.
+- The trace layer uses SVG path dashing with a normalized `pathLength` to draw the existing closed contour in reverse path direction, beginning at the path's final point near the F stem's lower terminal and proceeding toward the path's initial point.
+- The filled monogram appears immediately after the contour trace, restoring the exact original solid mark before K1 begins.
+- The K0 completion event is emitted only when the final fill animation ends; this event starts the existing K1 crossfade.
+- Reduced-motion users still receive the complete static Logo and enter the existing static K1 waiting state.
+
+This is a **geometry-preserving contour-trace prototype**, not yet a visually approved interpretation of the requested stroke growth. The supplied monogram is a closed filled outline, not a set of centerline strokes. The current trace therefore follows its perimeter rather than an inferred centerline. Browser review must determine whether this reads as the intended F-to-P growth; do not claim that centerline data exists in the source asset.
+
+Provisional timing: plate 820ms after 180ms delay; contour trace 1,650ms after 1,050ms delay; final fill 140ms after 2,620ms delay. These values are implementation starting points, not approved motion specifications.
+
+**Next step:** run the local app and visually inspect the direction and pacing of the contour trace, plate reveal, final fill and K1 handoff. If the trace does not match the intended visual, revise the reveal method before implementing K2. K0/K1 have not yet been locally build-verified or visually approved.
