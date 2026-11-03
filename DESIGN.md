@@ -1004,7 +1004,7 @@ No new animation library is mandated by this document. First evaluate whether th
 
 - Full-viewport initial composition.
 - Left name / website designation.
-- Right Logo reservation.
+- Supplied FP Logo in the right-side Title Page area.
 - Language and theme controls in a non-Header placement.
 - Responsive layout.
 
@@ -1013,7 +1013,7 @@ No new animation library is mandated by this document. First evaluate whether th
 - The initial page fills the visible viewport.
 - No traditional Header exists.
 - The name remains visually dominant.
-- The missing Logo is not replaced by invented artwork.
+- The supplied Logo is used without redrawing or substituting its geometry.
 - Both language and theme functions work.
 
 ### Phase 2 — K0 and K1
@@ -1266,6 +1266,9 @@ Implemented:
 - Title Page targets `100svh`.
 - Left area contains the name “Federico Prask” and the website designation.
 - Right area displays the supplied `public/images/fp-logo.svg` without modifying its source geometry.
+- Added `src/components/LogoMark.vue` with inline background and monogram groups preserving the original path elements.
+- Added the first provisional left-to-right clip-path extension reveal for K0.
+- Added a reduced-motion fallback that shows the full Logo immediately.
 - Chinese / English selection remains functional.
 - Theme selection remains functional and retains the existing system/light/dark preference cycle.
 - Controls are integrated into the Title Page; no Header is rendered.
