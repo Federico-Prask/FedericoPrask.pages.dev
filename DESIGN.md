@@ -404,7 +404,7 @@ When K2 starts, these annotation elements disappear:
 - x/y labels and their position markers.
 - Force nodes.
 - Force tangent/control handles.
-- The F outline itself.
+- The complete original FP Logo outline, including the rounded background-plate frame.
 
 The normal Logo has already disappeared during K1.
 
