@@ -1,0 +1,103 @@
+@theme {
+  /* Typography: display headings stay sans-serif and proportional. */
+  --font-heading: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", "Cascadia Code", monospace;
+
+  /* Light palette */
+  --color-page: #f4f3ee;
+  --color-page-soft: #e9e8e1;
+  --color-panel: #fbfaf6;
+  --color-text: #18181b;
+  --color-text-secondary: #3f3f46;
+  --color-text-muted: #6e6e76;
+  --color-rule: rgb(24 24 27 / 22%);
+  --color-rule-strong: rgb(24 24 27 / 55%);
+  --color-brand: #9cb8d7;
+  --color-brand-strong: #7e9fc5;
+  --color-brand-ink: #5b7da3;
+  --color-brand-deep: #263d58;
+  --color-brand-pale: #dce7f2;
+
+  /* Hero monochrome endpoints */
+  --color-title-light: #f4f3ee;
+  --color-title-dark: #0b0b0c;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --color-page: #0b0f15;
+  --color-page-soft: #111b28;
+  --color-panel: #162638;
+  --color-text: #e7edf4;
+  --color-text-secondary: #b2c1d0;
+  --color-text-muted: #8294a7;
+  --color-rule: rgb(231 237 244 / 17%);
+  --color-rule-strong: rgb(231 237 244 / 44%);
+  --color-brand: #a9c5e4;
+  --color-brand-strong: #9cb8d7;
+  --color-brand-ink: #c5d9ee;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+html {
+  background: var(--color-page);
+}
+
+body {
+  margin: 0;
+  background: var(--color-page);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+::selection {
+  background: var(--color-brand);
+  color: #18181b;
+}
+
+.dark ::selection {
+  background: var(--color-brand-strong);
+  color: #0b0f15;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
+}
