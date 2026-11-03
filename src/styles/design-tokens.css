@@ -63,6 +63,7 @@
 
   /* Shared brand identity. */
   --site-brand: #9cb8d7;
+  --site-guide: #a9c5e4;
   --site-brand-strong: #7e9fc5;
   --site-brand-text: #5b7da3;
 }
@@ -88,6 +89,7 @@
 
   /* Shared brand identity with dark-mode contrast adjustment. */
   --site-brand: #a9c5e4;
+  --site-guide: #5b7da3;
   --site-brand-strong: #9cb8d7;
   --site-brand-text: #b5cfe9;
 }
