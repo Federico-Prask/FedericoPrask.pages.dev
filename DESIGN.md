@@ -1289,7 +1289,7 @@ The active application is intentionally small:
 - `src/composables/useI18n.ts` — lightweight shared locale state and persistence.
 - `src/composables/useTheme.ts` — shared theme preference and system-theme synchronization.
 
-Legacy page components, their UI primitives, the old content-data model, unused font stylesheets and the empty router placeholder are being removed from the redesign branch. The old content data is not used as a source for the new page; new content will be curated against the four-Part structure in this document.
+Legacy page components, their UI primitives, the old content-data model, unused font stylesheets and the empty router placeholder have been removed from the redesign branch. The old content data is not used as a source for the new page; new content will be curated against the four-Part structure in this document.
 
 ### 19.4 Verification status
 
