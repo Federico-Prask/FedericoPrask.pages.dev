@@ -25,7 +25,7 @@ The active application is a deliberately small Vue page. The old page compositio
 - Language and theme controls remain available.
 - The Logo uses the original SVG viewBox, path data and fills.
 - K0 now has a source-level two-stage prototype: opacity-and-blur plate entrance, reverse contour trace of the original monogram path, then the original solid fill. The contour interpretation, plate focus-in appearance, theme inversion and timing still require browser review.
-- K1 now has a source-derived construction view of the complete FP Logo: solid plate/monogram outlines, eighteen unshifted full-span dashed guides in the active theme color, bracketed start coordinates and solid Force handles at eight rounded corners. K0/K1 are not yet visually approved.
+- K1 now has a source-derived construction view of the complete FP Logo: solid plate/monogram outlines, eighteen unshifted full-span dashed guides in the theme-adaptive brand blue, bracketed start coordinates and solid Force handles at eight rounded corners. K0/K1 are not yet visually approved.
 - K2–K5 are not implemented.
 - The four content Parts are not implemented.
 - A local production build and browser visual review have not been completed.
