@@ -249,4 +249,11 @@ const props = withDefaults(defineProps<{ k2Started?: boolean }>(), {
   fill: currentColor;
   stroke: none;
 }
+@media (prefers-reduced-motion: reduce) {
+  #annotation-original-logo,
+  #annotation-coordinate-labels,
+  #annotation-force-handles {
+    transition: none;
+  }
+}
 </style>
