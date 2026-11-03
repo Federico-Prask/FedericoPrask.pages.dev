@@ -1348,3 +1348,6 @@ In Light mode, the normal Logo is inverted as a whole so its white plate becomes
 
 The Logo sizing is also being decoupled from small viewport-width changes. Desktop layout gives the Logo column a larger minimum width and reduces the viewport-proportional inter-column gap; the Logo itself uses a bounded responsive size. Narrow layouts use a wider viewport-relative range with a larger minimum and maximum than the previous 28vw rule. These are first-pass CSS values and require browser review at desktop, intermediate and narrow widths.
 
+### 19.7 K0-to-K1 handoff reliability correction
+
+The K0 completion listener is bound directly to the final monogram-fill path rather than relying on an animation event bubbling from the root SVG. The handler still checks for the exact `fp-monogram-fill` animation name before emitting the completion event. This makes the intended K0 → K1 state transition explicit at the element that owns the final animation. The change is source-level only; local runtime behavior and the complete K1 annotation still require browser verification.
