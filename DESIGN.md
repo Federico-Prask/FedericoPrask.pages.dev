@@ -199,6 +199,8 @@ The letter **F** described in Section 5 is an explanatory example for SVG annota
 
 A sans-serif family such as Inter may be used as the current implementation starting point, but exact family, weight, optical size, line-height and tracking should be evaluated in the final composition.
 
+**Tracking feedback:** the current lettering feels too tightly spaced. Loosen letter spacing in the next typography pass, with particular attention to the large name heading. The current strongly negative tracking on the name (`-0.085em`) is too compressed and must be reduced substantially or removed. Do not apply one indiscriminate tracking value to every text role; tune headings, subtitles, controls and technical annotations according to their scale and function.
+
 Monospace typography may still be used selectively for technical annotations, coordinates, short labels or metadata where it improves the visual language. It must not become the main title face.
 
 ### 3.5 Hero controls
@@ -303,15 +305,14 @@ The opening sequence presents the Logo and then its vector construction.
 
 ### 5.1 K0 — Logo Reveal
 
-The Logo appears through an extension-based reveal animation.
+The Logo is the initial visual focus on the right side of the Title Page. Its reveal is a **two-stage, sequential animation**:
 
-The exact reveal direction, extension distance, duration and easing are not yet fixed. The movement should feel deliberate and structural rather than like a generic fade or scale-in.
+1. **Background plate — bottom-up reveal.** The white rounded-square background plate begins to appear at the Logo's bottom edge and reveals upward until the complete plate is visible. The black FP monogram remains hidden during this first stage. Preserve the original background path geometry and fill.
+2. **FP monogram — path-following growth.** Once the background plate is fully visible, the black FP monogram grows along the actual designed line/path. Growth begins at the bottom terminal of the F and proceeds continuously through the mark, finishing at the terminal end of the P. The reveal must follow the Logo's vector geometry rather than using a generic rectangular wipe, whole-mark fade or scale-in.
 
-The Logo is the initial visual focus on the right side of the Title Page.
+Preserve the original monogram path geometry and fill. The implementation may use a path-derived mask, clip or another geometry-aware reveal technique, but must not redraw the monogram as a different outline or distort the supplied path. The visual result should read as the Logo's strokes being drawn from the F's bottom toward the P's endpoint.
 
-**Implementation starting point (provisional):** use a left-to-right clipping reveal over the undistorted original SVG. The current first pass uses a 1.35-second Out Cubic-like curve with a 350 ms initial delay. These are tuning values, not final decisions.
-
-K0 completion is detected from the Logo SVG's `animationend` event. K1 begins from that event; it must not depend on a hard-coded timer that can drift from the actual reveal.
+The exact duration, easing, stroke-growth pacing and technical masking strategy remain open for visual implementation and browser tuning. K0 completion is detected only after **both** stages have finished. K1 begins from that actual completion event; it must not depend on a hard-coded timer that can drift from the reveal.
 
 ### 5.2 K1 — SVG Annotation
 
@@ -1154,7 +1155,9 @@ The following are intentionally not fixed yet. They should be resolved through v
 
 ### 16.2 Motion details
 
-- Logo extension direction, distance and duration.
+- Background plate bottom-up reveal duration and easing.
+- FP monogram path-growth pacing, duration and easing from the F bottom terminal to the P endpoint.
+- Exact geometry-aware masking / reveal technique for the supplied filled monogram path.
 - Logo / annotation crossfade duration.
 - Guide movement and expansion duration.
 - Pause before Part title reveal.
@@ -1199,7 +1202,7 @@ Use this checklist when reviewing implementation changes.
 - [ ] Chinese / English switching remains available.
 - [ ] Light / Dark switching remains available.
 - [ ] Title typography is sans-serif and proportional.
-- [ ] K0 reveals the Logo through extension motion.
+- [ ] K0 first reveals the white rounded-square background plate from bottom to top, then grows the FP monogram along its vector path from the F bottom terminal to the P endpoint.
 - [ ] K1 crossfades the Logo into SVG annotation.
 - [ ] The annotation remains still while waiting.
 - [ ] K2 starts on the first downward user scroll only.
@@ -1284,7 +1287,7 @@ Implemented:
 - K1 crossfades the normal Logo out and the annotation in, then remains still.
 - Reduced-motion users start in the static K1 waiting composition.
 - Added `src/components/LogoMark.vue` with inline background and monogram groups preserving the original path elements.
-- Added the first provisional left-to-right clip-path extension reveal for K0.
+- Added a first-pass left-to-right clip-path reveal for K0; this is now an obsolete prototype and must be replaced by the two-stage bottom-up plate reveal and path-following monogram growth.
 - Added a reduced-motion fallback that shows the full Logo immediately.
 - Chinese / English selection remains functional.
 - Theme selection remains functional and retains the existing system/light/dark preference cycle.
@@ -1321,4 +1324,4 @@ Source files have been fetched again from the target branch after the changes, a
 
 ### 19.5 Next implementation step
 
-Calibrate the K0/K1 sequence in a local browser, then implement K2 against the explicit persistent-guide groups in `LogoAnnotation.vue`. K0 and K1 are implemented in source but have not been locally built or visually verified.
+Replace the obsolete K0 left-to-right clip with the two-stage reveal specified in Section 5.1, then calibrate K0/K1 in a local browser. After the revised K0 is stable, implement K2 against the explicit persistent-guide groups in `LogoAnnotation.vue`. K0 and K1 source behavior has not yet been locally build-verified or visually approved.
