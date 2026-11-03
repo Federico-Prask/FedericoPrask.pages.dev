@@ -1,7 +1,7 @@
 # TASKLIST.md — Implementation Tracker
 
 > **Project:** Federico Prask — Personal Website  
-> **Branch:** `redesign/intro-transition`  
+> **Branch:** `dev`  
 > **Last updated:** 2026-11-03  
 > **Design authority:** `DESIGN.md`
 >
