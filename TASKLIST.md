@@ -24,13 +24,13 @@ The active application is a deliberately small Vue page. The old page compositio
 - The full-screen Title Page structure exists.
 - Language and theme controls remain available.
 - The Logo uses the original SVG viewBox, path data and fills.
-- K0 currently contains an obsolete first-pass left-to-right clipping reveal; it does not yet implement the revised two-stage animation.
-- K1's annotation sequence exists in source, but K0 must be revised before the sequence is ready for visual approval.
+- K0 now has a source-level two-stage prototype: bottom-up plate reveal, reverse contour trace of the original monogram path, then the original solid fill. The contour interpretation and timing still require browser review.
+- K1's annotation sequence remains event-driven from K0 completion; K0/K1 are not yet visually approved.
 - K2–K5 are not implemented.
 - The four content Parts are not implemented.
 - A local production build and browser visual review have not been completed.
 
-**Next implementation target:** replace K0 with the bottom-up background-plate reveal followed by path-following FP monogram growth, loosen the overly tight title tracking, then verify the complete K0/K1 sequence in a browser. Preserve the F outline through the entire K1 waiting state; it disappears only when K2 begins.
+**Next implementation target:** run and visually inspect the K0/K1 prototype. The name tracking has been loosened in source; its final spacing still needs browser review. Preserve the F outline through the entire K1 waiting state; it disappears only when K2 begins.
 
 ## 2. Foundation and repository cleanup
 
@@ -76,9 +76,9 @@ The active application is a deliberately small Vue page. The old page compositio
 ### 3.2 K0 — Logo Reveal
 
 - [x] Implement the original first-pass left-to-right clipping reveal (obsolete prototype; retained only as implementation history).
-- [ ] Replace the prototype with the two-stage K0 sequence: reveal the white rounded-square background plate from bottom to top, then grow the FP monogram along its actual vector path from the bottom terminal of F to the terminal end of P.
-- [ ] Implement a geometry-aware reveal for the supplied filled monogram without redrawing or distorting its source path.
-- [ ] Loosen the Title Page name tracking; review letter spacing across the Title Page typography.
+- [x] Replace the old left-to-right clip with a two-stage source prototype: reveal the white plate bottom-to-top, then trace the original monogram contour in reverse from its final path point near the F stem's lower terminal.
+- [x] Preserve the original filled monogram path geometry; use a separate no-fill trace layer and restore the exact solid fill after tracing. (Visual interpretation remains unverified.)
+- [x] Loosen the Title Page name tracking from -0.085em to -0.035em. (Final spacing still needs browser review.)
 - [ ] Tune the revised K0 stage timing and easing through browser iteration.
 - [ ] Tune K0 and K1 together so the crossfade begins exactly after the reveal completes.
 - [x] Keep the Logo aligned within the right side of the Title Page.
@@ -182,7 +182,7 @@ The active application is a deliberately small Vue page. The old page compositio
 
 ## 8. Current next actions
 
-1. Replace the obsolete K0 clip reveal with the bottom-up background plate followed by path-following FP monogram growth; loosen the overly tight name tracking.
+1. Run the local app and inspect the K0 plate reveal, reverse contour trace, final fill and K1 handoff; decide whether the contour trace matches the intended F-to-P growth.
 2. Review and calibrate revised K0/K1 in a local browser, including the full waiting state, reduced-motion behavior and responsive sizes.
 3. Implement K2 against the persistent guide elements; do not recreate the lines.
 4. Update this file and `DESIGN.md` after each completed implementation slice.
