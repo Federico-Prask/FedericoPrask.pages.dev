@@ -178,12 +178,12 @@ The Title Page uses a left/right composition:
 
 | Left area | Right area |
 |---|---|
-| Federico Prask | Reserved Logo area |
-| Personal Website | Logo / vector annotation presentation |
+| Federico Prask | Supplied FP Logo |
+| Personal Website | Logo reveal / vector annotation presentation |
 
 The left side presents the owner's name and the website designation. The name is the principal typographic anchor.
 
-The right side uses the supplied Logo asset at `public/images/fp-logo.svg`. The SVG has a `0 0 256 256` viewBox and contains two primary paths: a white rounded-square background and a black FP monogram. Preserve this source geometry; do not redraw or substitute the mark.
+The right side displays the supplied Logo asset at `public/images/fp-logo.svg`. The SVG has a `0 0 256 256` viewBox and exactly two path elements: a white rounded-square background and a black FP monogram. The source paths currently have no animation-specific IDs or grouping. Preserve both path geometries and their fills; any animation wrapper or IDs must be added without redrawing or changing the mark.
 
 The letter **F** described in Section 5 is an explanatory example for SVG annotation behavior, not approval to use a fabricated F mark as the final Logo.
 
@@ -1132,7 +1132,7 @@ The following are intentionally not fixed yet. They should be resolved through v
 - Exact desktop and mobile grid dimensions.
 - Title Page side-by-side proportions and internal alignment.
 - Exact placement of language and theme controls.
-- Final Logo geometry and asset.
+- Final on-screen Logo scale and placement.
 - Exact SVG line positions and which explicit line IDs persist through K2.
 - Final Light and Dark destination colors for the content stage.
 - Whether the deep-blue extension color is used, and where.
@@ -1263,16 +1263,15 @@ Implemented:
 - Added `src/components/TitlePage.vue`.
 - Title Page targets `100svh`.
 - Left area contains the name “Federico Prask” and the website designation.
-- Right area is reserved for the future Logo/SVG presentation.
+- Right area displays the supplied `public/images/fp-logo.svg` without modifying its source geometry.
 - Chinese / English selection remains functional.
 - Theme selection remains functional and retains the existing system/light/dark preference cycle.
 - Controls are integrated into the Title Page; no Header is rendered.
-- Added a narrow-screen layout that stacks the identity and reserved mark area.
+- Added a narrow-screen layout that stacks the identity and Logo area.
 
 Not yet completed:
 
-- Integrate the supplied `public/images/fp-logo.svg` into the Title Page.
-- Prepare its SVG structure for K0/K1 animation while preserving the original paths.
+- Build the animation-ready SVG presentation around the supplied asset while preserving the original path data and fills.
 - K0 Logo reveal.
 - K1 Logo-to-SVG annotation crossfade.
 - SVG annotation geometry and line continuity.
@@ -1299,4 +1298,4 @@ Source files have been fetched again from the target branch after the changes, a
 
 ### 19.5 Next implementation step
 
-Continue Phase 1 visual calibration, then integrate `public/images/fp-logo.svg` and prepare the SVG annotation/Logo reveal architecture. The asset is available, but K0/K1 are not implemented or verified yet.
+Implement K0 using the supplied `public/images/fp-logo.svg`, then prepare the K1 annotation layer. Keep the source Logo paths intact; K0/K1 and the SVG annotation are not implemented or verified yet.
