@@ -25,12 +25,12 @@ The active application is a deliberately small Vue page. The old page compositio
 - Language and theme controls remain available.
 - The Logo uses the original SVG viewBox, path data and fills.
 - K0 now has a source-level two-stage prototype: opacity-and-blur plate entrance, reverse contour trace of the original monogram path, then the original solid fill. The contour interpretation, plate focus-in appearance, theme inversion and timing still require browser review.
-- K1's annotation sequence remains event-driven from K0 completion; K0/K1 are not yet visually approved.
+- K1 now has a source-derived construction view of the complete FP Logo: solid plate/monogram outlines, eighteen dashed axis guides, bracketed start coordinates and solid Force handles at eight rounded corners. K0/K1 are not yet visually approved.
 - K2–K5 are not implemented.
 - The four content Parts are not implemented.
 - A local production build and browser visual review have not been completed.
 
-**Next implementation target:** run and visually inspect the K0/K1 prototype. The name tracking has been loosened in source; its final spacing still needs browser review. Preserve the F outline through the entire K1 waiting state; it disappears only when K2 begins.
+**Next implementation target:** run and visually inspect the K0/K1 prototype. The name tracking and the K1 guide/label offsets still need browser review. Preserve the complete FP Logo outline through the K1 waiting state; it disappears only when K2 begins.
 
 ## 2. Foundation and repository cleanup
 
@@ -70,8 +70,8 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Preserve the source white rounded-square path exactly.
 - [x] Preserve the source black FP monogram path exactly.
 - [x] Add stable IDs / grouping around the existing paths without redrawing the Logo.
-- [x] Keep the explanatory F-outline annotation as a separate construction layer; do not replace the FP Logo with an invented final mark.
-- [x] Define explicit groups for persistent guide lines and temporary annotation elements.
+- [x] Build the construction outline from the complete supplied FP Logo geometry, including the rounded background plate; do not substitute a standalone F.
+- [x] Define explicit groups for the eighteen persistent source-derived guide lines and temporary outline/coordinate/Force elements.
 
 ### 3.2 K0 — Logo Reveal
 
@@ -90,15 +90,15 @@ The active application is a deliberately small Vue page. The old page compositio
 ### 3.3 K1 — SVG Annotation
 
 - [x] Crossfade the normal Logo into the SVG construction annotation when K0's SVG animation completes.
-- [x] Build the F outline, five horizontal guides and four vertical guides.
-- [x] Add x/y coordinate annotations and dimension ticks.
-- [x] Add Force nodes and tangent/control handles for the rounded upper-left curve.
-- [x] Connect each tangent handle to its corresponding vector node.
-- [x] Keep Force values and a visible “Force” label out of the annotation.
+- [x] Reuse the exact source paths for the complete FP monogram and rounded background-plate frame as solid outlines.
+- [x] Derive eighteen dashed guide paths from the original horizontal/vertical segments: four plate segments and fourteen monogram segments; do not add a background grid.
+- [x] Add one `[ x , y ]` coordinate label at the original start point of every guide; rotate vertical labels by 90 degrees, including their brackets.
+- [x] Add Force anchor nodes and solid tangent/control handles at all eight rounded corners: four on the plate and four on the FP monogram.
+- [x] Keep Force values and a visible “Force” text label out of the annotation.
 - [x] Keep the annotation still after K1; do not use a timeout to start K2.
-- [ ] Visually verify that the F outline, x/y annotations, Force handles and guides remain visible throughout the K1 waiting state.
-- [ ] Visually verify that the normal Logo is fully gone at the end of the crossfade.
-- [ ] Tune K1 crossfade timing, label positions, guide spacing and line contrast in the browser.
+- [ ] Visually verify that the complete FP outline, all eighteen guides, coordinate labels and Force handles remain visible throughout the K1 waiting state.
+- [ ] Visually verify that the normal filled Logo is fully gone at the end of the crossfade.
+- [ ] Tune K1 guide offsets, label positions, handle scale, crossfade timing and line contrast in the browser.
 
 ## 4. Phase 2 — First-scroll transition
 
@@ -106,7 +106,7 @@ The active application is a deliberately small Vue page. The old page compositio
 
 - [ ] Trigger K2 on the first downward user scroll only.
 - [ ] Make the trigger one-shot; upward scrolling must not reverse or replay it.
-- [ ] Remove x/y annotations, Force nodes, Force handles and the F outline when K2 begins.
+- [ ] Remove coordinate labels, Force nodes, Force handles and the complete original FP Logo outline when K2 begins.
 - [ ] Preserve the original designated SVG guide-line elements; do not replace them with newly created borders.
 - [ ] Move the surviving guides to the bottom boundary of the entire Title Page composition.
 - [ ] Expand guide spacing horizontally with the specified fast Out Cubic character.
@@ -186,7 +186,7 @@ The active application is a deliberately small Vue page. The old page compositio
 
 - [x] Bind the K0 completion listener directly to the final monogram-fill path; rely on the dedicated target instead of comparing a potentially rewritten scoped keyframe name.
 - [ ] Verify locally that K0 crossfades into the complete K1 annotation and that the normal Logo is fully gone.
-- [ ] Verify the F outline, all nine persistent guides, x/y annotations and Force handles remain visible in the K1 waiting state.
+- [ ] Verify the complete FP Logo outline, all eighteen persistent guides, x/y annotations and Force handles remain visible in the K1 waiting state.
 
 ## 8. Current next actions
 
