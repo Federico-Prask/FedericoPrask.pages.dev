@@ -1,0 +1,120 @@
+/*
+ * Design tokens for the redesign.
+ *
+ * This file defines semantic values only. It deliberately does not define
+ * page layout, decorative patterns, or component styling.
+ *
+ * The Hero and content palettes are separate concepts:
+ * - Hero tokens describe the monochrome opening state.
+ * - Brand tokens preserve the established blue identity.
+ * - Neutral tokens provide the current light/dark reference surfaces.
+ *
+ * Final content-stage surface mapping will be calibrated visually before K3
+ * is implemented; do not treat these reference values as final animation stops.
+ */
+
+@theme {
+  /* Proportional typography for all display headings. */
+  --font-heading: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-technical: "JetBrains Mono", ui-monospace, "SF Mono", "Cascadia Code", monospace;
+
+  /* Brand blue family — retained from the previous identity. */
+  --color-brand-blue: #9cb8d7;
+  --color-brand-blue-strong: #7e9fc5;
+  --color-brand-blue-ink: #5b7da3;
+  --color-brand-blue-dark: #a9c5e4;
+
+  /* Neutral reference palette. */
+  --color-neutral-light: #f4f3ee;
+  --color-neutral-light-soft: #e9e8e1;
+  --color-neutral-light-panel: #fbfaf6;
+  --color-neutral-dark: #0b0b0c;
+  --color-neutral-dark-soft: #111114;
+  --color-neutral-dark-panel: #16161b;
+
+  /* Text reference palette. */
+  --color-text-light: #18181b;
+  --color-text-light-secondary: #3f3f46;
+  --color-text-light-muted: #6e6e76;
+  --color-text-dark: #e7e7e4;
+  --color-text-dark-secondary: #a3a3ad;
+  --color-text-dark-muted: #6f6f7a;
+}
+
+:root {
+  color-scheme: light;
+
+  /* Hero: monochrome opening state. */
+  --site-hero-background: #f4f3ee;
+  --site-hero-foreground: #18181b;
+  --site-hero-rule: rgb(24 24 27 / 22%);
+  --site-hero-rule-strong: rgb(24 24 27 / 55%);
+
+  /* Light-mode neutral references. */
+  --site-page-background: #f4f3ee;
+  --site-page-background-soft: #e9e8e1;
+  --site-panel-background: #fbfaf6;
+  --site-text-primary: #18181b;
+  --site-text-secondary: #3f3f46;
+  --site-text-muted: #6e6e76;
+  --site-rule: rgb(24 24 27 / 22%);
+  --site-rule-strong: rgb(24 24 27 / 55%);
+
+  /* Shared brand identity. */
+  --site-brand: #9cb8d7;
+  --site-brand-strong: #7e9fc5;
+  --site-brand-text: #5b7da3;
+}
+
+:root.dark {
+  color-scheme: dark;
+
+  /* Hero: monochrome opening state. */
+  --site-hero-background: #0b0b0c;
+  --site-hero-foreground: #e7e7e4;
+  --site-hero-rule: rgb(231 231 228 / 16%);
+  --site-hero-rule-strong: rgb(231 231 228 / 42%);
+
+  /* Dark-mode neutral references. */
+  --site-page-background: #0b0b0c;
+  --site-page-background-soft: #111114;
+  --site-panel-background: #16161b;
+  --site-text-primary: #e7e7e4;
+  --site-text-secondary: #a3a3ad;
+  --site-text-muted: #6f6f7a;
+  --site-rule: rgb(231 231 228 / 16%);
+  --site-rule-strong: rgb(231 231 228 / 42%);
+
+  /* Shared brand identity with dark-mode contrast adjustment. */
+  --site-brand: #a9c5e4;
+  --site-brand-strong: #9cb8d7;
+  --site-brand-text: #b5cfe9;
+}
+
+html {
+  background-color: var(--site-page-background);
+}
+
+body {
+  color: var(--site-text-primary);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
