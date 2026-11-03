@@ -89,6 +89,7 @@ function handleAnnotationFadeEnd(event: TransitionEvent) {
           <div
             v-if="logoStage !== 'waiting'"
             class="title-page__logo-normal"
+            :class="{ 'is-inverted': resolved === 'light' }"
             aria-hidden="true"
           >
             <LogoMark @reveal-end="handleLogoRevealEnd" />
@@ -243,13 +244,13 @@ function handleAnnotationFadeEnd(event: TransitionEvent) {
 
 .title-page__logo-normal {
   opacity: 1;
-  filter: invert(1);
+  filter: none;
   transition: opacity 700ms cubic-bezier(0.22, 0.7, 0.24, 1),
     filter 220ms ease;
 }
 
-:global(:root.dark) .title-page__logo-normal {
-  filter: none;
+.title-page__logo-normal.is-inverted {
+  filter: invert(1);
 }
 
 .title-page__logo-annotation {
