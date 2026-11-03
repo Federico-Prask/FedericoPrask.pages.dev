@@ -18,17 +18,18 @@ A task is not complete merely because code has been written. Build, runtime and 
 
 ## 1. Current project state
 
-The active application is a deliberately small Vue page. The old page composition and its component tree have been removed from this branch. The supplied FP Logo is visible as a static image in the Title Page.
+The active application is a deliberately small Vue page. The old page composition and its component tree have been removed from this branch. The supplied FP Logo is now rendered by an inline SVG component.
 
 **Current implementation boundary:**
 - The full-screen Title Page structure exists.
 - Language and theme controls remain available.
-- The supplied Logo asset is displayed without changing its source file.
-- K0–K5 animations are not implemented.
+- The Logo uses the original SVG viewBox, path data and fills.
+- K0 has a provisional left-to-right clipping reveal with a reduced-motion final-state fallback.
+- K1–K5 are not implemented.
 - The four content Parts are not implemented.
-- A local production build and browser visual review have not been completed.
+- K0 has not yet been reviewed in a local browser; a local production build and visual review have not been completed.
 
-**Next implementation target:** create an animation-capable SVG presentation for the supplied Logo, preserving the original path data, then implement K0.
+**Next implementation target:** verify and tune K0 in a browser, then implement K1 as a separate SVG annotation layer. Preserve the F outline through the entire K1 waiting state; it disappears only when K2 begins.
 
 ## 2. Foundation and repository cleanup
 
