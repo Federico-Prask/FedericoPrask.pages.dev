@@ -183,9 +183,9 @@ function handleAnnotationFadeEnd(event: TransitionEvent) {
 .title-page__layout {
   display: grid;
   width: min(100%, 88rem);
-  grid-template-columns: minmax(0, 1.12fr) minmax(14rem, 0.88fr);
+  grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.82fr);
   align-items: center;
-  gap: clamp(2rem, 7vw, 8rem);
+  gap: clamp(2rem, 5vw, 5rem);
   margin: auto;
 }
 
@@ -220,10 +220,12 @@ function handleAnnotationFadeEnd(event: TransitionEvent) {
 
 .title-page__mark-space {
   display: grid;
-  width: min(100%, 25rem);
+  width: clamp(18rem, 28vw, 25rem);
+  max-width: 100%;
   min-width: 0;
   aspect-ratio: 1;
   place-items: center;
+  justify-self: end;
 }
 
 .title-page__logo-sequence {
@@ -278,7 +280,7 @@ function handleAnnotationFadeEnd(event: TransitionEvent) {
   }
 
   .title-page__mark-space {
-    width: clamp(8rem, 28vw, 11rem);
+    width: clamp(12rem, 42vw, 16rem);
     justify-self: center;
   }
 }
