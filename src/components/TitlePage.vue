@@ -1,10 +1,32 @@
 <script setup lang="ts">
+import { ref } from "vue";
 import { useI18n } from "../composables/useI18n";
 import { useTheme } from "../composables/useTheme";
 import LogoMark from "./LogoMark.vue";
+import LogoAnnotation from "./LogoAnnotation.vue";
 
 const { locale, setLocale } = useI18n();
 const { pref, resolved, cycle } = useTheme();
+
+type LogoStage = "reveal" | "crossfade" | "waiting";
+
+const prefersReducedMotion =
+  typeof window !== "undefined" &&
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const logoStage = ref<LogoStage>(prefersReducedMotion ? "waiting" : "reveal");
+
+function handleLogoRevealEnd() {
+  if (logoStage.value === "reveal") {
+    logoStage.value = "crossfade";
+  }
+}
+
+function handleAnnotationFadeEnd(event: TransitionEvent) {
+  if (event.propertyName === "opacity" && logoStage.value === "crossfade") {
+    logoStage.value = "waiting";
+  }
+}
 </script>
 
 <template>
@@ -58,7 +80,27 @@ const { pref, resolved, cycle } = useTheme();
       </div>
 
       <div class="title-page__mark-space">
-        <LogoMark />
+        <div
+          class="title-page__logo-sequence"
+          :class="`is-${logoStage}`"
+          role="img"
+          :aria-label="locale === 'zh' ? 'FP 标志' : 'FP monogram'"
+        >
+          <div
+            v-if="logoStage !== 'waiting'"
+            class="title-page__logo-normal"
+            aria-hidden="true"
+          >
+            <LogoMark @reveal-end="handleLogoRevealEnd" />
+          </div>
+          <div
+            class="title-page__logo-annotation"
+            :aria-hidden="logoStage === 'reveal'"
+            @transitionend.self="handleAnnotationFadeEnd"
+          >
+            <LogoAnnotation />
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -180,8 +222,39 @@ const { pref, resolved, cycle } = useTheme();
   display: grid;
   width: min(100%, 25rem);
   min-width: 0;
-  min-height: min(42vw, 34rem);
+  aspect-ratio: 1;
   place-items: center;
+}
+
+.title-page__logo-sequence {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.title-page__logo-normal,
+.title-page__logo-annotation {
+  position: absolute;
+  inset: 0;
+  transition: opacity 700ms cubic-bezier(0.22, 0.7, 0.24, 1);
+}
+
+.title-page__logo-normal {
+  opacity: 1;
+}
+
+.title-page__logo-annotation {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.title-page__logo-sequence.is-crossfade .title-page__logo-normal {
+  opacity: 0;
+}
+
+.title-page__logo-sequence.is-crossfade .title-page__logo-annotation,
+.title-page__logo-sequence.is-waiting .title-page__logo-annotation {
+  opacity: 1;
 }
 
 @media (max-width: 760px) {
@@ -206,7 +279,6 @@ const { pref, resolved, cycle } = useTheme();
 
   .title-page__mark-space {
     width: clamp(8rem, 28vw, 11rem);
-    min-height: clamp(8rem, 24svh, 12rem);
     justify-self: center;
   }
 }
@@ -218,7 +290,9 @@ const { pref, resolved, cycle } = useTheme();
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .title-page__control {
+  .title-page__control,
+  .title-page__logo-normal,
+  .title-page__logo-annotation {
     transition: none;
   }
 }
