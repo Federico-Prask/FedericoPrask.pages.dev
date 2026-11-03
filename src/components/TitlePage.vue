@@ -246,7 +246,7 @@ function handleAnnotationFadeEnd(event: TransitionEvent) {
   opacity: 1;
   filter: none;
   transition: opacity 700ms cubic-bezier(0.22, 0.7, 0.24, 1),
-    filter 220ms ease;
+    filter 100ms ease;
 }
 
 .title-page__logo-normal.is-inverted {
