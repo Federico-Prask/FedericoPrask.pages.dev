@@ -50,8 +50,11 @@ function onRevealAnimationEnd(event: AnimationEvent) {
 }
 
 .fp-logo__plate {
-  clip-path: inset(100% 0 0 0);
-  animation: fp-plate-rise 820ms cubic-bezier(0.16, 1, 0.3, 1) 180ms both;
+  opacity: 0;
+  mask-image: linear-gradient(to top, #000 0%, #000 58%, transparent 100%);
+  mask-size: 100% 200%;
+  mask-position: 0 100%;
+  animation: fp-plate-gradient-rise 820ms cubic-bezier(0.16, 1, 0.3, 1) 180ms both;
 }
 
 .fp-logo__monogram-trace {
@@ -66,9 +69,15 @@ function onRevealAnimationEnd(event: AnimationEvent) {
   animation: fp-monogram-fill 140ms ease-out 2.62s both;
 }
 
-@keyframes fp-plate-rise {
-  from { clip-path: inset(100% 0 0 0); }
-  to { clip-path: inset(0 0 0 0); }
+@keyframes fp-plate-gradient-rise {
+  0% {
+    opacity: 0;
+    mask-position: 0 100%;
+  }
+  100% {
+    opacity: 1;
+    mask-position: 0 0;
+  }
 }
 
 @keyframes fp-monogram-trace {
@@ -95,7 +104,8 @@ function onRevealAnimationEnd(event: AnimationEvent) {
   }
 
   .fp-logo__plate {
-    clip-path: none;
+    opacity: 1;
+    mask-image: none;
   }
 
   .fp-logo__monogram-trace {
