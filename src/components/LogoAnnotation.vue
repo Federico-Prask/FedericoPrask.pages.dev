@@ -124,10 +124,6 @@ import LogoMark from "./LogoMark.vue";
 
 .coordinate-label {
   fill: currentColor;
-  stroke: var(--site-hero-background);
-  stroke-width: 2.4px;
-  stroke-linejoin: round;
-  paint-order: stroke;
   font-family: var(--font-technical);
   font-size: 6.2px;
   font-weight: 500;
