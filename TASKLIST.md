@@ -186,7 +186,7 @@ The active application is a deliberately small Vue page. The old page compositio
 
 - [x] Bind the K0 completion listener directly to the final monogram-fill path; rely on the dedicated target instead of comparing a potentially rewritten scoped keyframe name.
 - [ ] Verify locally that K0 crossfades into the complete K1 annotation and that the normal Logo is fully gone.
-- [ ] Verify the complete FP Logo outline, all eighteen persistent guides, x/y annotations and Force handles remain visible in the K1 waiting state.
+- [ ] Verify the complete FP Logo outline, all eighteen dashed guides and their bracketed start-coordinate labels, and all solid Force handles remain visible in the K1 waiting state.
 
 ## 8. Current next actions
 
