@@ -41,56 +41,74 @@ import LogoMark from "./LogoMark.vue";
     <g id="annotation-coordinate-labels" class="coordinates" data-k2-disposition="remove">
       <text class="coordinate-label" data-guide-ref="guide-plate-h-01" x="56" y="-10.5" text-anchor="start">[ 56 , 0 ]</text>
       <g class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-plate-v-01">
-        <text class="coordinate-bracket" x="250" y="48" text-anchor="middle" transform="rotate(90 250 48)">[</text>
-        <text x="250" y="56" text-anchor="end"> 256 , 56 </text>
-        <text class="coordinate-bracket" x="250" y="64" text-anchor="middle" transform="rotate(90 250 64)">]</text>
+        <text class="coordinate-bracket" x="250" y="43" text-anchor="end">[</text>
+        <text x="250" y="49.5" text-anchor="end">256</text>
+        <text x="250" y="56" text-anchor="end">,</text>
+        <text x="250" y="62.5" text-anchor="end">56</text>
+        <text class="coordinate-bracket" x="250" y="69" text-anchor="end">]</text>
       </g>
       <text class="coordinate-label" data-guide-ref="guide-plate-h-02" x="200" y="272" text-anchor="end">[ 200 , 256 ]</text>
       <g class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-plate-v-02">
-        <text class="coordinate-bracket" x="6" y="192" text-anchor="middle" transform="rotate(90 6 192)">[</text>
-        <text x="6" y="200" text-anchor="start"> 0 , 200 </text>
-        <text class="coordinate-bracket" x="6" y="208" text-anchor="middle" transform="rotate(90 6 208)">]</text>
+        <text class="coordinate-bracket" x="6" y="187" text-anchor="start">[</text>
+        <text x="6" y="193.5" text-anchor="start">0</text>
+        <text x="6" y="200" text-anchor="start">,</text>
+        <text x="6" y="206.5" text-anchor="start">200</text>
+        <text class="coordinate-bracket" x="6" y="213" text-anchor="start">]</text>
       </g>
       <text class="coordinate-label" data-guide-ref="guide-mono-h-01" x="52" y="29.5" text-anchor="start">[ 52 , 40 ]</text>
       <g class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-mono-v-01">
-        <text class="coordinate-bracket" x="245" y="102" text-anchor="middle" transform="rotate(90 245 102)">[</text>
-        <text x="245" y="110" text-anchor="end"> 219 , 106 </text>
-        <text class="coordinate-bracket" x="245" y="118" text-anchor="middle" transform="rotate(90 245 118)">]</text>
+        <text class="coordinate-bracket" x="245" y="97" text-anchor="end">[</text>
+        <text x="245" y="103.5" text-anchor="end">219</text>
+        <text x="245" y="110" text-anchor="end">,</text>
+        <text x="245" y="116.5" text-anchor="end">106</text>
+        <text class="coordinate-bracket" x="245" y="123" text-anchor="end">]</text>
       </g>
       <g class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-mono-v-02">
-        <text class="coordinate-bracket" x="158" y="183" text-anchor="middle" transform="rotate(90 158 183)">[</text>
-        <text x="158" y="191" text-anchor="start"> 153 , 191 </text>
-        <text class="coordinate-bracket" x="158" y="199" text-anchor="middle" transform="rotate(90 158 199)">]</text>
+        <text class="coordinate-bracket" x="158" y="178" text-anchor="start">[</text>
+        <text x="158" y="184.5" text-anchor="start">153</text>
+        <text x="158" y="191" text-anchor="start">,</text>
+        <text x="158" y="197.5" text-anchor="start">191</text>
+        <text class="coordinate-bracket" x="158" y="204" text-anchor="start">]</text>
       </g>
       <text class="coordinate-label" data-guide-ref="guide-mono-h-02" x="153" y="282" text-anchor="end">[ 153 , 256 ]</text>
       <g class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-mono-v-03">
-        <text class="coordinate-bracket" x="126" y="238" text-anchor="middle" transform="rotate(90 126 238)">[</text>
-        <text x="126" y="246" text-anchor="start"> 121 , 256 </text>
-        <text class="coordinate-bracket" x="126" y="254" text-anchor="middle" transform="rotate(90 126 254)">]</text>
+        <text class="coordinate-bracket" x="126" y="225" text-anchor="start">[</text>
+        <text x="126" y="231.5" text-anchor="start">121</text>
+        <text x="126" y="238" text-anchor="start">,</text>
+        <text x="126" y="244.5" text-anchor="start">256</text>
+        <text class="coordinate-bracket" x="126" y="251" text-anchor="start">]</text>
       </g>
       <text class="coordinate-label" data-guide-ref="guide-mono-h-03" x="121" y="148.5" text-anchor="start">[ 121 , 159 ]</text>
       <g class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-mono-v-04">
-        <text class="coordinate-bracket" x="190" y="117" text-anchor="middle" transform="rotate(90 190 117)">[</text>
-        <text x="190" y="125" text-anchor="start"> 187 , 125 </text>
-        <text class="coordinate-bracket" x="190" y="133" text-anchor="middle" transform="rotate(90 190 133)">]</text>
+        <text class="coordinate-bracket" x="190" y="112" text-anchor="start">[</text>
+        <text x="190" y="118.5" text-anchor="start">187</text>
+        <text x="190" y="125" text-anchor="start">,</text>
+        <text x="190" y="131.5" text-anchor="start">125</text>
+        <text class="coordinate-bracket" x="190" y="138" text-anchor="start">]</text>
       </g>
       <text class="coordinate-label" data-guide-ref="guide-mono-h-04" x="153" y="88" text-anchor="end">[ 153 , 72 ]</text>
       <g class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-mono-v-05">
-        <text class="coordinate-bracket" x="92" y="64" text-anchor="middle" transform="rotate(90 92 64)">[</text>
-        <text x="92" y="72" text-anchor="start"> 86 , 72 </text>
-        <text class="coordinate-bracket" x="92" y="80" text-anchor="middle" transform="rotate(90 92 80)">]</text>
+        <text class="coordinate-bracket" x="92" y="59" text-anchor="start">[</text>
+        <text x="92" y="65.5" text-anchor="start">86</text>
+        <text x="92" y="72" text-anchor="start">,</text>
+        <text x="92" y="78.5" text-anchor="start">72</text>
+        <text class="coordinate-bracket" x="92" y="85" text-anchor="start">]</text>
       </g>
       <text class="coordinate-label" data-guide-ref="guide-mono-h-05" x="86" y="91.5" text-anchor="start">[ 86 , 102 ]</text>
       <g class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-mono-v-06">
-        <text class="coordinate-bracket" x="153" y="94" text-anchor="middle" transform="rotate(90 153 94)">[</text>
-        <text x="153" y="102" text-anchor="start"> 148 , 102 </text>
-        <text class="coordinate-bracket" x="153" y="110" text-anchor="middle" transform="rotate(90 153 110)">]</text>
+        <text class="coordinate-bracket" x="153" y="89" text-anchor="start">[</text>
+        <text x="153" y="95.5" text-anchor="start">148</text>
+        <text x="153" y="102" text-anchor="start">,</text>
+        <text x="153" y="108.5" text-anchor="start">102</text>
+        <text class="coordinate-bracket" x="153" y="115" text-anchor="start">]</text>
       </g>
       <text class="coordinate-label" data-guide-ref="guide-mono-h-06" x="148" y="147" text-anchor="end">[ 148 , 131 ]</text>
       <g class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-mono-v-07">
-        <text class="coordinate-bracket" x="92" y="123" text-anchor="middle" transform="rotate(90 92 123)">[</text>
-        <text x="92" y="131" text-anchor="start"> 86 , 131 </text>
-        <text class="coordinate-bracket" x="92" y="139" text-anchor="middle" transform="rotate(90 92 139)">]</text>
+        <text class="coordinate-bracket" x="92" y="118" text-anchor="start">[</text>
+        <text x="92" y="124.5" text-anchor="start">86</text>
+        <text x="92" y="131" text-anchor="start">,</text>
+        <text x="92" y="137.5" text-anchor="start">131</text>
+        <text class="coordinate-bracket" x="92" y="144" text-anchor="start">]</text>
       </g>
       <text class="coordinate-label" data-guide-ref="guide-mono-h-07" x="86" y="215" text-anchor="end">[ 86 , 199 ]</text>
     </g>
