@@ -49,6 +49,7 @@ The active application is a deliberately small Vue page. The old page compositio
 ### 2.2 Legacy cleanup
 
 - [x] Remove obsolete page components: About, Card, Contact, Experience, Figure, Footer, Hero, Projects, Stack, Ticker and TopBar.
+- [x] Remove the orphaned legacy `src/views/Homepage.vue` view.
 - [x] Remove obsolete UI primitives: Corners, Frame, Icon, Pill, Reveal, SectionHeader and TaggedFrame.
 - [x] Remove the old `data.ts` / `data-en.ts` content model.
 - [x] Remove unused `fonts.css` and embedded Space Mono stylesheet.
