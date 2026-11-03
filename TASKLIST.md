@@ -24,7 +24,7 @@ The active application is a deliberately small Vue page. The old page compositio
 - The full-screen Title Page structure exists.
 - Language and theme controls remain available.
 - The Logo uses the original SVG viewBox, path data and fills.
-- K0 now has a source-level two-stage prototype: soft gradient-mask plate reveal, reverse contour trace of the original monogram path, then the original solid fill. The contour interpretation, gradient edge and timing still require browser review.
+- K0 now has a source-level two-stage prototype: opacity-and-blur plate entrance, reverse contour trace of the original monogram path, then the original solid fill. The contour interpretation, gradient edge and timing still require browser review.
 - K1's annotation sequence remains event-driven from K0 completion; K0/K1 are not yet visually approved.
 - K2–K5 are not implemented.
 - The four content Parts are not implemented.
@@ -76,13 +76,13 @@ The active application is a deliberately small Vue page. The old page compositio
 ### 3.2 K0 — Logo Reveal
 
 - [x] Implement the original first-pass left-to-right clipping reveal (obsolete prototype; retained only as implementation history).
-- [x] Replace the old left-to-right clip with a two-stage source prototype: reveal the white plate from the bottom using a soft gradient mask, then trace the original monogram contour in reverse from its final path point near the F stem's lower terminal.
+- [x] Replace the old left-to-right clip with a two-stage source prototype: reveal the white plate from the bottom using a opacity-and-blur focus transition, then trace the original monogram contour in reverse from its final path point near the F stem's lower terminal.
 - [x] Preserve the original filled monogram path geometry; use a separate no-fill trace layer and restore the exact solid fill after tracing. (Visual interpretation remains unverified.)
 - [x] Loosen the Title Page name tracking from -0.085em to -0.035em. (Final spacing still needs browser review.)
 - [ ] Tune the revised K0 stage timing and easing through browser iteration.
 - [ ] Tune K0 and K1 together so the crossfade begins exactly after the reveal completes.
 - [x] Keep the Logo aligned within the right side of the Title Page.
-- [ ] Verify the gradient plate reveal in Light and Dark modes and at narrow viewport widths.
+- [ ] Verify the opacity-and-blur plate entrance in Light and Dark modes and at narrow viewport widths.
 - [ ] Verify the bounded responsive Logo sizing at desktop, intermediate and narrow viewport widths.
 - [x] Make reduced-motion users enter the static K1 annotation state without playing K0/K1 motion.
 
@@ -183,7 +183,7 @@ The active application is a deliberately small Vue page. The old page compositio
 
 ## 8. Current next actions
 
-1. Run the local app and inspect the gradient plate reveal, reverse contour trace, final fill and K1 handoff; decide whether the contour trace matches the intended F-to-P growth.
+1. Run the local app and inspect the opacity-and-blur plate entrance, reverse contour trace, final fill and K1 handoff; decide whether the contour trace matches the intended F-to-P growth.
 2. Check Logo sizing at several viewport widths; tune the minimum, preferred and maximum sizes if the Logo still feels too sensitive to window width.
 3. Review and calibrate revised K0/K1 in a local browser, including the full waiting state, reduced-motion behavior and responsive sizes.
 4. Implement K2 against the persistent guide elements; do not recreate the lines.
