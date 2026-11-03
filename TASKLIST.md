@@ -24,7 +24,7 @@ The active application is a deliberately small Vue page. The old page compositio
 - The full-screen Title Page structure exists.
 - Language and theme controls remain available.
 - The Logo uses the original SVG viewBox, path data and fills.
-- K0 now has a source-level two-stage prototype: opacity-and-blur plate entrance, reverse contour trace of the original monogram path, then the original solid fill. The contour interpretation, gradient edge and timing still require browser review.
+- K0 now has a source-level two-stage prototype: opacity-and-blur plate entrance, reverse contour trace of the original monogram path, then the original solid fill. The contour interpretation, plate focus-in appearance, theme inversion and timing still require browser review.
 - K1's annotation sequence remains event-driven from K0 completion; K0/K1 are not yet visually approved.
 - K2–K5 are not implemented.
 - The four content Parts are not implemented.
@@ -82,7 +82,8 @@ The active application is a deliberately small Vue page. The old page compositio
 - [ ] Tune the revised K0 stage timing and easing through browser iteration.
 - [ ] Tune K0 and K1 together so the crossfade begins exactly after the reveal completes.
 - [x] Keep the Logo aligned within the right side of the Title Page.
-- [ ] Verify the opacity-and-blur plate entrance in Light and Dark modes and at narrow viewport widths.
+- [x] Apply whole-Logo inversion in Light mode while retaining the original colors in Dark mode.
+- [ ] Verify the opacity-and-blur plate entrance and theme inversion in Light and Dark modes and at narrow viewport widths.
 - [ ] Verify the bounded responsive Logo sizing at desktop, intermediate and narrow viewport widths.
 - [x] Make reduced-motion users enter the static K1 annotation state without playing K0/K1 motion.
 
