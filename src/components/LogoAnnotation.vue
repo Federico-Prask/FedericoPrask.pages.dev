@@ -12,11 +12,6 @@ import LogoMark from "./LogoMark.vue";
     aria-hidden="true"
   >
     <!-- The exact supplied FP mark, including its rounded plate frame, is retained as a solid outline. -->
-    <g id="annotation-original-logo" data-k2-disposition="remove">
-      <LogoMark mode="outline" />
-    </g>
-
-    <!-- Only source-derived horizontal and vertical segments become persistent dashed guides. -->
     <g id="annotation-persistent-guides" class="axis-guides" data-k2-disposition="preserve">
       <path id="guide-plate-h-01" data-source="plate" data-axis="h" data-start="56,0" d="M 0 0 L 256 0" />
       <path id="guide-plate-v-01" data-source="plate" data-axis="v" data-start="256,56" d="M 256 0 L 256 256" />
@@ -36,6 +31,10 @@ import LogoMark from "./LogoMark.vue";
       <path id="guide-mono-h-06" data-source="monogram" data-axis="h" data-start="148,131" d="M 0 131 L 256 131" />
       <path id="guide-mono-v-07" data-source="monogram" data-axis="v" data-start="86,131" d="M 86 0 L 86 256" />
       <path id="guide-mono-h-07" data-source="monogram" data-axis="h" data-start="86,199" d="M 0 199 L 256 199" />
+    </g>
+
+    <g id="annotation-original-logo" data-k2-disposition="remove">
+      <LogoMark mode="outline" />
     </g>
 
     <!-- Coordinates identify the original start point of each guide. Vertical labels rotate as a whole. -->
