@@ -1,10 +1,8 @@
 <script setup lang="ts">
 const emit = defineEmits(["reveal-end"]);
 
-function onRevealAnimationEnd(event: AnimationEvent) {
-  if (event.animationName === "fp-monogram-fill") {
-    emit("reveal-end");
-  }
+function onRevealAnimationEnd() {
+  emit("reveal-end");
 }
 </script>
 
