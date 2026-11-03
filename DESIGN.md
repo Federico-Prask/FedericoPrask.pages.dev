@@ -1279,16 +1279,17 @@ Not yet completed:
 
 ### 19.3 Application entry and active files
 
-The current application entry renders the new Title Page only:
+The active application is intentionally small:
 
+- `src/main.ts` — imports the global stylesheet and mounts the Vue application.
 - `src/App.vue` — minimal application shell.
-- `src/components/TitlePage.vue` — initial full-viewport composition and controls.
+- `src/components/TitlePage.vue` — full-viewport opening composition and controls.
 - `src/styles/design-tokens.css` — semantic visual tokens.
-- `src/index.css` — Tailwind import and small global base layer.
-- `src/composables/useI18n.ts` — retained language state.
-- `src/composables/useTheme.ts` — retained theme preference behavior.
+- `src/index.css` — Tailwind import and global base layer.
+- `src/composables/useI18n.ts` — lightweight shared locale state and persistence.
+- `src/composables/useTheme.ts` — shared theme preference and system-theme synchronization.
 
-The previous page components remain in the repository but are not imported by the current application entry. Their layouts and visual styling are not part of the redesign.
+Legacy page components, their UI primitives, the old content-data model, unused font stylesheets and the empty router placeholder are being removed from the redesign branch. The old content data is not used as a source for the new page; new content will be curated against the four-Part structure in this document.
 
 ### 19.4 Verification status
 
