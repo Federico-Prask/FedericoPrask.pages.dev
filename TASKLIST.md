@@ -25,12 +25,12 @@ The active application is a deliberately small Vue page. The old page compositio
 - Language and theme controls remain available.
 - The Logo uses the original SVG viewBox, path data and fills.
 - K0 now has a source-level two-stage prototype: opacity-and-blur plate entrance, reverse contour trace of the original monogram path, then the original solid fill. The contour interpretation, plate focus-in appearance, theme inversion and timing still require browser review.
-- K1 now has a source-derived construction view of the complete FP Logo: solid plate/monogram outlines, eighteen dashed axis guides, bracketed start coordinates and solid Force handles at eight rounded corners. K0/K1 are not yet visually approved.
+- K1 now has a source-derived construction view of the complete FP Logo: solid plate/monogram outlines, eighteen unshifted full-span dashed guides in the active theme color, bracketed start coordinates and solid Force handles at eight rounded corners. K0/K1 are not yet visually approved.
 - K2–K5 are not implemented.
 - The four content Parts are not implemented.
 - A local production build and browser visual review have not been completed.
 
-**Next implementation target:** run and visually inspect the K0/K1 prototype. The name tracking and the K1 guide/label offsets still need browser review. Preserve the complete FP Logo outline through the K1 waiting state; it disappears only when K2 begins.
+**Next implementation target:** run and visually inspect the K0/K1 prototype. The K1 guide paths now follow their exact source coordinates and span the original Logo frame; coordinate-label placement, handle scale and line rhythm still need browser review. Preserve the complete FP Logo outline through the K1 waiting state; it disappears only when K2 begins.
 
 ## 2. Foundation and repository cleanup
 
@@ -91,14 +91,14 @@ The active application is a deliberately small Vue page. The old page compositio
 
 - [x] Crossfade the normal Logo into the SVG construction annotation when K0's SVG animation completes.
 - [x] Reuse the exact source paths for the complete FP monogram and rounded background-plate frame as solid outlines.
-- [x] Derive eighteen dashed guide paths from the original horizontal/vertical segments: four plate segments and fourteen monogram segments; do not add a background grid.
+- [x] Derive eighteen separate dashed guide paths from the original horizontal/vertical segments: four plate segments and fourteen monogram segments; align each guide to the exact source coordinate and extend it to the corresponding edge-to-edge boundary of the original 256 × 256 Logo frame; do not add unrelated background-grid lines.
 - [x] Add one `[ x , y ]` coordinate label at the original start point of every guide; rotate vertical labels by 90 degrees, including their brackets.
 - [x] Add Force anchor nodes and solid tangent/control handles at all eight rounded corners: four on the plate and four on the FP monogram.
 - [x] Keep Force values and a visible “Force” text label out of the annotation.
 - [x] Keep the annotation still after K1; do not use a timeout to start K2.
 - [ ] Visually verify that the complete FP outline, all eighteen guides, coordinate labels and Force handles remain visible throughout the K1 waiting state.
 - [ ] Visually verify that the normal filled Logo is fully gone at the end of the crossfade.
-- [ ] Tune K1 guide offsets, label positions, handle scale, crossfade timing and line contrast in the browser.
+- [ ] Visually tune K1 dashed-line rhythm, coordinate-label positions, handle scale and crossfade timing in the browser.
 
 ## 4. Phase 2 — First-scroll transition
 
