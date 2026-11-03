@@ -309,6 +309,8 @@ The exact reveal direction, extension distance, duration and easing are not yet 
 
 The Logo is the initial visual focus on the right side of the Title Page.
 
+**Implementation starting point (provisional):** use a left-to-right clipping reveal over the undistorted original SVG. This is a first motion pass, not a final direction or timing decision. Tune it in the browser before treating the motion values as settled.
+
 ### 5.2 K1 — SVG Annotation
 
 After the Logo reveal, the normal Logo transitions into an SVG construction annotation.
