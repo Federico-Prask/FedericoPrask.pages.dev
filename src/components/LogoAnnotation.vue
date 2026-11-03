@@ -1,3 +1,7 @@
+<script setup lang="ts">
+import LogoMark from "./LogoMark.vue";
+</script>
+
 <template>
   <svg
     class="logo-annotation"
@@ -7,49 +11,90 @@
     role="presentation"
     aria-hidden="true"
   >
-    <!-- Persistent paths: K2 keeps these exact SVG elements and their geometry. -->
-    <g id="annotation-persistent-guides" data-k2-disposition="preserve">
-      <g id="annotation-horizontal-guides" class="guide-lines">
-        <path id="guide-h-01" d="M12 26 H244" />
-        <path id="guide-h-02" d="M12 77 H244" />
-        <path id="guide-h-03" d="M12 128 H244" />
-        <path id="guide-h-04" d="M12 179 H244" />
-        <path id="guide-h-05" d="M12 230 H244" />
-      </g>
-      <g id="annotation-vertical-guides" class="guide-lines">
-        <path id="guide-v-01" d="M26 12 V244" />
-        <path id="guide-v-02" d="M94 12 V244" />
-        <path id="guide-v-03" d="M162 12 V244" />
-        <path id="guide-v-04" d="M230 12 V244" />
-      </g>
+    <!-- The exact supplied FP mark, including its rounded plate frame, is retained as a solid outline. -->
+    <g id="annotation-original-logo" data-k2-disposition="remove">
+      <LogoMark mode="outline" />
     </g>
 
-    <!-- Temporary annotation paths: K2 removes these groups. -->
-    <g id="annotation-f-outline" data-k2-disposition="remove">
-      <path
-        id="annotation-f-path"
-        class="f-outline"
-        d="M92 42 H188 V76 H105 V111 H169 V144 H105 V214 H70 V64 C70 51.8497 79.8497 42 92 42 Z"
-      />
+    <!-- Only source-derived horizontal and vertical segments become persistent dashed guides. -->
+    <g id="annotation-persistent-guides" class="axis-guides" data-k2-disposition="preserve">
+      <path id="guide-plate-h-01" data-source="plate" data-axis="h" data-start="56,0" d="M 56 -7 L 200 -7" />
+      <path id="guide-plate-v-01" data-source="plate" data-axis="v" data-start="256,56" d="M 263 56 L 263 200" />
+      <path id="guide-plate-h-02" data-source="plate" data-axis="h" data-start="200,256" d="M 200 263 L 56 263" />
+      <path id="guide-plate-v-02" data-source="plate" data-axis="v" data-start="0,200" d="M -7 200 L -7 56" />
+      <path id="guide-mono-h-01" data-source="monogram" data-axis="h" data-start="52,40" d="M 52 33 L 153 33" />
+      <path id="guide-mono-v-01" data-source="monogram" data-axis="v" data-start="219,106" d="M 226 106 L 226 125" />
+      <path id="guide-mono-v-02" data-source="monogram" data-axis="v" data-start="153,191" d="M 160 191 L 160 256" />
+      <path id="guide-mono-h-02" data-source="monogram" data-axis="h" data-start="153,256" d="M 153 263 L 121 263" />
+      <path id="guide-mono-v-03" data-source="monogram" data-axis="v" data-start="121,256" d="M 114 256 L 114 159" />
+      <path id="guide-mono-h-03" data-source="monogram" data-axis="h" data-start="121,159" d="M 121 152 L 153 152" />
+      <path id="guide-mono-v-04" data-source="monogram" data-axis="v" data-start="187,125" d="M 180 125 L 180 106" />
+      <path id="guide-mono-h-04" data-source="monogram" data-axis="h" data-start="153,72" d="M 153 79 L 86 79" />
+      <path id="guide-mono-v-05" data-source="monogram" data-axis="v" data-start="86,72" d="M 93 72 L 93 102" />
+      <path id="guide-mono-h-05" data-source="monogram" data-axis="h" data-start="86,102" d="M 86 95 L 148 95" />
+      <path id="guide-mono-v-06" data-source="monogram" data-axis="v" data-start="148,102" d="M 155 102 L 155 131" />
+      <path id="guide-mono-h-06" data-source="monogram" data-axis="h" data-start="148,131" d="M 148 138 L 86 138" />
+      <path id="guide-mono-v-07" data-source="monogram" data-axis="v" data-start="86,131" d="M 93 131 L 93 199" />
+      <path id="guide-mono-h-07" data-source="monogram" data-axis="h" data-start="86,199" d="M 86 206 L 52 206" />
     </g>
 
-    <g id="annotation-coordinate-system" class="coordinates" data-k2-disposition="remove">
-      <path d="M70 20 V32 M188 20 V32 M70 20 H188" />
-      <path d="M54 64 H66 M54 214 H66 M54 64 V214" />
-      <text x="195" y="23">x</text>
-      <text x="48" y="226">y</text>
+    <!-- Coordinates identify the original start point of each guide. Vertical labels rotate as a whole. -->
+    <g id="annotation-coordinate-labels" class="coordinates" data-k2-disposition="remove">
+      <text class="coordinate-label" data-guide-ref="guide-plate-h-01" x="56" y="-10.5" text-anchor="start">[ 56 , 0 ]</text>
+      <text class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-plate-v-01" x="258.5" y="56" text-anchor="middle" transform="rotate(-90 258.5 56)">[ 256 , 56 ]</text>
+      <text class="coordinate-label" data-guide-ref="guide-plate-h-02" x="200" y="272" text-anchor="end">[ 200 , 256 ]</text>
+      <text class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-plate-v-02" x="-2.5" y="200" text-anchor="middle" transform="rotate(-90 -2.5 200)">[ 0 , 200 ]</text>
+      <text class="coordinate-label" data-guide-ref="guide-mono-h-01" x="52" y="29.5" text-anchor="start">[ 52 , 40 ]</text>
+      <text class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-mono-v-01" x="221.5" y="106" text-anchor="middle" transform="rotate(-90 221.5 106)">[ 219 , 106 ]</text>
+      <text class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-mono-v-02" x="155.5" y="191" text-anchor="middle" transform="rotate(-90 155.5 191)">[ 153 , 191 ]</text>
+      <text class="coordinate-label" data-guide-ref="guide-mono-h-02" x="153" y="272" text-anchor="end">[ 153 , 256 ]</text>
+      <text class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-mono-v-03" x="118.5" y="256" text-anchor="middle" transform="rotate(-90 118.5 256)">[ 121 , 256 ]</text>
+      <text class="coordinate-label" data-guide-ref="guide-mono-h-03" x="121" y="148.5" text-anchor="start">[ 121 , 159 ]</text>
+      <text class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-mono-v-04" x="184.5" y="125" text-anchor="middle" transform="rotate(-90 184.5 125)">[ 187 , 125 ]</text>
+      <text class="coordinate-label" data-guide-ref="guide-mono-h-04" x="153" y="88" text-anchor="end">[ 153 , 72 ]</text>
+      <text class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-mono-v-05" x="88.5" y="72" text-anchor="middle" transform="rotate(-90 88.5 72)">[ 86 , 72 ]</text>
+      <text class="coordinate-label" data-guide-ref="guide-mono-h-05" x="86" y="91.5" text-anchor="start">[ 86 , 102 ]</text>
+      <text class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-mono-v-06" x="150.5" y="102" text-anchor="middle" transform="rotate(-90 150.5 102)">[ 148 , 102 ]</text>
+      <text class="coordinate-label" data-guide-ref="guide-mono-h-06" x="148" y="147" text-anchor="end">[ 148 , 131 ]</text>
+      <text class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-mono-v-07" x="88.5" y="131" text-anchor="middle" transform="rotate(-90 88.5 131)">[ 86 , 131 ]</text>
+      <text class="coordinate-label" data-guide-ref="guide-mono-h-07" x="86" y="215" text-anchor="end">[ 86 , 199 ]</text>
     </g>
 
+    <!-- Solid tangent/control handles mark all four rounded plate corners and all four FP curves. -->
     <g id="annotation-force-handles" class="force-handles" data-k2-disposition="remove">
-      <!-- Cubic corner: P0=(70,64), P1=(70,51.8497), P2=(79.8497,42), P3=(92,42). -->
-      <path
-        id="force-handle-connectors"
-        d="M70 64 L70 51.8497 M92 42 L79.8497 42"
-      />
-      <circle id="force-node-start" class="force-node" cx="70" cy="64" r="2.8" />
-      <circle id="force-control-start" class="force-control" cx="70" cy="51.8497" r="2.1" />
-      <circle id="force-node-end" class="force-node" cx="92" cy="42" r="2.8" />
-      <circle id="force-control-end" class="force-control" cx="79.8497" cy="42" r="2.1" />
+      <path class="force-connectors" d="M 200 0 L 230.928 0 M 256 56 L 256 25.072 M 256 200 L 256 230.928 M 200 256 L 230.928 256 M 56 256 L 25.072 256 M 0 200 L 0 230.928 M 0 56 L 0 25.072 M 56 0 L 25.072 0 M 153 40 L 189.451 40 M 219 106 L 219 69.549 M 219 125 L 219 161.451 M 153 191 L 189.451 191 M 153 159 L 171.778 159 M 187 125 L 187 143.778 M 187 106 L 187 87.222 M 153 72 L 171.778 72" />
+      <circle class="force-node" data-corner="plate-corner-tr" cx="200" cy="0" r="2" />
+      <circle class="force-node" data-corner="plate-corner-tr" cx="256" cy="56" r="2" />
+      <circle class="force-node" data-corner="plate-corner-br" cx="256" cy="200" r="2" />
+      <circle class="force-node" data-corner="plate-corner-br" cx="200" cy="256" r="2" />
+      <circle class="force-node" data-corner="plate-corner-bl" cx="56" cy="256" r="2" />
+      <circle class="force-node" data-corner="plate-corner-bl" cx="0" cy="200" r="2" />
+      <circle class="force-node" data-corner="plate-corner-tl" cx="0" cy="56" r="2" />
+      <circle class="force-node" data-corner="plate-corner-tl" cx="56" cy="0" r="2" />
+      <circle class="force-node" data-corner="monogram-outer-tr" cx="153" cy="40" r="2" />
+      <circle class="force-node" data-corner="monogram-outer-tr" cx="219" cy="106" r="2" />
+      <circle class="force-node" data-corner="monogram-outer-br" cx="219" cy="125" r="2" />
+      <circle class="force-node" data-corner="monogram-outer-br" cx="153" cy="191" r="2" />
+      <circle class="force-node" data-corner="monogram-inner-br" cx="153" cy="159" r="2" />
+      <circle class="force-node" data-corner="monogram-inner-br" cx="187" cy="125" r="2" />
+      <circle class="force-node" data-corner="monogram-inner-tr" cx="187" cy="106" r="2" />
+      <circle class="force-node" data-corner="monogram-inner-tr" cx="153" cy="72" r="2" />
+      <circle class="force-control" data-corner="plate-corner-tr" cx="230.928" cy="0" r="1.55" />
+      <circle class="force-control" data-corner="plate-corner-tr" cx="256" cy="25.072" r="1.55" />
+      <circle class="force-control" data-corner="plate-corner-br" cx="256" cy="230.928" r="1.55" />
+      <circle class="force-control" data-corner="plate-corner-br" cx="230.928" cy="256" r="1.55" />
+      <circle class="force-control" data-corner="plate-corner-bl" cx="25.072" cy="256" r="1.55" />
+      <circle class="force-control" data-corner="plate-corner-bl" cx="0" cy="230.928" r="1.55" />
+      <circle class="force-control" data-corner="plate-corner-tl" cx="0" cy="25.072" r="1.55" />
+      <circle class="force-control" data-corner="plate-corner-tl" cx="25.072" cy="0" r="1.55" />
+      <circle class="force-control" data-corner="monogram-outer-tr" cx="189.451" cy="40" r="1.55" />
+      <circle class="force-control" data-corner="monogram-outer-tr" cx="219" cy="69.549" r="1.55" />
+      <circle class="force-control" data-corner="monogram-outer-br" cx="219" cy="161.451" r="1.55" />
+      <circle class="force-control" data-corner="monogram-outer-br" cx="189.451" cy="191" r="1.55" />
+      <circle class="force-control" data-corner="monogram-inner-br" cx="171.778" cy="159" r="1.55" />
+      <circle class="force-control" data-corner="monogram-inner-br" cx="187" cy="143.778" r="1.55" />
+      <circle class="force-control" data-corner="monogram-inner-tr" cx="187" cy="87.222" r="1.55" />
+      <circle class="force-control" data-corner="monogram-inner-tr" cx="171.778" cy="72" r="1.55" />
     </g>
   </svg>
 </template>
@@ -63,58 +108,52 @@
   color: inherit;
 }
 
-.guide-lines {
+.axis-guides {
   fill: none;
   stroke: currentColor;
-  stroke-width: 0.8;
-  stroke-dasharray: 2.4 5.2;
+  stroke-width: 0.85;
+  stroke-dasharray: 2.6 4.2;
   stroke-linecap: round;
-  opacity: 0.34;
-  vector-effect: non-scaling-stroke;
-}
-
-.f-outline {
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 3.2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  opacity: 0.94;
+  opacity: 0.68;
   vector-effect: non-scaling-stroke;
 }
 
 .coordinates {
   fill: none;
-  stroke: currentColor;
-  stroke-width: 0.9;
-  stroke-linecap: round;
-  opacity: 0.78;
-  vector-effect: non-scaling-stroke;
+  opacity: 0.9;
+  pointer-events: none;
 }
 
-.coordinates text {
+.coordinate-label {
   fill: currentColor;
-  stroke: none;
+  stroke: var(--site-hero-background);
+  stroke-width: 2.4px;
+  stroke-linejoin: round;
+  paint-order: stroke;
   font-family: var(--font-technical);
-  font-size: 8px;
+  font-size: 6.2px;
   font-weight: 500;
-  letter-spacing: 0.02em;
+  letter-spacing: 0;
 }
 
 .force-handles {
   fill: none;
   stroke: currentColor;
   stroke-width: 1;
-  stroke-dasharray: 2.6 3.4;
   stroke-linecap: round;
-  opacity: 0.84;
+  stroke-linejoin: round;
+  opacity: 0.92;
   vector-effect: non-scaling-stroke;
+}
+
+.force-connectors {
+  stroke-dasharray: none;
 }
 
 .force-node {
   fill: var(--site-hero-background);
   stroke: currentColor;
-  stroke-width: 1.2;
+  stroke-width: 1.15;
 }
 
 .force-control {
