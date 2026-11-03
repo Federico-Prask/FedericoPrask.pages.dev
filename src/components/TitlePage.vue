@@ -56,9 +56,17 @@ const { pref, resolved, cycle } = useTheme();
         </p>
       </div>
 
-      <!-- Reserved for the owner's Logo and its SVG construction sequence.
-           Do not insert a placeholder mark: the original Logo asset is pending. -->
-      <div class="title-page__mark-space" aria-hidden="true"></div>
+      <div class="title-page__mark-space">
+        <img
+          class="title-page__logo"
+          src="/images/fp-logo.svg"
+          alt="FP monogram"
+          width="256"
+          height="256"
+          decoding="async"
+          fetchpriority="high"
+        />
+      </div>
     </div>
   </section>
 </template>
@@ -176,8 +184,18 @@ const { pref, resolved, cycle } = useTheme();
 }
 
 .title-page__mark-space {
+  display: grid;
   min-width: 0;
   min-height: min(42vw, 34rem);
+  place-items: center;
+}
+
+.title-page__logo {
+  display: block;
+  width: min(100%, 25rem);
+  max-height: min(66svh, 25rem);
+  aspect-ratio: 1;
+  object-fit: contain;
 }
 
 @media (max-width: 760px) {
@@ -201,7 +219,12 @@ const { pref, resolved, cycle } = useTheme();
   }
 
   .title-page__mark-space {
-    min-height: 18svh;
+    min-height: clamp(8rem, 24svh, 12rem);
+  }
+
+  .title-page__logo {
+    width: clamp(8rem, 28vw, 11rem);
+    max-height: 12rem;
   }
 }
 
