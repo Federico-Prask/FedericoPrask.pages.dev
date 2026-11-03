@@ -1226,3 +1226,76 @@ When a requirement changes:
 Do not let implementation details silently redefine the intended design.
 
 **This document describes the desired experience. The code should implement the document—not the other way around.**
+
+---
+
+## 19. Current implementation status
+
+This section records implementation progress. It does not weaken or replace the requirements above.
+
+### 19.1 Phase 0 — Design Foundation
+
+**Status: initial foundation created; visual calibration remains open.**
+
+Implemented:
+
+- Added `src/styles/design-tokens.css`.
+- Added semantic typography tokens for proportional headings/body text and technical annotations.
+- Added semantic aliases for the established blue palette.
+- Added Hero monochrome foreground, background and rule tokens for Light and Dark modes.
+- Added neutral reference tokens for both modes.
+- Imported the token file through `src/index.css`.
+- Replaced the old global style sheet with a small reset/base layer. Old grid, frame, marquee, reveal and legacy utility styling is no longer part of the active global stylesheet.
+
+Not yet completed:
+
+- Final content-stage background/surface mapping.
+- Final K3 transition endpoints and intermediate color stops.
+- Font asset/loading decision and final type scale.
+- Final grid, spacing and page-edge measurements.
+
+### 19.2 Phase 1 — Title Page
+
+**Status: first structural implementation created; Logo and visual review pending.**
+
+Implemented:
+
+- Added `src/components/TitlePage.vue`.
+- Title Page targets `100svh`.
+- Left area contains the name “Federico Prask” and the website designation.
+- Right area is reserved for the future Logo/SVG presentation.
+- Chinese / English selection remains functional.
+- Theme selection remains functional and retains the existing system/light/dark preference cycle.
+- Controls are integrated into the Title Page; no Header is rendered.
+- Added a narrow-screen layout that stacks the identity and reserved mark area.
+
+Not yet completed:
+
+- Actual Logo asset and its vector path.
+- K0 Logo reveal.
+- K1 Logo-to-SVG annotation crossfade.
+- SVG annotation geometry and line continuity.
+- Final visual review at desktop, tablet and mobile sizes.
+
+### 19.3 Application entry and active files
+
+The current application entry renders the new Title Page only:
+
+- `src/App.vue` — minimal application shell.
+- `src/components/TitlePage.vue` — initial full-viewport composition and controls.
+- `src/styles/design-tokens.css` — semantic visual tokens.
+- `src/index.css` — Tailwind import and small global base layer.
+- `src/composables/useI18n.ts` — retained language state.
+- `src/composables/useTheme.ts` — retained theme preference behavior.
+
+The previous page components remain in the repository but are not imported by the current application entry. Their layouts and visual styling are not part of the redesign.
+
+### 19.4 Verification status
+
+Source files have been fetched again from the target branch after the changes, and the import relationship and application entry were inspected.
+
+**A local Vite production build and browser visual review have not yet been run.** Do not report the current implementation as build-verified or visually approved.
+
+### 19.5 Next implementation step
+
+Continue Phase 1 visual calibration and then prepare the SVG annotation/Logo reveal architecture. The actual Logo asset is a required input for final K0/K1 geometry. Until it is supplied, do not create a substitute Logo or claim that K0/K1 are complete.
