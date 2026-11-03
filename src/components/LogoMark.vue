@@ -51,10 +51,8 @@ function onRevealAnimationEnd(event: AnimationEvent) {
 
 .fp-logo__plate {
   opacity: 0;
-  mask-image: linear-gradient(to top, #000 0%, #000 58%, transparent 100%);
-  mask-size: 100% 200%;
-  mask-position: 0 100%;
-  animation: fp-plate-gradient-rise 820ms cubic-bezier(0.16, 1, 0.3, 1) 180ms both;
+  filter: blur(24px);
+  animation: fp-plate-focus-in 820ms cubic-bezier(0.16, 1, 0.3, 1) 180ms both;
 }
 
 .fp-logo__monogram-trace {
@@ -69,14 +67,14 @@ function onRevealAnimationEnd(event: AnimationEvent) {
   animation: fp-monogram-fill 140ms ease-out 2.62s both;
 }
 
-@keyframes fp-plate-gradient-rise {
-  0% {
+@keyframes fp-plate-focus-in {
+  from {
     opacity: 0;
-    mask-position: 0 100%;
+    filter: blur(24px);
   }
-  100% {
+  to {
     opacity: 1;
-    mask-position: 0 0;
+    filter: blur(1px);
   }
 }
 
@@ -105,7 +103,7 @@ function onRevealAnimationEnd(event: AnimationEvent) {
 
   .fp-logo__plate {
     opacity: 1;
-    mask-image: none;
+    filter: none;
   }
 
   .fp-logo__monogram-trace {
