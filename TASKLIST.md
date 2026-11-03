@@ -25,7 +25,7 @@ The active application is a deliberately small Vue page. The old page compositio
 - Language and theme controls remain available.
 - The Logo uses the original SVG viewBox, path data and fills.
 - K0 has a provisional left-to-right clipping reveal with a reduced-motion final-state fallback.
-- K1–K5 are not implemented.
+- K2–K5 are not implemented.
 - The four content Parts are not implemented.
 - K0 has not yet been reviewed in a local browser; a local production build and visual review have not been completed.
 
@@ -69,28 +69,30 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Preserve the source white rounded-square path exactly.
 - [x] Preserve the source black FP monogram path exactly.
 - [x] Add stable IDs / grouping around the existing paths without redrawing the Logo.
-- [ ] Keep the explanatory F-outline annotation as a separate construction layer; do not replace the FP Logo with an invented final mark.
-- [ ] Define explicit groups for persistent guide lines and temporary annotation elements.
+- [x] Keep the explanatory F-outline annotation as a separate construction layer; do not replace the FP Logo with an invented final mark.
+- [x] Define explicit groups for persistent guide lines and temporary annotation elements.
 
 ### 3.2 K0 — Logo Reveal
 
 - [x] Implement the first provisional left-to-right clipping reveal described in `DESIGN.md`.
 - [ ] Tune direction, distance, duration and easing through browser iteration.
+- [ ] Tune K0 and K1 together so the crossfade begins exactly after the reveal completes.
 - [x] Keep the Logo aligned within the right side of the Title Page.
 - [ ] Verify the reveal in Light and Dark modes and at narrow viewport widths.
-- [x] Make the Logo resolve immediately to its final visible state when reduced motion is requested.
+- [x] Make reduced-motion users enter the static K1 annotation state without playing K0/K1 motion.
 
 ### 3.3 K1 — SVG Annotation
 
-- [ ] Crossfade the normal Logo into the SVG construction annotation.
-- [ ] Build the F outline, five horizontal guides and four vertical guides.
-- [ ] Add x/y coordinate annotations.
-- [ ] Add Force nodes and tangent/control handles.
-- [ ] Ensure the handles attach to their corresponding vector nodes.
-- [ ] Do not show Force numbers or a visible “Force” label.
-- [ ] Keep the annotation still after K1; do not use a timeout to start K2.
-- [ ] Verify that the F outline, x/y annotations, Force handles and guides all remain visible throughout the K1 waiting state.
-- [ ] Verify that the normal Logo is fully gone at the end of the crossfade.
+- [x] Crossfade the normal Logo into the SVG construction annotation when K0's SVG animation completes.
+- [x] Build the F outline, five horizontal guides and four vertical guides.
+- [x] Add x/y coordinate annotations and dimension ticks.
+- [x] Add Force nodes and tangent/control handles for the rounded upper-left curve.
+- [x] Connect each tangent handle to its corresponding vector node.
+- [x] Keep Force values and a visible “Force” label out of the annotation.
+- [x] Keep the annotation still after K1; do not use a timeout to start K2.
+- [ ] Visually verify that the F outline, x/y annotations, Force handles and guides remain visible throughout the K1 waiting state.
+- [ ] Visually verify that the normal Logo is fully gone at the end of the crossfade.
+- [ ] Tune K1 crossfade timing, label positions, guide spacing and line contrast in the browser.
 
 ## 4. Phase 2 — First-scroll transition
 
@@ -176,7 +178,7 @@ The active application is a deliberately small Vue page. The old page compositio
 
 ## 8. Current next actions
 
-1. Review and calibrate the K0 reveal in a local browser, including reduced-motion behavior and responsive sizes.
-2. Implement K1 annotation as a separate layer; keep the F outline visible until K2 begins.
+1. Review and calibrate the K0/K1 sequence in a local browser, including the full waiting state, reduced-motion behavior and responsive sizes.
+2. Implement K2 against the persistent guide elements; do not recreate the lines.
 3. Update this file and `DESIGN.md` after each completed implementation slice.
-4. Do not mark a task complete until its source and relevant behavior have been checked.
+4. Do not mark visual verification tasks complete until they have been checked in a browser.
