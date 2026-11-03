@@ -1340,9 +1340,9 @@ Provisional timing: plate 820ms after 180ms delay; contour trace 1,650ms after 1
 **Next step:** run the local app and visually inspect the direction and pacing of the contour trace, plate reveal, final fill and K1 handoff. If the trace does not match the intended visual, revise the reveal method before implementing K2. K0/K1 have not yet been locally build-verified or visually approved.
 
 
-### 19.6 Responsive Logo sizing and plate entrance refinement
+### 19.6 Responsive Logo sizing and plate focus-in refinement
 
-The next K0 visual iteration changes the white plate entrance from a hard bottom-up clip edge to a soft gradient-mask reveal. The plate should emerge from the bottom with a feathered upper edge, then resolve to the exact solid white rounded-square shape before the monogram trace begins. The original SVG path geometry and fill remain unchanged.
+The K0 plate entrance uses a simultaneous opacity-and-focus transition: opacity rises from 0 to 1 while blur decreases from 24px to 1px over the same duration and easing. This is a whole-plate soft-focus entrance, not a gradient mask or a moving clip edge. The original SVG path geometry and fill remain unchanged.
 
 The Logo sizing is also being decoupled from small viewport-width changes. Desktop layout gives the Logo column a larger minimum width and reduces the viewport-proportional inter-column gap; the Logo itself uses a bounded responsive size. Narrow layouts use a wider viewport-relative range with a larger minimum and maximum than the previous 28vw rule. These are first-pass CSS values and require browser review at desktop, intermediate and narrow widths.
 
