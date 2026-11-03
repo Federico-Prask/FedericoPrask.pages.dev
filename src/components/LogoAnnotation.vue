@@ -31,86 +31,94 @@ import LogoMark from "./LogoMark.vue";
       <path id="guide-mono-h-06" data-source="monogram" data-axis="h" data-start="148,131" d="M 0 131 L 256 131" />
       <path id="guide-mono-v-07" data-source="monogram" data-axis="v" data-start="86,131" d="M 86 0 L 86 256" />
       <path id="guide-mono-h-07" data-source="monogram" data-axis="h" data-start="86,199" d="M 0 199 L 256 199" />
+      <path id="guide-mono-v-08" data-source="monogram" data-axis="v" data-start="52,199" d="M 52 0 L 52 256" />
     </g>
 
     <g id="annotation-original-logo" data-k2-disposition="remove">
       <LogoMark mode="outline" />
     </g>
 
-    <!-- Coordinates identify the original start point of each guide. Vertical labels rotate as a whole. -->
+    <!-- Coordinates identify each guide start. Vertical labels use five centered rows and geometric horizontal bracket paths. -->
     <g id="annotation-coordinate-labels" class="coordinates" data-k2-disposition="remove">
       <text class="coordinate-label" data-guide-ref="guide-plate-h-01" x="56" y="-10.5" text-anchor="start">[ 56 , 0 ]</text>
-      <g class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-plate-v-01">
-        <text class="coordinate-bracket" x="250" y="43" text-anchor="middle" transform="rotate(90 250 43)">[</text>
-        <text x="250" y="49.5" text-anchor="middle">256</text>
-        <text x="250" y="56" text-anchor="middle">,</text>
-        <text x="250" y="62.5" text-anchor="middle">56</text>
-        <text class="coordinate-bracket" x="250" y="69" text-anchor="middle" transform="rotate(90 250 69)">]</text>
+            <g class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-plate-v-01">
+        <path class="coordinate-bracket coordinate-bracket--open" d="M 242 45 V 41 H 250 V 45" />
+        <text x="246" y="49.5" text-anchor="middle" dominant-baseline="middle">256</text>
+        <text x="246" y="56" text-anchor="middle" dominant-baseline="middle">,</text>
+        <text x="246" y="62.5" text-anchor="middle" dominant-baseline="middle">56</text>
+        <path class="coordinate-bracket coordinate-bracket--close" d="M 242 67 V 71 H 250 V 67" />
       </g>
       <text class="coordinate-label" data-guide-ref="guide-plate-h-02" x="200" y="272" text-anchor="end">[ 200 , 256 ]</text>
-      <g class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-plate-v-02">
-        <text class="coordinate-bracket" x="6" y="187" text-anchor="middle" transform="rotate(90 6 187)">[</text>
-        <text x="6" y="193.5" text-anchor="middle">0</text>
-        <text x="6" y="200" text-anchor="middle">,</text>
-        <text x="6" y="206.5" text-anchor="middle">200</text>
-        <text class="coordinate-bracket" x="6" y="213" text-anchor="middle" transform="rotate(90 6 213)">]</text>
+            <g class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-plate-v-02">
+        <path class="coordinate-bracket coordinate-bracket--open" d="M 6 189 V 185 H 14 V 189" />
+        <text x="10" y="193.5" text-anchor="middle" dominant-baseline="middle">0</text>
+        <text x="10" y="200" text-anchor="middle" dominant-baseline="middle">,</text>
+        <text x="10" y="206.5" text-anchor="middle" dominant-baseline="middle">200</text>
+        <path class="coordinate-bracket coordinate-bracket--close" d="M 6 211 V 215 H 14 V 211" />
       </g>
       <text class="coordinate-label" data-guide-ref="guide-mono-h-01" x="52" y="29.5" text-anchor="start">[ 52 , 40 ]</text>
-      <g class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-mono-v-01">
-        <text class="coordinate-bracket" x="245" y="97" text-anchor="middle" transform="rotate(90 245 97)">[</text>
-        <text x="245" y="103.5" text-anchor="middle">219</text>
-        <text x="245" y="110" text-anchor="middle">,</text>
-        <text x="245" y="116.5" text-anchor="middle">106</text>
-        <text class="coordinate-bracket" x="245" y="123" text-anchor="middle" transform="rotate(90 245 123)">]</text>
+            <g class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-mono-v-01">
+        <path class="coordinate-bracket coordinate-bracket--open" d="M 241 99 V 95 H 249 V 99" />
+        <text x="245" y="103.5" text-anchor="middle" dominant-baseline="middle">219</text>
+        <text x="245" y="110" text-anchor="middle" dominant-baseline="middle">,</text>
+        <text x="245" y="116.5" text-anchor="middle" dominant-baseline="middle">106</text>
+        <path class="coordinate-bracket coordinate-bracket--close" d="M 241 121 V 125 H 249 V 121" />
       </g>
-      <g class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-mono-v-02">
-        <text class="coordinate-bracket" x="158" y="178" text-anchor="middle" transform="rotate(90 158 178)">[</text>
-        <text x="158" y="184.5" text-anchor="middle">153</text>
-        <text x="158" y="191" text-anchor="middle">,</text>
-        <text x="158" y="197.5" text-anchor="middle">191</text>
-        <text class="coordinate-bracket" x="158" y="204" text-anchor="middle" transform="rotate(90 158 204)">]</text>
+            <g class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-mono-v-02">
+        <path class="coordinate-bracket coordinate-bracket--open" d="M 154 180 V 176 H 162 V 180" />
+        <text x="158" y="184.5" text-anchor="middle" dominant-baseline="middle">153</text>
+        <text x="158" y="191" text-anchor="middle" dominant-baseline="middle">,</text>
+        <text x="158" y="197.5" text-anchor="middle" dominant-baseline="middle">191</text>
+        <path class="coordinate-bracket coordinate-bracket--close" d="M 154 202 V 206 H 162 V 202" />
       </g>
       <text class="coordinate-label" data-guide-ref="guide-mono-h-02" x="153" y="285" text-anchor="end">[ 153 , 256 ]</text>
-      <g class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-mono-v-03">
-        <text class="coordinate-bracket" x="126" y="225" text-anchor="middle" transform="rotate(90 126 225)">[</text>
-        <text x="126" y="231.5" text-anchor="middle">121</text>
-        <text x="126" y="238" text-anchor="middle">,</text>
-        <text x="126" y="244.5" text-anchor="middle">256</text>
-        <text class="coordinate-bracket" x="126" y="251" text-anchor="middle" transform="rotate(90 126 251)">]</text>
+            <g class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-mono-v-03">
+        <path class="coordinate-bracket coordinate-bracket--open" d="M 122 219 V 215 H 130 V 219" />
+        <text x="126" y="223.5" text-anchor="middle" dominant-baseline="middle">121</text>
+        <text x="126" y="230" text-anchor="middle" dominant-baseline="middle">,</text>
+        <text x="126" y="236.5" text-anchor="middle" dominant-baseline="middle">256</text>
+        <path class="coordinate-bracket coordinate-bracket--close" d="M 122 241 V 245 H 130 V 241" />
       </g>
       <text class="coordinate-label" data-guide-ref="guide-mono-h-03" x="121" y="167" text-anchor="start">[ 121 , 159 ]</text>
-      <g class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-mono-v-04">
-        <text class="coordinate-bracket" x="190" y="112" text-anchor="middle" transform="rotate(90 190 112)">[</text>
-        <text x="190" y="118.5" text-anchor="middle">187</text>
-        <text x="190" y="125" text-anchor="middle">,</text>
-        <text x="190" y="131.5" text-anchor="middle">125</text>
-        <text class="coordinate-bracket" x="190" y="138" text-anchor="middle" transform="rotate(90 190 138)">]</text>
+            <g class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-mono-v-04">
+        <path class="coordinate-bracket coordinate-bracket--open" d="M 186 114 V 110 H 194 V 114" />
+        <text x="190" y="118.5" text-anchor="middle" dominant-baseline="middle">187</text>
+        <text x="190" y="125" text-anchor="middle" dominant-baseline="middle">,</text>
+        <text x="190" y="131.5" text-anchor="middle" dominant-baseline="middle">125</text>
+        <path class="coordinate-bracket coordinate-bracket--close" d="M 186 136 V 140 H 194 V 136" />
       </g>
       <text class="coordinate-label" data-guide-ref="guide-mono-h-04" x="153" y="55.5" text-anchor="end">[ 153 , 72 ]</text>
-      <g class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-mono-v-05">
-        <text class="coordinate-bracket" x="92" y="59" text-anchor="middle" transform="rotate(90 92 59)">[</text>
-        <text x="92" y="65.5" text-anchor="middle">86</text>
-        <text x="92" y="72" text-anchor="middle">,</text>
-        <text x="92" y="78.5" text-anchor="middle">72</text>
-        <text class="coordinate-bracket" x="92" y="85" text-anchor="middle" transform="rotate(90 92 85)">]</text>
+            <g class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-mono-v-05">
+        <path class="coordinate-bracket coordinate-bracket--open" d="M 88 63 V 59 H 96 V 63" />
+        <text x="92" y="67.5" text-anchor="middle" dominant-baseline="middle">86</text>
+        <text x="92" y="74" text-anchor="middle" dominant-baseline="middle">,</text>
+        <text x="92" y="80.5" text-anchor="middle" dominant-baseline="middle">72</text>
+        <path class="coordinate-bracket coordinate-bracket--close" d="M 88 85 V 89 H 96 V 85" />
       </g>
       <text class="coordinate-label" data-guide-ref="guide-mono-h-05" x="86" y="98" text-anchor="start">[ 86 , 102 ]</text>
-      <g class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-mono-v-06">
-        <text class="coordinate-bracket" x="153" y="89" text-anchor="middle" transform="rotate(90 153 89)">[</text>
-        <text x="153" y="95.5" text-anchor="middle">148</text>
-        <text x="153" y="102" text-anchor="middle">,</text>
-        <text x="153" y="108.5" text-anchor="middle">102</text>
-        <text class="coordinate-bracket" x="153" y="115" text-anchor="middle" transform="rotate(90 153 115)">]</text>
+            <g class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-mono-v-06">
+        <path class="coordinate-bracket coordinate-bracket--open" d="M 149 91 V 87 H 157 V 91" />
+        <text x="153" y="95.5" text-anchor="middle" dominant-baseline="middle">148</text>
+        <text x="153" y="102" text-anchor="middle" dominant-baseline="middle">,</text>
+        <text x="153" y="108.5" text-anchor="middle" dominant-baseline="middle">102</text>
+        <path class="coordinate-bracket coordinate-bracket--close" d="M 149 113 V 117 H 157 V 113" />
       </g>
       <text class="coordinate-label" data-guide-ref="guide-mono-h-06" x="152" y="147" text-anchor="end">[ 148 , 131 ]</text>
-      <g class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-mono-v-07">
-        <text class="coordinate-bracket" x="92" y="118" text-anchor="middle" transform="rotate(90 92 118)">[</text>
-        <text x="92" y="124.5" text-anchor="middle">86</text>
-        <text x="92" y="131" text-anchor="middle">,</text>
-        <text x="92" y="137.5" text-anchor="middle">131</text>
-        <text class="coordinate-bracket" x="92" y="144" text-anchor="middle" transform="rotate(90 92 144)">]</text>
+            <g class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-mono-v-07">
+        <path class="coordinate-bracket coordinate-bracket--open" d="M 88 120 V 116 H 96 V 120" />
+        <text x="92" y="124.5" text-anchor="middle" dominant-baseline="middle">86</text>
+        <text x="92" y="131" text-anchor="middle" dominant-baseline="middle">,</text>
+        <text x="92" y="137.5" text-anchor="middle" dominant-baseline="middle">131</text>
+        <path class="coordinate-bracket coordinate-bracket--close" d="M 88 142 V 146 H 96 V 142" />
       </g>
       <text class="coordinate-label" data-guide-ref="guide-mono-h-07" x="86" y="215" text-anchor="end">[ 86 , 199 ]</text>
+      <g class="coordinate-label coordinate-label--vertical" data-guide-ref="guide-mono-v-08">
+        <path class="coordinate-bracket coordinate-bracket--open" d="M 31 169 V 165 H 39 V 169" />
+        <text x="35" y="173.5" text-anchor="middle" dominant-baseline="middle">52</text>
+        <text x="35" y="180" text-anchor="middle" dominant-baseline="middle">,</text>
+        <text x="35" y="186.5" text-anchor="middle" dominant-baseline="middle">199</text>
+        <path class="coordinate-bracket coordinate-bracket--close" d="M 31 193 V 197 H 39 V 193" />
+      </g>
     </g>
 
     <!-- Solid tangent/control handles mark all four rounded plate corners and all four FP curves. -->
@@ -163,7 +171,7 @@ import LogoMark from "./LogoMark.vue";
 
 .axis-guides {
   fill: none;
-  stroke: var(--site-brand);
+  stroke: var(--site-guide);
   stroke-width: 0.65;
   stroke-dasharray: 2.6 4.2;
   stroke-linecap: butt;
@@ -185,8 +193,11 @@ import LogoMark from "./LogoMark.vue";
 }
 
 .coordinate-bracket {
-  font-size: 8.5px;
-  font-weight: 600;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 0.85;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
 }
 
 .force-handles {
