@@ -1,4 +1,8 @@
 <script setup lang="ts">
+const props = withDefaults(defineProps<{ mode?: "reveal" | "outline" }>(), {
+  mode: "reveal",
+});
+
 const emit = defineEmits(["reveal-end"]);
 
 function onRevealAnimationEnd() {
@@ -9,6 +13,7 @@ function onRevealAnimationEnd() {
 <template>
   <svg
     class="fp-logo"
+    :class="{ 'fp-logo--outline': props.mode === 'outline' }"
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 256 256"
     role="presentation"
@@ -90,6 +95,38 @@ function onRevealAnimationEnd() {
 @keyframes fp-monogram-fill {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+
+/* Static construction view: preserve the exact source paths, but render both as solid outlines. */
+.fp-logo--outline .fp-logo__plate {
+  opacity: 1;
+  filter: none;
+  animation: none;
+}
+
+.fp-logo--outline .fp-logo__plate path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.1;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.fp-logo--outline .fp-logo__monogram-trace {
+  display: none;
+  animation: none;
+}
+
+.fp-logo--outline .fp-logo__monogram-fill {
+  opacity: 1;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  animation: none;
+  vector-effect: non-scaling-stroke;
 }
 
 @media (prefers-reduced-motion: reduce) {
