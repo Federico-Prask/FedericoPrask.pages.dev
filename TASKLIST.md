@@ -184,7 +184,7 @@ The active application is a deliberately small Vue page. The old page compositio
 
 ### K0/K1 handoff correction
 
-- [x] Bind the K0 completion listener directly to the final monogram-fill path and retain the animation-name guard.
+- [x] Bind the K0 completion listener directly to the final monogram-fill path; rely on the dedicated target instead of comparing a potentially rewritten scoped keyframe name.
 - [ ] Verify locally that K0 crossfades into the complete K1 annotation and that the normal Logo is fully gone.
 - [ ] Verify the F outline, all nine persistent guides, x/y annotations and Force handles remain visible in the K1 waiting state.
 
