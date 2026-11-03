@@ -92,14 +92,14 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Crossfade the normal Logo into the SVG construction annotation when K0's SVG animation completes.
 - [x] Reuse the exact source paths for the complete FP monogram and rounded background-plate frame as solid outlines.
 - [x] Derive eighteen separate dashed guide paths from the original horizontal/vertical segments: four plate segments and fourteen monogram segments; align each guide to the exact source coordinate and extend it to the corresponding edge-to-edge boundary of the original 256 × 256 Logo frame; do not add unrelated background-grid lines.
-- [x] Add one `[ x , y ]` coordinate label at the original start point of every guide; for vertical guides place the square brackets as separate SVG text elements on lines above and below the horizontal coordinate pair, rotate each bracket with an explicit SVG transform, enlarge the brackets, and keep numbers and commas horizontal; render labels in the active theme color without a text outline or halo.
+- [x] Add one `[ x , y ]` coordinate label at the original start point of every guide; for vertical guides stack five separate lines in the order `[`, x-coordinate, comma, y-coordinate, `]`; keep every glyph horizontal and do not rotate the brackets; enlarge the brackets and render labels in the active theme color without a text outline or halo.
 - [x] Add Force anchor nodes and solid tangent/control handles at all eight rounded corners: four on the plate and four on the FP monogram.
 - [x] Keep Force values and a visible “Force” text label out of the annotation.
 - [x] Keep the annotation still after K1; do not use a timeout to start K2.
 - [ ] Visually verify that the complete FP outline, all eighteen guides, coordinate labels and Force handles remain visible throughout the K1 waiting state.
 - [ ] Visually verify that the normal filled Logo is fully gone at the end of the crossfade.
 - [ ] Visually verify the 2.2px solid Logo outline remains clearly heavier than the 0.65px butt-ended dashed guides.
-- [ ] Visually verify that vertical-guide labels use separate bracket lines around the horizontal coordinate pair, with visibly larger brackets explicitly rotated by SVG transforms; numbers and commas remain horizontal.
+- [ ] Visually verify that vertical-guide labels use five separate horizontal lines in the order `[`, x-coordinate, comma, y-coordinate, `]`, with visibly larger unrotated square brackets.
 - [ ] Resolve all coordinate-label collisions at the actual rendered size, including the lower-edge pair.
 - [ ] Visually tune K1 dashed-line rhythm, coordinate-label positions, handle scale and crossfade timing in the browser.
 
