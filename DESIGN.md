@@ -335,11 +335,11 @@ The construction view reuses the exact source path geometry from the supplied Lo
 - The complete FP monogram is shown as a **solid outline**, preserving both its outer and inner contours.
 - The source fills are omitted in this construction view; no replacement F shape is drawn.
 
-Every horizontal or vertical straight segment in those original paths receives one corresponding **dashed guide line**. The current source geometry contains eighteen such segments: four on the background plate and fourteen on the FP monogram. Each guide remains a separate SVG element with a stable ID.
+Every horizontal or vertical straight segment in those original paths receives one corresponding **dashed guide line**. The source geometry contains nineteen such segments: four on the background plate and fifteen on the FP monogram. The fifteenth monogram segment is the F's leftmost vertical stem edge, which closes the source path from (52,199) back to (52,40). Each guide remains a separate SVG element with a stable ID.
 
-The guide set is selective, not a background grid: no evenly spaced rows, columns or unrelated grid lines may be added. Each guide lies exactly on its source segment's original horizontal or vertical coordinate, with **no perpendicular offset**. A horizontal guide spans the full original Logo viewBox width (`x = 0` through `x = 256`); a vertical guide spans its full original height (`y = 0` through `y = 256`). The guides therefore extend to the boundaries of the Logo's own 256 × 256 frame and never enlarge that frame. Each guide uses the active theme's brand-blue token (`--site-brand`) at full opacity: dark blue in light mode and light blue in dark mode. It must not use the monochrome Hero foreground token. The rounded background-plate frame and the FP monogram use the same 1.7px solid outline width. Guide strokes use square/butt dash ends and remain visibly thinner at 0.65px. Where a guide coincides with the solid Logo outline, the underlying outline remains solid; the dashed rhythm is visible along the guide's extension beyond the Logo segment.
+The guide set is selective, not a background grid: no evenly spaced rows, columns or unrelated grid lines may be added. Each guide lies exactly on its source segment's original horizontal or vertical coordinate, with **no perpendicular offset**. A horizontal guide spans the full original Logo viewBox width (`x = 0` through `x = 256`); a vertical guide spans its full original height (`y = 0` through `y = 256`). The guides therefore extend to the boundaries of the Logo's own 256 × 256 frame and never enlarge that frame. Each guide uses its dedicated `--site-guide` token at full opacity: light blue (`#a9c5e4`) in light mode and dark blue (`#5b7da3`) in dark mode. Do not use `--site-brand` or the monochrome Hero foreground token for these guides. The rounded background-plate frame and the FP monogram use the same 1.7px solid outline width. Guide strokes use square/butt dash ends and remain visibly thinner at 0.65px. Where a guide coincides with the solid Logo outline, the underlying outline remains solid; the dashed rhythm is visible along the guide's extension beyond the Logo segment.
 
-The eighteen guide paths are the persistent elements carried into K2. The original Logo outline, coordinate labels and Force handles are temporary construction elements and are removed when K2 begins.
+The nineteen guide paths are the persistent elements carried into K2. The original Logo outline, coordinate labels and Force handles are temporary construction elements and are removed when K2 begins.
 
 ### 5.4 Coordinate annotations
 
@@ -347,11 +347,11 @@ Every dashed guide has one coordinate label at its source segment's **starting p
 
 - Use the bracketed format `[ x , y ]`.
 - Labels associated with horizontal segments remain horizontal.
-- Labels associated with vertical segments use a five-line arrangement: opening square bracket, x-coordinate, comma, y-coordinate, closing square bracket. Each item occupies its own line, in the exact order `[`, `x`, `,`, `y`, `]`. The two square-bracket glyphs are each rotated 90 degrees so they read horizontally; the x-coordinate, comma and y-coordinate remain unrotated and each occupies its own line. All five rows share the same horizontal center axis (`text-anchor="middle"`). The two square-bracket glyphs use a larger font size than the coordinate text.
+- Labels associated with vertical segments use a five-line arrangement: opening square bracket, x-coordinate, comma, y-coordinate, closing square bracket. Each item occupies its own line, in the exact order `[`, `x`, `,`, `y`, `]`. The top and bottom square brackets are drawn as horizontal SVG paths rather than rotated font glyphs. Their geometric centers align with the same column as the x-coordinate, comma and y-coordinate; the text rows use `dominant-baseline="middle"` so their visual centers align with the bracket paths.
 - The numbers identify the original Logo path coordinates, not screen or viewport positions.
 - Coordinate labels use the active theme foreground color directly. Do not add a background-colored stroke, outline or halo around the text in either theme.
 
-Coordinate labels must be treated as one layout of eighteen rendered annotations. Calculate their text bounding boxes using the active technical font and the larger bracket size; check horizontal-to-horizontal and horizontal-to-vertical collisions, not merely the baseline positions. Reposition conflicting labels with separate rows or offsets while preserving each label's association with its source point. Keep a visible clearance between distinct labels, and ensure the two lower-edge labels do not occupy the same row. Do not replace these point coordinates with generic `x` / `y` axis labels. For the current K1 arrangement, the collision-adjusted label placements are intentionally staggered: `[153,72]` uses baseline y=55.5; `[86,102]` uses y=98; `[121,159]` uses y=167; `[148,131]` is end-aligned at x=152, y=147; and `[153,256]` uses y=285. These are presentation offsets only; the displayed coordinate values remain the original source start points. The current conservative estimate uses 6.2px monospace text at 0.6em advance and 8.5px bracket glyphs, producing no label-to-label intersections and a minimum estimated clearance of 5.49 SVG units. Browser verification with the actual loaded technical font is still required.
+Coordinate labels must be treated as one layout of nineteen rendered annotations. Calculate their text bounding boxes using the active technical font and the larger bracket size; check horizontal-to-horizontal and horizontal-to-vertical collisions, not merely the baseline positions. Reposition conflicting labels with separate rows or offsets while preserving each label's association with its source point. Keep a visible clearance between distinct labels, and ensure the two lower-edge labels do not occupy the same row. Do not replace these point coordinates with generic `x` / `y` axis labels. For the current K1 arrangement, the collision-adjusted label placements are intentionally staggered: `[153,72]` uses baseline y=55.5; `[86,102]` uses y=98; `[121,159]` uses y=167; `[148,131]` is end-aligned at x=152, y=147; and `[153,256]` uses y=285. These are presentation offsets only; the displayed coordinate values remain the original source start points. The current conservative estimate uses 6.2px monospace text at 0.6em advance and 0.85px bracket strokes, producing no label-to-label intersections; the closest estimated label pair is separated by approximately 4 SVG units. Browser verification with the actual loaded technical font is still required.
 
 ### 5.5 Force annotation
 
@@ -375,7 +375,7 @@ At this point:
 - The Title Page and left-side text remain unchanged.
 - The normal filled Logo is no longer visible.
 - The complete original FP Logo outline remains visible, including the rounded background-plate frame.
-- All eighteen source-derived dashed guides remain visible, with their coordinate labels at the corresponding segment starts.
+- All nineteen source-derived dashed guides remain visible, with their coordinate labels at the corresponding segment starts.
 - The eight rounded corners retain their Force nodes and solid tangent/control handles.
 - No background grid is present.
 - The annotation does not morph or move before the first downward scroll.
@@ -946,7 +946,7 @@ SVG
 └── temporary-force-handles
 ```
 
-The Logo source geometry is available at `public/images/fp-logo.svg`. The annotation now reuses the supplied FP Logo geometry. Its eighteen dashed guide paths are the original visible K1 elements that survive into K2; browser verification is still required.
+The Logo source geometry is available at `public/images/fp-logo.svg`. The annotation now reuses the supplied FP Logo geometry. Its nineteen dashed guide paths are the original visible K1 elements that survive into K2; browser verification is still required.
 
 ### 14.4 Part components
 
@@ -1287,7 +1287,7 @@ Implemented:
 Not yet completed:
 
 - Tune K0 and K1 timing, geometry, contrast and visual balance in a local browser.
-- Implement K2 using the original eighteen persistent SVG guide paths.
+- Implement K2 using the original nineteen persistent SVG guide paths.
 - Verify the complete sequence at desktop, tablet and mobile sizes.
 
 ### 19.3 Application entry and active files
