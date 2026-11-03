@@ -1,10 +1,15 @@
 <script setup lang="ts">
 import LogoMark from "./LogoMark.vue";
+
+const props = withDefaults(defineProps<{ k2Started?: boolean }>(), {
+  k2Started: false,
+});
 </script>
 
 <template>
   <svg
     class="logo-annotation"
+    :class="{ 'is-k2-started': props.k2Started }"
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 256 256"
     preserveAspectRatio="xMidYMid meet"
@@ -182,6 +187,26 @@ import LogoMark from "./LogoMark.vue";
   fill: none;
   opacity: 0.9;
   pointer-events: none;
+}
+
+#annotation-original-logo,
+#annotation-coordinate-labels,
+#annotation-force-handles {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 420ms cubic-bezier(0.22, 0.7, 0.24, 1),
+    visibility 0s linear;
+}
+
+.logo-annotation.is-k2-started #annotation-original-logo,
+.logo-annotation.is-k2-started #annotation-coordinate-labels,
+.logo-annotation.is-k2-started #annotation-force-handles {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 420ms cubic-bezier(0.22, 0.7, 0.24, 1),
+    visibility 0s linear 420ms;
 }
 
 .coordinate-label {
