@@ -1338,3 +1338,11 @@ This is a **geometry-preserving contour-trace prototype**, not yet a visually ap
 Provisional timing: plate 820ms after 180ms delay; contour trace 1,650ms after 1,050ms delay; final fill 140ms after 2,620ms delay. These values are implementation starting points, not approved motion specifications.
 
 **Next step:** run the local app and visually inspect the direction and pacing of the contour trace, plate reveal, final fill and K1 handoff. If the trace does not match the intended visual, revise the reveal method before implementing K2. K0/K1 have not yet been locally build-verified or visually approved.
+
+
+### 19.6 Responsive Logo sizing and plate entrance refinement
+
+The next K0 visual iteration changes the white plate entrance from a hard bottom-up clip edge to a soft gradient-mask reveal. The plate should emerge from the bottom with a feathered upper edge, then resolve to the exact solid white rounded-square shape before the monogram trace begins. The original SVG path geometry and fill remain unchanged.
+
+The Logo sizing is also being decoupled from small viewport-width changes. Desktop layout gives the Logo column a larger minimum width and reduces the viewport-proportional inter-column gap; the Logo itself uses a bounded responsive size. Narrow layouts use a wider viewport-relative range with a larger minimum and maximum than the previous 28vw rule. These are first-pass CSS values and require browser review at desktop, intermediate and narrow widths.
+
