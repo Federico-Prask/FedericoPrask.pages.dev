@@ -92,7 +92,7 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Crossfade the normal Logo into the SVG construction annotation when K0's SVG animation completes.
 - [x] Reuse the exact source paths for the complete FP monogram and rounded background-plate frame as solid outlines.
 - [x] Derive eighteen separate dashed guide paths from the original horizontal/vertical segments: four plate segments and fourteen monogram segments; align each guide to the exact source coordinate and extend it to the corresponding edge-to-edge boundary of the original 256 × 256 Logo frame; do not add unrelated background-grid lines.
-- [x] Add one `[ x , y ]` coordinate label at the original start point of every guide; rotate vertical labels by 90 degrees, including their brackets.
+- [x] Add one `[ x , y ]` coordinate label at the original start point of every guide; rotate vertical labels by 90 degrees, including their brackets; render them in the active theme color without a text outline or halo.
 - [x] Add Force anchor nodes and solid tangent/control handles at all eight rounded corners: four on the plate and four on the FP monogram.
 - [x] Keep Force values and a visible “Force” text label out of the annotation.
 - [x] Keep the annotation still after K1; do not use a timeout to start K2.
