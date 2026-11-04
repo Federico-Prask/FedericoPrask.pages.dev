@@ -709,7 +709,7 @@ onBeforeUnmount(() => {
   opacity: 0;
   transform: translateY(0.42em) scale(0.94);
   transform-origin: center bottom;
-  animation: framework-character-pop 420ms cubic-bezier(0.33, 1, 0.68, 1) both;
+  animation: framework-character-pop 420ms cubic-bezier(0.333333, 1, 0.666667, 1) both;
   animation-delay: var(--character-delay);
 }
 
