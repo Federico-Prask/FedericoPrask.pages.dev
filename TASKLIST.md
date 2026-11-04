@@ -124,6 +124,7 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Replace the clipped whole-line title reveal with individual character pop-in animation using Out Cubic and a 36ms per-character delay.
 - [x] Use a shared page-edge inset for title text; keep the rules edge-to-edge.
 - [x] Use a baseline-aligned single-color underline cursor with binary 0%/100% opacity blink; keep each cursor attached to its title's final character.
+- [x] Start all four cursor blink cycles together, after the longest title has completed, using one shared delay and period.
 - [x] Set desktop title line-box size to at least 0.4 of the adjacent rule spacing; preserve the current mobile size.
 - [ ] Verify wheel, touch, keyboard and scrollbar-triggered input; confirm K2 runs once and upward scrolling never reverses it.
 - [ ] Verify that the initial 22% document movement leaves the Hero visible and the five full-width rules occupy the lower area with moderate spacing.
@@ -209,8 +210,9 @@ The active application is a deliberately small Vue page. The old page compositio
 
 - [x] Remove the superseded Climate Crisis Google Fonts import and point Part titles at SF Pro Display Heavy (CSS weight 800).
 - [x] Add local `@font-face` declarations for `public/fonts/SF-Pro.woff` and `public/fonts/SF-Pro-Italic.woff` under the Part-title family alias `SF Pro Display`, with a declared variable weight range.
+- [!] Confirm the intended non-Heavy title weight and whether to use the SF Pro Display or SF Pro Text family.
 - [!] Inspect the uploaded font's internal name records and variation axes; confirm how Text, Display and Rounded are represented before adding aliases for the other families.
-- [ ] Verify that SF Pro Display Heavy resolves to the intended weight in the browser and that the desktop/mobile size rules remain correct.
+- [ ] Verify that the selected SF Pro family and weight resolve correctly in the browser and that the desktop/mobile size rules remain correct.
 
 ## 8. Current next actions
 
