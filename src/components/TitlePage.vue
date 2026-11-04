@@ -694,7 +694,7 @@ onBeforeUnmount(() => {
   min-width: 0;
   font-family: "SF Pro Display", var(--font-heading);
   font-size: var(--framework-title-size);
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: -0.035em;
   line-height: 1;
   white-space: nowrap;
