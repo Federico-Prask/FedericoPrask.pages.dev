@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { useI18n } from "../composables/useI18n";
 import { useTheme } from "../composables/useTheme";
 import LogoMark from "./LogoMark.vue";
@@ -17,6 +17,23 @@ const prefersReducedMotion =
 const logoStage = ref<LogoStage>(prefersReducedMotion ? "waiting" : "reveal");
 
 const k2Started = ref(false);
+type K2Phase = "idle" | "converging" | "expanding" | "titles";
+const k2Phase = ref<K2Phase>("idle");
+const markSpaceRef = ref<HTMLElement | null>(null);
+const annotationBounds = ref<Record<string, string>>({});
+const annotationStyle = computed(() => {
+  if (k2Phase.value === "expanding" || k2Phase.value === "titles") {
+    return {
+      left: "0px",
+      top: "0px",
+      width: "100vw",
+      height: "100vh",
+      "--annotation-unit": annotationBounds.value["--annotation-unit"] ?? "1px",
+    };
+  }
+  return annotationBounds.value;
+});
+let k2ConvergeTimer: number | undefined;
 let touchStartY: number | null = null;
 let pendingK2 = false;
 let lastScrollY = 0;
@@ -29,6 +46,14 @@ function beginK2() {
   }
   k2Started.value = true;
   pendingK2 = false;
+  if (prefersReducedMotion) {
+    k2Phase.value = "titles";
+    return;
+  }
+  k2Phase.value = "converging";
+  k2ConvergeTimer = window.setTimeout(() => {
+    k2Phase.value = "expanding";
+  }, 420);
 }
 
 function handleWheel(event: WheelEvent) {
@@ -69,7 +94,31 @@ function handleKeydown(event: KeyboardEvent) {
   }
 }
 
+function updateAnnotationBounds() {
+  if (k2Started.value || !markSpaceRef.value) return;
+  const rect = markSpaceRef.value.getBoundingClientRect();
+  annotationBounds.value = {
+    left: `${rect.left}px`,
+    top: `${rect.top}px`,
+    width: `${rect.width}px`,
+    height: `${rect.height}px`,
+    "--annotation-unit": `${rect.height / 256}px`,
+  };
+}
+
+function handleFrameworkTransitionEnd(event: TransitionEvent) {
+  if (
+    k2Phase.value === "expanding" &&
+    event.target === event.currentTarget &&
+    (event.propertyName === "width" || event.propertyName === "height")
+  ) {
+    k2Phase.value = "titles";
+  }
+}
+
 onMounted(() => {
+  updateAnnotationBounds();
+  window.addEventListener("resize", updateAnnotationBounds, { passive: true });
   lastScrollY = window.scrollY;
   window.addEventListener("wheel", handleWheel, { passive: true, capture: true });
   window.addEventListener("touchstart", handleTouchStart, { passive: true, capture: true });
@@ -81,6 +130,8 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+  if (k2ConvergeTimer !== undefined) window.clearTimeout(k2ConvergeTimer);
+  window.removeEventListener("resize", updateAnnotationBounds);
   window.removeEventListener("wheel", handleWheel, true);
   window.removeEventListener("touchstart", handleTouchStart, true);
   window.removeEventListener("touchmove", handleTouchMove, true);
@@ -154,7 +205,7 @@ function handleAnnotationFadeEnd(event: TransitionEvent) {
         </p>
       </div>
 
-      <div class="title-page__mark-space">
+      <div ref="markSpaceRef" class="title-page__mark-space">
         <div
           class="title-page__logo-sequence"
           :class="`is-${logoStage}`"
@@ -169,17 +220,40 @@ function handleAnnotationFadeEnd(event: TransitionEvent) {
           >
             <LogoMark @reveal-end="handleLogoRevealEnd" />
           </div>
-          <div
-            class="title-page__logo-annotation"
-            :aria-hidden="logoStage === 'reveal'"
-            @transitionend.self="handleAnnotationFadeEnd"
-          >
-            <LogoAnnotation :k2-started="k2Started" />
-          </div>
+          <!-- Annotation is rendered in a fixed overlay so its original SVG paths can travel into the page framework. -->
         </div>
       </div>
     </div>
   </section>
+
+  <div
+    v-if="Object.keys(annotationBounds).length"
+    class="title-page__logo-annotation"
+    :class="{
+      'is-visible': logoStage === 'crossfade' || logoStage === 'waiting',
+      'is-expanded': k2Phase === 'expanding' || k2Phase === 'titles',
+    }"
+    :style="annotationStyle"
+    aria-hidden="true"
+    @transitionend.self="handleFrameworkTransitionEnd"
+  >
+    <LogoAnnotation :k2-started="k2Started" :k2-phase="k2Phase" />
+    <div v-if="k2Phase === 'titles'" class="framework-titles">
+      <div
+        v-for="(part, index) in [
+          'Part.01 Introduction',
+          'Part.02 Works',
+          'Part.03 Milestones',
+          'Part.04 Beyond',
+        ]"
+        :key="part"
+        class="framework-title"
+        :style="{ animationDelay: (index * 150) + 'ms' }"
+      >
+        <span>{{ part }}</span><span class="framework-title__cursor" aria-hidden="true"></span>
+      </div>
+    </div>
+  </div>
 </template>
 
 <style scoped>
@@ -310,8 +384,7 @@ function handleAnnotationFadeEnd(event: TransitionEvent) {
   height: 100%;
 }
 
-.title-page__logo-normal,
-.title-page__logo-annotation {
+.title-page__logo-normal {
   position: absolute;
   inset: 0;
   transition: opacity 700ms cubic-bezier(0.22, 0.7, 0.24, 1);
@@ -329,17 +402,77 @@ function handleAnnotationFadeEnd(event: TransitionEvent) {
 }
 
 .title-page__logo-annotation {
+  position: fixed;
+  z-index: 20;
+  left: 0;
+  top: 0;
+  display: block;
+  overflow: visible;
+  color: var(--site-hero-foreground);
+  pointer-events: none;
   opacity: 0;
+  transition:
+    left 900ms cubic-bezier(0.16, 1, 0.3, 1),
+    top 900ms cubic-bezier(0.16, 1, 0.3, 1),
+    width 900ms cubic-bezier(0.16, 1, 0.3, 1),
+    height 900ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 700ms cubic-bezier(0.22, 0.7, 0.24, 1);
+}
+
+.title-page__logo-annotation.is-visible {
+  opacity: 1;
+}
+
+.title-page__logo-annotation.is-expanded {
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+.title-page__logo-annotation > .logo-annotation {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.framework-titles {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: 28.125% 23.047% 26.563% 22.265%;
+  color: var(--site-hero-foreground);
   pointer-events: none;
 }
 
-.title-page__logo-sequence.is-crossfade .title-page__logo-normal {
-  opacity: 0;
+.framework-title {
+  display: flex;
+  align-items: center;
+  padding-inline: clamp(1.5rem, 7vw, 7rem);
+  font-family: var(--font-heading);
+  font-size: clamp(1.15rem, 2.7vw, 2.6rem);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  clip-path: inset(0 100% 0 0);
+  animation: framework-title-reveal 460ms steps(22, end) forwards;
 }
 
-.title-page__logo-sequence.is-crossfade .title-page__logo-annotation,
-.title-page__logo-sequence.is-waiting .title-page__logo-annotation {
-  opacity: 1;
+.framework-title__cursor {
+  display: inline-block;
+  width: 1.15em;
+  height: 0.08em;
+  margin-inline-start: 0.16em;
+  border-bottom: 1px solid currentColor;
+  transform: translateY(0.16em);
+  animation: framework-cursor-blink 900ms steps(2, end) infinite;
+}
+
+@keyframes framework-title-reveal {
+  to { clip-path: inset(0 0 0 0); }
+}
+
+@keyframes framework-cursor-blink {
+  50% { opacity: 0; }
 }
 
 @media (max-width: 760px) {
@@ -379,6 +512,15 @@ function handleAnnotationFadeEnd(event: TransitionEvent) {
   .title-page__logo-normal,
   .title-page__logo-annotation {
     transition: none;
+  }
+
+  .framework-title {
+    clip-path: none;
+    animation: none;
+  }
+
+  .framework-title__cursor {
+    animation: none;
   }
 }
 </style>
