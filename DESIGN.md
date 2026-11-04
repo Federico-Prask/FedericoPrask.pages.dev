@@ -440,64 +440,71 @@ All vertical guide paths and the four unselected horizontal guide paths are temp
 As K2 begins, the five selected horizontal guides:
 
 - Lose their dashed pattern and become continuous solid rules.
-- Become extremely thin structural lines (initial implementation target: 0.5 CSS px).
+- Become thinner than the K1 construction guides. Current target: **0.35 CSS px**; verify visibility on real displays.
 - Change to the inverse blue mapping from the K1 construction guides:
   - Light mode: dark blue `#5b7da3`.
   - Dark mode: light blue `#a9c5e4`.
 - Remain visually subordinate to the Part titles and page content.
 
-Use a dedicated semantic framework-rule token. Do not reuse `--site-guide`, whose K1 light/dark mapping is intentionally the opposite.
+Use the dedicated `--site-framework-rule` token. Do not reuse `--site-guide`, whose K1 light/dark mapping is intentionally the opposite.
 
-### 6.5 Move and expand the framework
+### 6.5 K2 motion sequence
 
-The five original line elements first converge toward the bottom boundary of the **entire Title Page composition**.
+K2 is a discrete choreography triggered by the first downward user input. It is not tied continuously to scroll progress. The browser document itself scrolls down by one viewport so the Hero physically moves upward and completely leaves the visible area.
 
-The destination is not under the name, subtitle, Logo, or an individual title. It is the lower boundary of the complete Hero / Title Page.
+**Stage A — Recompose the original paths below the Hero**
 
-From that shared boundary, the five lines expand vertically into the five ordered framework positions and horizontally across the page width. Their final spacing establishes four Part regions, with one boundary above Part.01 and one below Part.04.
+The five selected original SVG path elements move directly from their own K1 coordinates into a compact stack of five parallel rules immediately below the Hero's document section. Their spacing is deliberately small. This stage changes the transforms of the original path elements; it must not stretch the entire annotation SVG or replace the paths with HTML borders or newly drawn SVG lines.
 
-Use a fast ease-out motion in the Out Cubic family. The result should feel like the compact construction diagram opening into a page-wide editorial framework. The initial implementation uses a 420 ms convergence, a 900 ms expansion and a short 180 ms pause before the title reveal; these timings remain provisional until browser review.
+**Stage B — Scroll the document while the rules travel outward**
 
-Do not duplicate the lines, create HTML borders, or draw replacement SVG paths. Preserve the five selected original SVG elements throughout the transformation.
+The page scrolls from the Hero to the following full-viewport framework stage using an **In-Out Cubic** curve. At the same time, all five rules begin an **Out Cubic** displacement, expanding horizontally from the Logo-width line group toward the page-wide rule width. The line-motion duration is slightly longer than the document-scroll duration. This overlap is intentional: the Hero moves out while the compact line group comes into view and opens across the page.
+
+**Stage C — Stagger the five rules into their framework positions**
+
+After the document reaches the framework stage, the rules separate vertically to their final positions. Their animation start times are staggered from top to bottom; they must not all start together. The final five positions define the four Part regions and the outer top/bottom limits.
+
+The five lines are inset from the page edges. Part titles use the same horizontal inset as the line starts, keeping the left title edge and rule edge aligned. The framework must be composed from the five original SVG elements only. The Logo annotation SVG viewport itself stays at the Logo's measured K1 size; only the selected paths travel outside it. Do not resize or stretch the SVG overlay to the viewport.
+
+Use Out Cubic for the path travel and vertical separation. Initial source timings are 760 ms for recomposition, 920 ms for document scroll (In-Out Cubic), 1,100 ms for simultaneous horizontal travel, and 920 ms for vertical separation plus top-to-bottom stagger. These are implementation starting points and remain subject to browser review.
 
 ### 6.6 Part title reveal
 
-After the guide expansion finishes, allow a short pause. Then reveal the Part titles in vertical order:
+The four titles are completely absent before the five-rule framework expansion finishes. Then all four title animations begin at the **same time**:
 
 1. Part.01 Introduction
 2. Part.02 Works
 3. Part.03 Milestones
 4. Part.04 Beyond
 
-The earlier numeric strings such as `111111` and `222222` were layout placeholders only. They are not final titles.
+Each title uses a smooth type-in / clipped reveal with an **Out Cubic** curve. The duration must be long enough for the reveal to visibly decelerate toward its end; do not use a short, abrupt steps animation. Do not stagger the four title start times.
 
-The titles should appear quickly, with a type-in / rapid reveal quality. Their exact speed and per-title delay remain open.
+Desktop title size must be at least **one two-and-a-halfth** of the vertical distance between adjacent framework rules (height ratio >= 0.4). Use a viewport-height-aware size so this relationship holds as the screen height changes. On phones, retain the current mobile title size; do not apply the desktop enlargement rule.
+
+Use one shared horizontal inset for the rules and the title text, so the title's left edge sits at approximately the same distance from the page edge as the rule's left endpoint.
 
 ### 6.7 Cursor treatment
 
-Each Part title ends with a terminal-inspired **underline cursor**.
-
-Requirements:
+Each Part title ends with a terminal-inspired **underline cursor**:
 
 - It is an underline-like cursor, not a block cursor.
-- It is visually attached to the end of the title.
-- It should stay close to the final title character.
-- It blinks during the title reveal and the initial framework state.
-- It is a title-ending cue, not a separate decorative element floating elsewhere.
+- It is attached immediately after the final title character.
+- All four cursors share the same alignment and use the title's single `currentColor`; do not introduce multiple cursor colors.
+- Its blink is binary only: fully visible (100% opacity) or fully hidden (0% opacity). Do not animate intermediate opacity values.
+- Keep the cursor visually aligned to the same text baseline in all four rows.
 
-Because the title font is proportional sans-serif, the cursor should be implemented as a separate inline visual mark if necessary. Do not switch the title to a monospace font just to obtain a cursor.
+Do not switch the title to a monospace font to obtain a cursor.
 
 ### 6.8 K2 end state
 
 At the end of K2:
 
-- The initial Title Page has completed its role in the scene.
-- The Part titles are visible in vertical order.
-- Horizontal separators / guide lines establish the initial Part divisions.
+- The browser document has scrolled down one viewport; the Hero is completely above the viewport.
+- Only the four Part titles and five horizontal framework rules are visible in the framework stage.
+- The five rules are evenly distributed and define four Part regions.
+- All four title type-in reveals have completed.
 - The left/right dashed outer boundaries have not yet completed their appearance.
-- The overall palette has not yet completed the content-theme transition.
-
----
+- The overall palette has not yet completed the K3 content-theme transition.
 
 ## 7. Part framework and visual transition: K3
 
@@ -1344,11 +1351,10 @@ The Logo sizing is also being decoupled from small viewport-width changes. Deskt
 The K0 completion listener is bound directly to the final monogram-fill path. Because Vue scoped styles may rewrite component-local keyframe identifiers, the handler does not compare `AnimationEvent.animationName` with the source-level keyframe name; the listener's placement on the dedicated final-fill path is the event filter. It emits the completion event when that path's animation ends, allowing TitlePage to advance from K0 reveal to the K1 annotation crossfade. This is a source-level correction; local runtime behavior and the complete K1 annotation still require browser verification.
 
 
-### 19.8 Part title typeface trial — Climate Crisis
+### 19.8 Part title typeface transition — SF Pro variable font pending
 
-A temporary typography trial loads **Climate Crisis** from Google Fonts for the four K2 Part titles only. The font is applied to the Part title labels, not the Hero name or other page typography. This is an evaluation setup for visual review, not the final deployment strategy. Google Fonts availability may vary by visitor network; before production, bundle the chosen `.woff2` file under the site's local font assets and load it with `@font-face`. The visual fit, readability and final font weight remain subject to browser review.
+The Climate Crisis trial is superseded. The intended title family is **SF Pro Display**, using its Heavy weight from the variable font asset the owner plans to upload. The supplied variable font is expected to contain the SF Pro Text, SF Pro Display and SF Pro Rounded families. Do not guess the internal family names, supported weight range, or variation axes: inspect the uploaded font before defining local `@font-face` declarations. The final site should load the provided font locally rather than depend on Google Fonts. Until the asset is available, the font-face configuration remains pending.
 
+### 19.9 Part title size refinement
 
-### 19.9 Climate Crisis scale refinement
-
-The first visual feedback on Climate Crisis was that the Part titles felt undersized and slightly too heavy. Increase the responsive title size from `clamp(1.15rem, 2.7vw, 2.6rem)` to `clamp(1.5rem, 3.6vw, 3.4rem)`. Keep the typeface at CSS weight 400 for this iteration; assess the larger scale in the browser before introducing artificial stroke thinning or changing the font. Mobile uses the same enlarged rule for now; verify that it remains legible and fits the available line width.
+The current mobile size is considered approximately correct and must be retained. Desktop titles were still too small. The desktop rule must be viewport-height-aware and ensure the title size/line-box height is at least 0.4 times the distance between adjacent rules. The mobile breakpoint keeps the existing `clamp(1.5rem, 3.6vw, 3.4rem)` size unchanged. The final title weight is SF Pro Display Heavy after the variable font asset is inspected and installed.
