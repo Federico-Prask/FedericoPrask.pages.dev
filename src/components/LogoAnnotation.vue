@@ -1,26 +1,27 @@
 <script setup lang="ts">
 import LogoMark from "./LogoMark.vue";
 
-const props = withDefaults(defineProps<{ k2Started?: boolean }>(), {
+const props = withDefaults(defineProps<{ k2Started?: boolean; k2Phase?: "idle" | "converging" | "expanding" | "titles" }>(), {
   k2Started: false,
+  k2Phase: "idle",
 });
 </script>
 
 <template>
   <svg
     class="logo-annotation"
-    :class="{ 'is-k2-started': props.k2Started }"
+    :class="{ 'is-k2-started': props.k2Started, 'is-k2-converging': props.k2Phase === 'converging' }"
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 256 256"
-    preserveAspectRatio="xMidYMid meet"
+    preserveAspectRatio="none"
     role="presentation"
     aria-hidden="true"
   >
     <!-- The exact supplied FP mark, including its rounded plate frame, is retained as a solid outline. -->
     <g id="annotation-persistent-guides" class="axis-guides" data-k2-disposition="preserve">
-      <path id="guide-plate-h-01" data-source="plate" data-axis="h" data-start="56,0" d="M 0 0 L 256 0" />
+      <path id="guide-plate-h-01" data-source="plate" data-axis="h" data-start="56,0" d="M 0 0 L 256 0" data-k2-persistent="true" style="--k2-converge-y: 256;" />
       <path id="guide-plate-v-01" data-source="plate" data-axis="v" data-start="256,56" d="M 256 0 L 256 256" />
-      <path id="guide-plate-h-02" data-source="plate" data-axis="h" data-start="200,256" d="M 0 256 L 256 256" />
+      <path id="guide-plate-h-02" data-source="plate" data-axis="h" data-start="200,256" d="M 0 256 L 256 256" data-k2-persistent="true" style="--k2-converge-y: 0;" />
       <path id="guide-plate-v-02" data-source="plate" data-axis="v" data-start="0,200" d="M 0 0 L 0 256" />
       <path id="guide-mono-h-01" data-source="monogram" data-axis="h" data-start="52,40" d="M 0 40 L 256 40" />
       <path id="guide-mono-v-01" data-source="monogram" data-axis="v" data-start="219,106" d="M 219 0 L 219 256" />
@@ -29,13 +30,13 @@ const props = withDefaults(defineProps<{ k2Started?: boolean }>(), {
       <path id="guide-mono-v-03" data-source="monogram" data-axis="v" data-start="121,256" d="M 121 0 L 121 256" />
       <path id="guide-mono-h-03" data-source="monogram" data-axis="h" data-start="121,159" d="M 0 159 L 256 159" />
       <path id="guide-mono-v-04" data-source="monogram" data-axis="v" data-start="187,125" d="M 187 0 L 187 256" />
-      <path id="guide-mono-h-04" data-source="monogram" data-axis="h" data-start="153,72" d="M 0 72 L 256 72" />
+      <path id="guide-mono-h-04" data-source="monogram" data-axis="h" data-start="153,72" d="M 0 72 L 256 72" data-k2-persistent="true" style="--k2-converge-y: 184;" />
       <path id="guide-mono-v-05" data-source="monogram" data-axis="v" data-start="86,72" d="M 86 0 L 86 256" />
       <path id="guide-mono-h-05" data-source="monogram" data-axis="h" data-start="86,102" d="M 0 102 L 256 102" />
       <path id="guide-mono-v-06" data-source="monogram" data-axis="v" data-start="148,102" d="M 148 0 L 148 256" />
-      <path id="guide-mono-h-06" data-source="monogram" data-axis="h" data-start="148,131" d="M 0 131 L 256 131" />
+      <path id="guide-mono-h-06" data-source="monogram" data-axis="h" data-start="148,131" d="M 0 131 L 256 131" data-k2-persistent="true" style="--k2-converge-y: 125;" />
       <path id="guide-mono-v-07" data-source="monogram" data-axis="v" data-start="86,131" d="M 86 0 L 86 256" />
-      <path id="guide-mono-h-07" data-source="monogram" data-axis="h" data-start="86,199" d="M 0 199 L 256 199" />
+      <path id="guide-mono-h-07" data-source="monogram" data-axis="h" data-start="86,199" d="M 0 199 L 256 199" data-k2-persistent="true" style="--k2-converge-y: 57;" />
       <path id="guide-mono-v-08" data-source="monogram" data-axis="v" data-start="52,199" d="M 52 0 L 52 256" />
     </g>
 
@@ -181,6 +182,39 @@ const props = withDefaults(defineProps<{ k2Started?: boolean }>(), {
   stroke-dasharray: 2.6 4.2;
   stroke-linecap: butt;
   vector-effect: non-scaling-stroke;
+}
+
+.axis-guides path {
+  opacity: 1;
+  transition:
+    opacity 420ms cubic-bezier(0.22, 0.7, 0.24, 1),
+    stroke 420ms ease,
+    stroke-width 420ms ease;
+}
+
+.logo-annotation.is-k2-started .axis-guides path[data-k2-persistent="true"] {
+  stroke: var(--site-framework-rule);
+  stroke-width: 0.5;
+  stroke-dasharray: none;
+}
+
+.logo-annotation.is-k2-started .axis-guides path:not([data-k2-persistent="true"]) {
+  opacity: 0;
+}
+
+.logo-annotation.is-k2-converging .axis-guides path[data-k2-persistent="true"] {
+  transform: translateY(calc(var(--k2-converge-y) * var(--annotation-unit)));
+  transition: transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.logo-annotation.is-k2-started .axis-guides path[data-k2-persistent="true"] {
+  transform-box: view-box;
+  transform-origin: 0 0;
+}
+
+.logo-annotation:not(.is-k2-converging) .axis-guides path[data-k2-persistent="true"] {
+  transform: translateY(0);
+  transition: transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .coordinates {
