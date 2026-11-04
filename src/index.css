@@ -3,9 +3,9 @@
 
 @font-face {
   font-family: "SF Pro Display";
-  src: url("/fonts/SF-Pro.woff") format("woff");
+  src: url("/fonts/SF-Pro.ttf") format("truetype");
   font-style: normal;
-  font-weight: 100 900;
+  font-weight: 1 1000;
   font-display: swap;
 }
 
@@ -13,7 +13,7 @@
   font-family: "SF Pro Display";
   src: url("/fonts/SF-Pro-Italic.woff") format("woff");
   font-style: italic;
-  font-weight: 100 900;
+  font-weight: 400;
   font-display: swap;
 }
 
