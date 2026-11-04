@@ -9,7 +9,7 @@ const { locale, setLocale } = useI18n();
 const { pref, resolved, cycle } = useTheme();
 
 type LogoStage = "reveal" | "crossfade" | "waiting";
-type K2Phase = "idle" | "recompose" | "travel" | "expand" | "titles";
+type K2Phase = "idle" | "recompose" | "settled" | "expand" | "titles";
 
 const prefersReducedMotion =
   typeof window !== "undefined" &&
@@ -51,9 +51,11 @@ const verticalInset = computed(() =>
   Math.max(28, Math.min(72, viewport.value.height * 0.07)),
 );
 
-const compactLineGap = computed(() =>
-  Math.max(6, Math.min(9, viewport.value.height * 0.01)),
-);
+const compactLineGap = computed(() => {
+  const { height } = viewport.value;
+  const rowGap = (height - verticalInset.value * 2) / 4;
+  return Math.max(22, Math.min(48, rowGap * 0.24));
+});
 
 function makeLineMatrix(
   sourceY: number,
@@ -85,12 +87,9 @@ const k2LineTransforms = computed<Record<string, string>>(() => {
       let targetY = compactTop + index * compactLineGap.value;
       let lineWidth = bounds.width;
 
-      if (k2Phase.value === "travel" || k2Phase.value === "expand" || k2Phase.value === "titles") {
+      if (k2Phase.value === "expand" || k2Phase.value === "titles") {
         targetX = horizontalInset.value;
         lineWidth = targetWidth;
-      }
-
-      if (k2Phase.value === "expand" || k2Phase.value === "titles") {
         targetY = heroHeight.value + verticalInset.value + index * finalRowGap;
       }
 
@@ -125,18 +124,20 @@ const frameworkTitlesStyle = computed(() => {
 });
 
 let k2RecomposeTimer: number | undefined;
-let k2TravelTimer: number | undefined;
+let k2SettleTimer: number | undefined;
 let k2ExpandTimer: number | undefined;
 let scrollFrame: number | undefined;
 let touchStartY: number | null = null;
 let pendingK2 = false;
 let lastScrollY = 0;
 
-const K2_RECOMPOSE_DURATION = 760;
-const K2_SCROLL_DURATION = 920;
-const K2_LINE_TRAVEL_DURATION = 1100;
-const K2_LINE_EXPAND_DURATION = 920;
-const K2_LINE_STAGGER = 70;
+const K2_RECOMPOSE_DURATION = 720;
+const K2_INITIAL_SCROLL_DURATION = 560;
+const K2_INITIAL_SCROLL_RATIO = 0.22;
+const K2_SETTLE_HOLD = 170;
+const K2_OPEN_SCROLL_DURATION = 1020;
+const K2_LINE_EXPAND_DURATION = 1120;
+const K2_LINE_STAGGER = 65;
 
 function easeInOutCubic(value: number): number {
   return value < 0.5
@@ -196,18 +197,30 @@ function beginK2() {
   }
 
   k2Phase.value = "recompose";
-  k2RecomposeTimer = window.setTimeout(() => {
-    k2Phase.value = "travel";
-    animateDocumentScroll(heroHeight.value, K2_SCROLL_DURATION);
 
-    k2TravelTimer = window.setTimeout(() => {
+  // Move the document only a short distance during the first line regrouping.
+  // The Hero remains mostly visible while the five paths settle into a
+  // moderately spaced group near its lower edge.
+  animateDocumentScroll(
+    heroHeight.value * K2_INITIAL_SCROLL_RATIO,
+    K2_INITIAL_SCROLL_DURATION,
+  );
+
+  k2RecomposeTimer = window.setTimeout(() => {
+    k2Phase.value = "settled";
+
+    // Hold the intermediate composition briefly, then let the rules open
+    // the framework while the document completes its upward-moving scroll.
+    k2SettleTimer = window.setTimeout(() => {
       k2Phase.value = "expand";
+      animateDocumentScroll(heroHeight.value, K2_OPEN_SCROLL_DURATION);
+
       const totalExpandTime =
         K2_LINE_EXPAND_DURATION + (lineDefinitions.length - 1) * K2_LINE_STAGGER;
       k2ExpandTimer = window.setTimeout(() => {
         k2Phase.value = "titles";
-      }, totalExpandTime + 80);
-    }, K2_LINE_TRAVEL_DURATION);
+      }, Math.max(totalExpandTime, K2_OPEN_SCROLL_DURATION) + 80);
+    }, K2_SETTLE_HOLD);
   }, K2_RECOMPOSE_DURATION);
 }
 
@@ -328,7 +341,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   if (k2RecomposeTimer !== undefined) window.clearTimeout(k2RecomposeTimer);
-  if (k2TravelTimer !== undefined) window.clearTimeout(k2TravelTimer);
+  if (k2SettleTimer !== undefined) window.clearTimeout(k2SettleTimer);
   if (k2ExpandTimer !== undefined) window.clearTimeout(k2ExpandTimer);
   if (scrollFrame !== undefined) window.cancelAnimationFrame(scrollFrame);
 
