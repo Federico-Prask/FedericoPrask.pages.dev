@@ -112,11 +112,13 @@ const k2LineDelays = computed<Record<string, string>>(() =>
 const frameworkTitlesStyle = computed(() => {
   const bounds = annotationBounds.value;
   const { width, height } = viewport.value;
+  const rowHeight = (height - verticalInset.value * 2) / 4;
   return {
     left: horizontalInset.value - bounds.left + "px",
     top: height + verticalInset.value - bounds.top + "px",
     width: width - horizontalInset.value * 2 + "px",
     height: height - verticalInset.value * 2 + "px",
+    "--framework-title-size": rowHeight / 2.5 + "px",
   };
 });
 
@@ -636,7 +638,7 @@ onBeforeUnmount(() => {
   align-items: baseline;
   min-width: 0;
   font-family: "SF Pro Display", var(--font-heading);
-  font-size: clamp(3rem, min(10svh, 7vw), 7rem);
+  font-size: var(--framework-title-size);
   font-weight: 800;
   letter-spacing: -0.035em;
   line-height: 1;
