@@ -106,19 +106,22 @@ The active application is a deliberately small Vue page. The old page compositio
 
 ## 4. Phase 2 — First-scroll transition
 
-### 4.1 K2 — Guide conversion
+### 4.1 K2 — First-scroll framework choreography
 
-- [ ] Verify all K2 navigation inputs in the browser: wheel, touch swipe measured from the initial touch point, keyboard navigation, and actual downward document scrolling. Inputs received during K1 must be queued and applied once the annotation reaches its waiting state.
-- [x] Make the trigger one-shot; upward scrolling must not reverse or replay it.
-- [x] Fade out and then hide coordinate labels, Force nodes, Force handles and the complete original FP Logo outline when K2 begins, while leaving the original persistent guide group untouched.
-- [x] Preserve exactly five original horizontal guide paths: `guide-plate-h-01`, `guide-mono-h-04`, `guide-mono-h-06`, `guide-mono-h-07`, `guide-plate-h-02`; hide the other horizontal guides and all vertical guides from the K2 framework.
-- [x] Convert the five surviving paths from dashed guides into 0.5px solid rules; use dark blue `#5b7da3` in Light mode and light blue `#a9c5e4` in Dark mode.
-- [x] Move the five original paths to the bottom boundary of the entire Title Page composition, then expand them vertically into the five ordered page-wide framework boundaries with fast Out Cubic motion.
-- [x] Pause briefly after the five-line framework expansion (initial source timing: 180ms).
-- [x] Reveal the four Part titles in vertical order using a rapid clipped reveal.
-- [x] Attach a blinking underline cursor to every Part title.
-- [ ] Verify K2 convergence, page-width expansion, title placement and cursor behavior in the browser at desktop and mobile widths, in both themes.
-
+- [ ] Replace the old fixed-overlay viewport-stretch prototype; do not stretch the annotation SVG to the viewport.
+- [ ] Preserve and animate only the five original horizontal path elements: `guide-plate-h-01`, `guide-mono-h-04`, `guide-mono-h-06`, `guide-mono-h-07`, `guide-plate-h-02`.
+- [ ] Convert those five paths to 0.35px solid framework rules with the existing inverse blue theme mapping; hide all other construction guides and fade out the Logo outline, coordinates and Force handles.
+- [ ] Recompose the five original paths into a compact parallel group below the Hero, each moving from its own original K1 coordinate.
+- [ ] Add a real one-viewport document scroll using In-Out Cubic; do not emulate it with a Hero-only translate.
+- [ ] During document scroll, expand the five rules horizontally with Out Cubic; the line travel duration must be slightly longer than the scroll duration.
+- [ ] After scroll completion, separate the five rules vertically into their final framework positions with top-to-bottom staggered start times.
+- [ ] Add the following full-viewport framework stage to the document so the Hero can physically leave the viewport.
+- [ ] Reveal all four Part titles only after line expansion; all four type-in reveals must start simultaneously and use a sufficiently long Out Cubic deceleration.
+- [ ] Use a shared left inset for title text and rule endpoints.
+- [ ] Use a baseline-aligned single-color underline cursor with binary 0%/100% opacity blink.
+- [ ] Set desktop title size/line-box height to at least 0.4 of the adjacent rule spacing; preserve the current mobile title size.
+- [ ] Verify wheel, touch, keyboard and scrollbar-triggered input; confirm K2 runs once and upward scrolling never reverses it.
+- [ ] Verify line transforms, scroll position, title layout, cursor alignment and both themes in desktop/mobile browsers.
 ### 4.2 K3 — Framework and theme transition
 
 - [ ] Move the left and right dashed boundaries inward from outside the scene.
@@ -193,12 +196,12 @@ The active application is a deliberately small Vue page. The old page compositio
 - [ ] Verify locally that K0 crossfades into the complete K1 annotation and that the normal Logo is fully gone.
 - [ ] Verify the complete FP Logo outline, all nineteen dashed guides and their bracketed start-coordinate labels, and all solid Force handles remain visible in the K1 waiting state.
 
-### Part title typeface trial
+### Part title typeface
 
-- [x] Add a temporary Google Fonts import for Climate Crisis and apply it to the four Part titles only.
-- [x] Increase the responsive Climate Crisis Part title size for the next visual review; retain CSS weight 400 (the current trial's lightest setting).
-- [ ] Review the enlarged typeface in the browser for perceived weight, readability, line spacing and fit at desktop and mobile widths.
-- [ ] If selected, replace the remote font dependency with a locally hosted `.woff2` asset and verify the local `@font-face` load.
+- [ ] Remove the superseded Climate Crisis Google Fonts import.
+- [ ] Inspect the uploaded SF Pro variable font's metadata and identify the Text, Display and Rounded family faces and supported axes.
+- [ ] Define local `@font-face` declarations for the supplied families and select SF Pro Display Heavy for the Part titles.
+- [ ] Verify the font loads from local assets and the desktop/mobile size rules remain correct.
 
 ## 8. Current next actions
 
