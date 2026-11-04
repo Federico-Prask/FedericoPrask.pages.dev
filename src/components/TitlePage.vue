@@ -582,10 +582,10 @@ onBeforeUnmount(() => {
 
 .title-page__layout {
   display: grid;
-  width: min(100%, 88rem);
-  grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.82fr);
+  width: min(100%, 82rem);
+  grid-template-columns: minmax(0, 1fr) minmax(16rem, 0.82fr);
   align-items: center;
-  gap: clamp(2rem, 5vw, 5rem);
+  gap: clamp(1.7rem, 4.2vw, 4.2rem);
   margin: auto;
 }
 
@@ -598,7 +598,7 @@ onBeforeUnmount(() => {
   flex-direction: column;
   margin: 0;
   font-family: var(--font-heading);
-  font-size: clamp(4.25rem, 10.4vw, 9.75rem);
+  font-size: clamp(3.55rem, 8.7vw, 8rem);
   font-weight: 600;
   letter-spacing: -0.035em;
   line-height: 0.84;
@@ -620,7 +620,7 @@ onBeforeUnmount(() => {
 
 .title-page__mark-space {
   display: grid;
-  width: clamp(18rem, 28vw, 25rem);
+  width: clamp(15rem, 23.5vw, 21rem);
   max-width: 100%;
   min-width: 0;
   aspect-ratio: 1;
@@ -769,11 +769,11 @@ onBeforeUnmount(() => {
   }
 
   .title-page__name {
-    font-size: clamp(4rem, 17vw, 7.25rem);
+    font-size: clamp(3.35rem, 14.3vw, 6.1rem);
   }
 
   .title-page__mark-space {
-    width: clamp(12rem, 42vw, 16rem);
+    width: clamp(10rem, 35.3vw, 13.4rem);
     justify-self: center;
   }
 
