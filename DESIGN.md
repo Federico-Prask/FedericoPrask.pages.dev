@@ -474,7 +474,7 @@ At the end, the five full-width rules frame four Part rows. No line is added, re
 
 Only after the upward line expansion completes, all four Part titles begin together. Each title is split into individual characters; characters pop into place one by one with a restrained upward movement and scale settle, using an Out Cubic curve. The four rows share the same start time and per-character cadence; do not delay one row behind another or reveal each title as one clipped block.
 
-Each title's underline cursor remains attached immediately after its final character. All cursors use the same current text color and only two opacity states (100% / 0%) while blinking.
+Each title's underline cursor remains attached immediately after its final character. All four cursors wait until the longest title has completed, then begin blinking at the exact same time with one shared delay and one shared 900ms cycle. All cursors use the same current text color and only two opacity states (100% / 0%).
 
 The title text keeps its left inset from the page edge. Desktop title size/line-box height must be at least **0.4 times the distance between adjacent rules** (one part in 2.5); mobile keeps the current title size unchanged.
 
@@ -1329,7 +1329,7 @@ The K0 completion listener is bound directly to the final monogram-fill path. Be
 
 ### 19.8 Part title typeface transition — SF Pro variable font pending
 
-The Climate Crisis trial is superseded. The intended Part-title face is **SF Pro Display Heavy**. The dev branch now contains `public/fonts/SF-Pro.woff` and `public/fonts/SF-Pro-Italic.woff`. Both are registered locally under the CSS family alias `SF Pro Display`, with a declared variable weight range of 100–900; Part titles request weight 800. The font is loaded locally, not through Google Fonts. The supplied file's internal name records and variation axes have not been independently inspected through the current repository-file interface, so the Text / Display / Rounded family mapping remains an explicit verification item rather than an assumption.
+The Climate Crisis trial is superseded. The dev branch now contains `public/fonts/SF-Pro.woff` and `public/fonts/SF-Pro-Italic.woff`, registered locally under the CSS family alias `SF Pro Display`. The current CSS still requests weight 800, but this is no longer an approved final choice: the owner has clarified that the title lettering should not be Heavy. Confirm the intended weight and whether the desired family is SF Pro Display or SF Pro Text before changing the weight/family declaration. The font is loaded locally, not through Google Fonts. Internal name records and variation axes remain unverified.
 
 ### 19.9 Part title size refinement
 
@@ -1345,8 +1345,8 @@ The current source sequence is:
 2. The document scrolls 22% of the Hero height over 560ms with In-Out Cubic. The Hero remains visible while the full-width rules settle over 720ms with Out Cubic.
 3. The compact composition holds for 170ms.
 4. The remaining document scroll uses 1100ms Out Cubic. The lowest rule receives a matching document-space translation over the same duration and easing, so it stays visually anchored in the viewport. The four upper rules then unfold upward from that anchor, starting with the rule immediately above it and staggering upward by 65ms. The rule width does not change during this stage.
-5. After the uppermost rule finishes, all four Part titles start together. Each title is rendered character by character; every glyph pops upward into place with a 36ms per-character delay and a 420ms Out Cubic transition. The four underline cursors share the title color and binary opacity blinking.
+5. After the uppermost rule finishes, all four Part titles start together. Each title is rendered character by character; every glyph pops upward into place with a 36ms per-character delay and a 420ms Out Cubic transition. All four underline cursors use one shared start delay calculated from the longest title, so their blink cycles start and remain synchronized; they share the title color and binary opacity blinking.
 
-Rules remain 0.35px solid. Title text retains its page-edge inset; desktop title size/line-box height remains 0.4 of each Part-row height, while the existing mobile size is unchanged. SF-Pro.woff and SF-Pro-Italic.woff are present under public/fonts/ on dev and are locally registered as the SF Pro Display family with a variable weight range. Part titles use weight 800. Internal font metadata / Text–Display–Rounded family mapping still needs direct verification.
+Rules remain 0.35px solid. Title text retains its page-edge inset; desktop title size/line-box height remains 0.4 of each Part-row height, while the existing mobile size is unchanged. SF-Pro.woff and SF-Pro-Italic.woff are present under public/fonts/ on dev and are locally registered as the SF Pro Display family with a variable weight range. The existing weight-800 request is provisional and awaits confirmation of the intended non-Heavy weight and family. Internal font metadata / Text–Display–Rounded family mapping still needs direct verification.
 
 This is a source-level implementation only. **No local production build or browser verification has been run.** Check the full-width Stage A composition, the lower-rule viewport anchor, bottom-to-top upward unfolding, matched Out Cubic scroll, character pop timing, title size, responsive behavior and reduced-motion state before treating K2 as approved.
