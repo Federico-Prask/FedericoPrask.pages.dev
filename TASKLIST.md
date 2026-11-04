@@ -109,22 +109,28 @@ The active application is a deliberately small Vue page. The old page compositio
 
 ### 4.1 K2 — First-scroll framework choreography
 
-- [x] Replace the old fixed-overlay viewport-stretch prototype; do not stretch the annotation SVG to the viewport.
 - [x] Preserve and animate only the five original horizontal path elements: `guide-plate-h-01`, `guide-mono-h-04`, `guide-mono-h-06`, `guide-mono-h-07`, `guide-plate-h-02`.
 - [x] Convert those five paths to 0.35px solid framework rules with the existing inverse blue theme mapping; hide all other construction guides and fade out the Logo outline, coordinates and Force handles.
-- [x] Recompose the five original paths into a compact parallel group below the Hero, each moving from its own original K1 coordinate.
-- [x] Add a real one-viewport document scroll using In-Out Cubic; do not emulate it with a Hero-only translate.
-- [x] During the second document movement, spring the five rules outward horizontally and vertically while the document completes its remaining scroll; the line movement outlasts the scroll slightly.
-- [x] After scroll completion, separate the five rules vertically into their final framework positions with top-to-bottom staggered start times.
+- [x] Move all five original paths directly from their K1 coordinates into a moderately spaced compact group.
+- [x] Make the five rules full viewport width during the first line movement; do not wait until the second stage to widen them.
+- [x] Position the lowest compact rule near the viewport bottom after the initial partial scroll, with the other four rules stacked above it.
+- [x] Add a real document scroll of 22% Hero height using In-Out Cubic; keep the Hero visibly present.
+- [x] Hold the compact full-width composition for 170ms.
+- [x] Use Out Cubic for the remaining document scroll and for the lowest rule's matching document-space movement, keeping that rule visually anchored in the viewport.
+- [x] Expand the four upper rules upward from the lowest rule, starting immediately above the anchor and staggering bottom-to-top by 65ms.
+- [x] Keep all five rules full width during Stage C; do not add a second horizontal expansion.
 - [x] Add the following full-viewport framework stage to the document so the Hero can physically leave the viewport.
-- [x] Reveal all four Part titles only after line expansion; all four type-in reveals must start simultaneously and use a sufficiently long Out Cubic deceleration.
-- [x] Use a shared left inset for title text and rule endpoints.
-- [x] Use a baseline-aligned single-color underline cursor with binary 0%/100% opacity blink.
-- [x] Set desktop title size/line-box height to at least 0.4 of the adjacent rule spacing; preserve the current mobile title size.
+- [x] Reveal all four Part titles only after the upward line expansion; start all four rows simultaneously.
+- [x] Replace the clipped whole-line title reveal with individual character pop-in animation using Out Cubic and a 36ms per-character delay.
+- [x] Use a shared page-edge inset for title text; keep the rules edge-to-edge.
+- [x] Use a baseline-aligned single-color underline cursor with binary 0%/100% opacity blink; keep each cursor attached to its title's final character.
+- [x] Set desktop title line-box size to at least 0.4 of the adjacent rule spacing; preserve the current mobile size.
 - [ ] Verify wheel, touch, keyboard and scrollbar-triggered input; confirm K2 runs once and upward scrolling never reverses it.
-- [ ] Verify that the initial 22% document movement leaves the Hero visible and the five-line group has moderate spacing.
-- [ ] Verify that the second movement makes the five lines spring outward while the document scrolls the remaining distance.
-- [ ] Verify line transforms, scroll position, title layout, cursor alignment and both themes in desktop/mobile browsers.
+- [ ] Verify that the initial 22% document movement leaves the Hero visible and the five full-width rules occupy the lower area with moderate spacing.
+- [ ] Verify that the lowest rule remains fixed in the viewport while the remaining scroll and upper-rule expansion use the same Out Cubic curve.
+- [ ] Verify that the four upper lines unfold upward in bottom-to-top order without changing horizontal width.
+- [ ] Verify that all four titles begin simultaneously, characters pop one by one, cursor alignment remains exact, and the desktop/mobile size rules hold.
+
 ### 4.2 K3 — Framework and theme transition
 
 - [ ] Move the left and right dashed boundaries inward from outside the scene.
@@ -202,15 +208,15 @@ The active application is a deliberately small Vue page. The old page compositio
 ### Part title typeface
 
 - [x] Remove the superseded Climate Crisis Google Fonts import and point Part titles at SF Pro Display Heavy (CSS weight 800).
-- [!] Inspect the SF Pro variable font metadata after the owner uploads it; identify the Text, Display and Rounded family faces and supported axes.
-- [ ] Define local `@font-face` declarations referencing assets in `public/fonts/` and load SF Pro Display Heavy for the Part titles.
-- [ ] Verify the font loads from local assets and the desktop/mobile size rules remain correct.
+- [x] Add local `@font-face` declarations for `public/fonts/SF-Pro.woff` and `public/fonts/SF-Pro-Italic.woff` under the Part-title family alias `SF Pro Display`, with a declared variable weight range.
+- [!] Inspect the uploaded font's internal name records and variation axes; confirm how Text, Display and Rounded are represented before adding aliases for the other families.
+- [ ] Verify that SF Pro Display Heavy resolves to the intended weight in the browser and that the desktop/mobile size rules remain correct.
 
 ## 8. Current next actions
 
 1. Run the local app and inspect the opacity-and-blur plate entrance, reverse contour trace, final fill and K1 handoff; decide whether the contour trace matches the intended F-to-P growth.
 2. Check Logo sizing at several viewport widths; tune the minimum, preferred and maximum sizes if the Logo still feels too sensitive to window width.
 3. Review and calibrate revised K0/K1 in a local browser, including the full waiting state, reduced-motion behavior and responsive sizes.
-4. Browser-test the K2 prototype, tune the line and title motion, and keep the five original guide paths as the only framework rules.
+4. Browser-test the revised K2 sequence: full-width Stage A rules, the lower-rule viewport anchor, bottom-to-top upward unfolding with matched Out Cubic scroll, and simultaneous character-by-character Part title reveals.
 5. Update this file and `DESIGN.md` after each completed implementation slice.
 6. Do not mark visual verification tasks complete until they have been checked in a browser.
