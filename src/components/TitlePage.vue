@@ -753,6 +753,8 @@ onBeforeUnmount(() => {
 }
 
 .title-page__logo-annotation > .logo-annotation {
+  position: relative;
+  z-index: 3;
   display: block;
   width: 100%;
   height: 100%;
@@ -761,6 +763,7 @@ onBeforeUnmount(() => {
 
 .framework-titles {
   position: absolute;
+  z-index: 2;
   display: grid;
   grid-template-rows: repeat(4, minmax(0, 1fr));
   color: var(--site-hero-foreground);
@@ -796,7 +799,7 @@ onBeforeUnmount(() => {
 
 .framework-boundary {
   position: absolute;
-  z-index: 3;
+  z-index: 4;
   width: 0;
   border-left: 0.65px dashed var(--site-hero-rule-strong);
   pointer-events: none;
