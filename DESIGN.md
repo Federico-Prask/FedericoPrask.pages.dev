@@ -411,53 +411,54 @@ The normal Logo has already disappeared during K1.
 
 After these elements are removed, only the designated original annotation frame/reference lines remain.
 
-### 6.3 Preserve the original lines
+### 6.3 The five persistent horizontal lines
 
-**Critical continuity requirement:** the surviving lines must be the same SVG line elements that were already present in K1.
+**Confirmed: K2 retains exactly five horizontal guide paths.** These five lines define the four Part regions and both outer horizontal limits of the framework:
 
-Do not destroy the original annotation lines and create visually similar HTML borders or a second set of SVG lines.
+1. The boundary between the Hero and Part.01.
+2. The boundary between Part.01 and Part.02.
+3. The boundary between Part.02 and Part.03.
+4. The boundary between Part.03 and Part.04.
+5. The boundary between Part.04 and the not-yet-designed content below it.
 
-The surviving line geometry must be carried into the page-layout state. The implementation may reorganize the SVG structure internally, but the visible line paths must retain continuity.
+The five surviving paths are selected from the original K1 SVG guide elements:
 
-A useful implementation contract is to identify line groups explicitly, for example:
+| Framework order | Original guide ID | Original source coordinate |
+|---|---|---|
+| 1 — Hero / Part.01 | `guide-plate-h-01` | `y = 0` |
+| 2 — Part.01 / Part.02 | `guide-mono-h-04` | `y = 72` |
+| 3 — Part.02 / Part.03 | `guide-mono-h-06` | `y = 131` |
+| 4 — Part.03 / Part.04 | `guide-mono-h-07` | `y = 199` |
+| 5 — Part.04 / future page content | `guide-plate-h-02` | `y = 256` |
 
-- Persistent guide/frame lines.
-- Temporary coordinate annotations.
-- Temporary Force handles.
-- Temporary Logo outline.
+These are the original SVG elements, not newly drawn substitutes. Their source coordinates identify their K1 construction positions only; K2 animates the same elements into the five final framework positions.
 
-The exact grouping and which guide IDs survive should be made explicit in the SVG source. Do not infer persistence from visual appearance at runtime.
+All vertical guide paths and the three unselected horizontal guide paths are temporary construction guides. They disappear during K2. Do not retain vertical guides as Part side boundaries; those belong to the later K3 boundary animation.
 
-### 6.4 Move guides to the Title Page boundary
+### 6.4 Convert the five guides into framework rules
 
-The persistent lines move toward the bottom edge of the **entire Title Page content region**.
+As K2 begins, the five selected horizontal guides:
 
-The destination is not:
+- Lose their dashed pattern and become continuous solid rules.
+- Become extremely thin structural lines (initial implementation target: 0.5 CSS px).
+- Change to the inverse blue mapping from the K1 construction guides:
+  - Light mode: dark blue `#5b7da3`.
+  - Dark mode: light blue `#a9c5e4`.
+- Remain visually subordinate to the Part titles and page content.
 
-- Under the name text.
-- Under the website subtitle.
-- Under the Logo.
-- Under one particular title line.
+Use a dedicated semantic framework-rule token. Do not reuse `--site-guide`, whose K1 light/dark mapping is intentionally the opposite.
 
-It is the lower boundary of the complete Hero / Title Page composition.
+### 6.5 Move and expand the framework
 
-The movement should visually establish the boundary between the Title Page and the following Part framework.
+The five original line elements first converge toward the bottom boundary of the **entire Title Page composition**.
 
-### 6.5 Expand the guide layout
+The destination is not under the name, subtitle, Logo, or an individual title. It is the lower boundary of the complete Hero / Title Page.
 
-After reaching the Title Page's lower boundary, the horizontal guide lines expand into their final page-width positions.
+From that shared boundary, the five lines expand vertically into the five ordered framework positions and horizontally across the page width. Their final spacing establishes four Part regions, with one boundary above Part.01 and one below Part.04.
 
-Their spacing becomes more even, forming the horizontal structure from which the Part regions are established.
+Use a fast ease-out motion in the Out Cubic family. The result should feel like the compact construction diagram opening into a page-wide editorial framework.
 
-Use a fast ease-out motion, preferably in the Out Cubic family:
-
-```text
-ease-out / Out Cubic
-```
-
-The animation should feel like a compact structural diagram rapidly opening into a page grid.
-
-The lines are not one generic divider duplicated four times after the fact. They are the continuing guide system that becomes the Part framework.
+Do not duplicate the lines, create HTML borders, or draw replacement SVG paths. Preserve the five selected original SVG elements throughout the transformation.
 
 ### 6.6 Part title reveal
 
