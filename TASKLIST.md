@@ -107,7 +107,7 @@ The active application is a deliberately small Vue page. The old page compositio
 
 ### 4.1 K2 — Guide conversion
 
-- [x] Trigger K2 on the first downward user scroll only after the K1 Logo annotation has reached its waiting state; support wheel, upward finger-swipe, and keyboard downward-navigation input.
+- [ ] Verify all K2 navigation inputs in the browser: wheel, touch swipe measured from the initial touch point, keyboard navigation, and actual downward document scrolling. Inputs received during K1 must be queued and applied once the annotation reaches its waiting state.
 - [x] Make the trigger one-shot; upward scrolling must not reverse or replay it.
 - [x] Fade out and then hide coordinate labels, Force nodes, Force handles and the complete original FP Logo outline when K2 begins, while leaving the original persistent guide group untouched.
 - [ ] Preserve the original designated SVG guide-line elements; do not replace them with newly created borders.
