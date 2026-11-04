@@ -479,7 +479,7 @@ The four titles are completely absent before the five-rule framework expansion f
 
 Each title uses a smooth type-in / clipped reveal with an **Out Cubic** curve. The duration must be long enough for the reveal to visibly decelerate toward its end; do not use a short, abrupt steps animation. Do not stagger the four title start times.
 
-Desktop title size must be at least **one two-and-a-halfth** of the vertical distance between adjacent framework rules (height ratio >= 0.4). Use a viewport-height-aware size so this relationship holds as the screen height changes. On phones, retain the current mobile title size; do not apply the desktop enlargement rule.
+Desktop title line-box height must be at least **0.4 times** the vertical distance between adjacent framework rules. Use a viewport-height-aware size so this relationship holds as the screen height changes. On phones, retain the current mobile title size; do not apply the desktop enlargement rule.
 
 Use one shared horizontal inset for the rules and the title text, so the title's left edge sits at approximately the same distance from the page edge as the rule's left endpoint.
 
@@ -1295,8 +1295,8 @@ Implemented:
 Not yet completed:
 
 - Tune K0 and K1 timing, geometry, contrast and visual balance in a local browser.
-- Implement K2 using the original nineteen persistent SVG guide paths.
-- Verify the complete sequence at desktop, tablet and mobile sizes.
+- Rebuild K2 using the five designated original SVG guide paths; the current source rewrite is recorded in Section 19.10.
+- Verify the complete K0–K2 sequence at desktop, tablet and mobile sizes.
 
 ### 19.3 Application entry and active files
 
