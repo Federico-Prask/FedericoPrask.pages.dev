@@ -43,6 +43,9 @@ const frameworkParts = [
   "Part.04 Beyond",
 ] as const;
 
+const frameworkCursorDelay =
+  Math.max(...frameworkParts.map((part) => part.length - 1)) * 36 + 420 + "ms";
+
 const annotationStyle = computed(() => ({
   left: annotationBounds.value.left + "px",
   top: annotationBounds.value.top + "px",
@@ -494,7 +497,7 @@ onBeforeUnmount(() => {
         </span>
         <span
           class="framework-title__cursor"
-          :style="{ '--cursor-delay': `${(part.length - 1) * 36 + 420}ms` }"
+          :style="{ '--cursor-delay': frameworkCursorDelay }"
         ></span>
       </div>
     </div>
