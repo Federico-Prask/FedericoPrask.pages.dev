@@ -450,67 +450,37 @@ Use the dedicated `--site-framework-rule` token. Do not reuse `--site-guide`, wh
 
 ### 6.5 K2 motion sequence
 
-K2 is a discrete choreography triggered by the first downward user input. The browser document itself scrolls; the Hero must move upward through the viewport rather than being translated independently.
+K2 is a one-shot choreography triggered by the first downward user input. The browser document itself scrolls; the Hero must move upward through the viewport rather than being translated independently. Preserve the five designated original SVG path elements and transform them individually. Never stretch the annotation SVG or replace those paths with newly drawn rules.
 
-**Stage A — Short initial movement and a moderately spaced line group**
+**Stage A — Recompose into five full-width rules**
 
-At the start, the five original SVG paths move directly from their K1 positions into a parallel group just below the Hero's document section. Their spacing is **not extremely tight**: the intermediate gap is 24% of the final Part-row gap, clamped to 22–48 CSS px. The document begins moving downward at the same time, but travels only **22% of the Hero height**. The Hero therefore remains clearly visible while the five lines gather near the lower edge of the viewport.
+The five original paths move directly from their K1 coordinates into a moderately spaced parallel group in the lower part of the Hero. By the end of this first line movement, every rule is already **the full width of the page**: its horizontal transform begins at the page's left edge and spans the viewport width. There must be no later horizontal widening during Stage C.
 
-The original SVG path elements are transformed individually. Do not stretch the annotation SVG itself or replace the five paths with HTML borders or newly drawn SVG lines.
+The compact group is positioned relative to its bottom rule. At the end of the short initial document scroll, that lower rule sits close to the viewport bottom; the other four rules are stacked above it with a moderate gap (24% of the final Part-row gap, clamped to 22–48 CSS px). At the same time, the document scrolls only **22% of the Hero height** over 560ms with In-Out Cubic. The Hero remains visibly present. The five paths reach their full-width compact arrangement over 720ms using Out Cubic.
 
 **Stage B — Brief held composition**
 
-After the initial line regrouping and short document movement finish, hold the intermediate composition for 170ms. At this point the Hero is still visible, and the five rules are separated enough to read as five distinct lines rather than a tightly compressed bundle.
+Hold the compact, full-width five-rule arrangement for 170ms. The Hero is still visible, all five lines are distinct, and the bottom rule establishes the anchor for the next movement.
 
-**Stage C — The lines spring the page open**
+**Stage C — Expand upward from the fixed lower rule**
 
-The five lines now move outward into their final framework positions. They expand both horizontally toward the shared page inset and vertically to the five Part boundaries. The vertical movement starts in order from the top line to the bottom line, with a 65ms stagger between starts.
+The **lowest rule is the visual anchor**. As the page scrolls through the remaining 78% of the Hero height, that lowest rule moves downward in document coordinates by exactly the same distance and with the same 1100ms Out Cubic timing. This counter-movement keeps the lowest rule stationary in the viewport.
 
-At the same time, the document completes its scroll from the 22% intermediate position to one full Hero height. The Hero moves completely above the viewport as the rules spread apart, so the movement should read as though the lines are physically opening the page into its four-Part structure.
+The four rules above it expand **upward**, increasing their separation from the lower anchor until the five rules reach the four Part boundaries. Begin with the rule immediately above the anchor, then stagger the remaining rules upward in sequence (65ms between starts); the topmost rule starts last. Their horizontal width remains unchanged at the full page width. The document's remaining scroll uses the same Out Cubic easing as the lower anchor rule, not In-Out Cubic. The Hero leaves the viewport as the upper rules unfold.
 
-Use In-Out Cubic for the remaining document scroll. Use a spring-like Out Cubic path transition with a restrained overshoot for the outward line movement; the line motion continues slightly longer than the document scroll. Initial source timings: 720ms for initial line regrouping, 560ms for the first 22% document movement, 170ms intermediate hold, 1,020ms for the remaining document scroll, and 1,120ms per line for the outward movement, plus 65ms stagger per line.
+At the end, the five full-width rules frame four Part rows. No line is added, removed, or replaced.
 
-The five final rules and all four title rows share one horizontal inset. The annotation SVG remains at its measured K1 Logo bounds throughout. Only the five original path elements travel beyond the Logo bounds.
+**Part title reveal**
 
+Only after the upward line expansion completes, all four Part titles begin together. Each title is split into individual characters; characters pop into place one by one with a restrained upward movement and scale settle, using an Out Cubic curve. The four rows share the same start time and per-character cadence; do not delay one row behind another or reveal each title as one clipped block.
 
-### 6.6 Part title reveal
+Each title's underline cursor remains attached immediately after its final character. All cursors use the same current text color and only two opacity states (100% / 0%) while blinking.
 
-The four titles are completely absent before the five-rule framework expansion finishes. Then all four title animations begin at the **same time**:
+The title text keeps its left inset from the page edge. Desktop title size/line-box height must be at least **0.4 times the distance between adjacent rules** (one part in 2.5); mobile keeps the current title size unchanged.
 
-1. Part.01 Introduction
-2. Part.02 Works
-3. Part.03 Milestones
-4. Part.04 Beyond
+**Initial source timings:** 720ms for Stage A line movement; 560ms for the initial 22% In-Out Cubic document scroll; 170ms intermediate hold; 1100ms for Stage C document scroll and each rule's Out Cubic movement; 65ms between upward rule starts. The title characters use a 36ms per-character delay and a 420ms Out Cubic pop. These are implementation starting points and still require browser calibration.
 
-Each title uses a smooth type-in / clipped reveal with an **Out Cubic** curve. The duration must be long enough for the reveal to visibly decelerate toward its end; do not use a short, abrupt steps animation. Do not stagger the four title start times.
-
-Desktop title line-box height must be at least **0.4 times** the vertical distance between adjacent framework rules. Use a viewport-height-aware size so this relationship holds as the screen height changes. On phones, retain the current mobile title size; do not apply the desktop enlargement rule.
-
-Use one shared horizontal inset for the rules and the title text, so the title's left edge sits at approximately the same distance from the page edge as the rule's left endpoint.
-
-### 6.7 Cursor treatment
-
-Each Part title ends with a terminal-inspired **underline cursor**:
-
-- It is an underline-like cursor, not a block cursor.
-- It is attached immediately after the final title character.
-- All four cursors share the same alignment and use the title's single `currentColor`; do not introduce multiple cursor colors.
-- Its blink is binary only: fully visible (100% opacity) or fully hidden (0% opacity). Do not animate intermediate opacity values.
-- Keep the cursor visually aligned to the same text baseline in all four rows.
-
-Do not switch the title to a monospace font to obtain a cursor.
-
-### 6.8 K2 end state
-
-At the end of K2:
-
-- The browser document has scrolled down one viewport; the Hero is completely above the viewport.
-- Only the four Part titles and five horizontal framework rules are visible in the framework stage.
-- The five rules are evenly distributed and define four Part regions.
-- All four title type-in reveals have completed.
-- The left/right dashed outer boundaries have not yet completed their appearance.
-- The overall palette has not yet completed the K3 content-theme transition.
-
+The annotation overlay stays at its measured K1 Logo bounds throughout. Only the five original path elements receive matrix transforms. A following full-viewport document stage provides the final scroll destination.
 ## 7. Part framework and visual transition: K3
 
 K3 converts the expanded guide layout into the final narrow Part framework while the page changes from the Hero's monochrome visual system to the content's blue-based visual system.
@@ -1211,9 +1181,10 @@ Use this checklist when reviewing implementation changes.
 - [ ] K2 starts on the first downward user scroll only.
 - [ ] K2 removes x/y, Force handles and the Logo outline.
 - [ ] K2 preserves the original designated SVG guide lines.
-- [ ] The guides move to the bottom edge of the whole Title Page.
-- [ ] Guide expansion uses a fast ease-out character.
-- [ ] Part titles appear after guide expansion and a short pause.
+- [ ] The five designated guides become full-viewport-width rules during Stage A.
+- [ ] The lowest rule remains visually anchored while the document and four upper rules move with Out Cubic.
+- [ ] The four upper rules unfold upward from the lowest rule, with bottom-to-top stagger.
+- [ ] Part titles begin together after line expansion and appear character by character with an Out Cubic pop.
 - [ ] Every Part title has an attached underline cursor.
 - [ ] K3 side boundaries move inward from outside toward the center.
 - [ ] Part titles and title rules shrink with the boundaries.
@@ -1358,24 +1329,24 @@ The K0 completion listener is bound directly to the final monogram-fill path. Be
 
 ### 19.8 Part title typeface transition — SF Pro variable font pending
 
-The Climate Crisis trial is superseded. The intended title family is **SF Pro Display**, using its Heavy weight from the variable font asset the owner plans to upload. The supplied variable font is expected to contain the SF Pro Text, SF Pro Display and SF Pro Rounded families. The asset will be stored under `public/fonts/` and loaded with local `@font-face` declarations. Do not guess the internal family names, supported weight range, or variation axes: inspect the uploaded font before defining local `@font-face` declarations. The final site should load the provided font locally from `public/fonts/` rather than depend on Google Fonts. Until the asset is available, the font-face configuration remains pending.
+The Climate Crisis trial is superseded. The intended Part-title face is **SF Pro Display Heavy**. The dev branch now contains `public/fonts/SF-Pro.woff` and `public/fonts/SF-Pro-Italic.woff`. Both are registered locally under the CSS family alias `SF Pro Display`, with a declared variable weight range of 100–900; Part titles request weight 800. The font is loaded locally, not through Google Fonts. The supplied file's internal name records and variation axes have not been independently inspected through the current repository-file interface, so the Text / Display / Rounded family mapping remains an explicit verification item rather than an assumption.
 
 ### 19.9 Part title size refinement
 
 The current mobile size is considered approximately correct and must be retained. Desktop titles were still too small. The desktop rule must be viewport-height-aware and ensure the title size/line-box height is at least 0.4 times the distance between adjacent rules. The mobile breakpoint keeps the existing `clamp(1.5rem, 3.6vw, 3.4rem)` size unchanged. The final title weight is SF Pro Display Heavy after the variable font asset is inspected and installed.
 
 
-### 19.10 K2 source rewrite — partial-scroll / spring-open revision
+### 19.10 K2 source rewrite — full-width rules and upward unfolding
 
-The previous K2 implementation that collapsed all five guides into a very tight group, scrolled the entire Hero away immediately, and enlarged the annotation SVG to viewport dimensions has been removed. The annotation overlay stays at its measured K1 Logo bounds and applies independent matrix transforms to the same five original SVG path nodes. A second full-viewport document stage provides the real scroll destination.
+The previous outward/horizontal spring-open behavior is superseded. The annotation overlay stays at its measured K1 Logo bounds and applies independent matrix transforms to the same five original SVG path nodes. No viewport-sized SVG stretch is used.
 
-The current sequence is:
-1. The five original paths recompose over 720ms into a moderately spaced group below the Hero. The intermediate line gap is 24% of the final Part-row gap, clamped to 22–48 CSS px.
-2. At the same time, the document scrolls only 22% of the Hero height over 560ms with In-Out Cubic. The Hero remains clearly visible.
-3. The intermediate composition holds for 170ms.
-4. The rules move outward to the final five framework positions while the document completes the remaining scroll over 1,020ms with In-Out Cubic. Each path uses a spring-like Out easing over 1,120ms, with 65ms top-to-bottom staggering. The five rules widen to the shared page inset and spread vertically, creating the impression that they open the page.
-5. All four titles begin their 1,800ms Out Cubic clipped type-in reveal together after the line motion completes.
+The current source sequence is:
+1. The five paths move from their individual K1 coordinates into a moderately spaced compact group. By the end of this first movement they are already full viewport width, edge to edge. The compact group's lowest rule is placed close to the viewport bottom after the partial scroll; the other four sit above it.
+2. The document scrolls 22% of the Hero height over 560ms with In-Out Cubic. The Hero remains visible while the full-width rules settle over 720ms with Out Cubic.
+3. The compact composition holds for 170ms.
+4. The remaining document scroll uses 1100ms Out Cubic. The lowest rule receives a matching document-space translation over the same duration and easing, so it stays visually anchored in the viewport. The four upper rules then unfold upward from that anchor, starting with the rule immediately above it and staggering upward by 65ms. The rule width does not change during this stage.
+5. After the uppermost rule finishes, all four Part titles start together. Each title is rendered character by character; every glyph pops upward into place with a 36ms per-character delay and a 420ms Out Cubic transition. The four underline cursors share the title color and binary opacity blinking.
 
-The five rules use a 0.35px stroke and share a horizontal inset with the title text. Desktop title line-box size is calculated as 0.4 of the Part row height; the existing mobile size remains unchanged. The four underline cursors use one current text color and binary opacity. Part titles target SF Pro Display Heavy (CSS weight 800); the variable font asset is expected at `public/fonts/`, but has not yet been uploaded, so local font-face declarations remain pending.
+Rules remain 0.35px solid. Title text retains its page-edge inset; desktop title size/line-box height remains 0.4 of each Part-row height, while the existing mobile size is unchanged. SF-Pro.woff and SF-Pro-Italic.woff are present under public/fonts/ on dev and are locally registered as the SF Pro Display family with a variable weight range. Part titles use weight 800. Internal font metadata / Text–Display–Rounded family mapping still needs direct verification.
 
-This is a source-level rewrite only. **No local production build or browser verification has been run.** Verify the initial partial scroll, the intermediate line spacing, the outward line motion, the completed document scroll, title clipping, responsive size and reduced-motion behavior before treating K2 as approved.
+This is a source-level implementation only. **No local production build or browser verification has been run.** Check the full-width Stage A composition, the lower-rule viewport anchor, bottom-to-top upward unfolding, matched Out Cubic scroll, character pop timing, title size, responsive behavior and reduced-motion state before treating K2 as approved.
