@@ -22,6 +22,7 @@ The active application is a deliberately small Vue page. The old page compositio
 
 **Current implementation boundary:**
 - The full-screen Title Page structure exists, with Chinese/English and theme controls.
+- The Hero name and FP Logo now use a compact base scale from K0 onward (approximately 84% of their previous CSS sizing); the overall layout width and column gap are reduced. The `DARK` / `LANGUAGE` controls and website designation retain their prior sizes. Visual sizing still needs browser review.
 - K0 has a source-level two-stage prototype: opacity-and-blur plate entrance, reverse contour trace of the original monogram path, then the original solid fill. Visual interpretation and timing still require browser review.
 - K1 has a source-derived construction view of the complete FP Logo: solid plate/monogram outlines, nineteen dashed guides, coordinate labels and Force handles. K0/K1 are not yet visually approved.
 - K2 has been rewritten at source level. The five original paths become full viewport-width rules during the first movement, while the document scrolls 22% of the Hero height with In-Out Cubic. After a short hold, the lowest line becomes the visual anchor; the remaining document scroll and the four upper lines move with matching Out Cubic timing, unfolding upward from the anchor. The annotation SVG is not stretched. Four Part titles then reveal together, character by character. Source files are fetched and checked; local build, animation rendering and input behavior remain unverified.
@@ -85,6 +86,8 @@ The active application is a deliberately small Vue page. The old page compositio
 - [ ] Verify the opacity-and-blur plate entrance and theme inversion in Light and Dark modes and at narrow viewport widths.
 - [ ] Verify the bounded responsive Logo sizing at desktop, intermediate and narrow viewport widths.
 - [x] Make reduced-motion users enter the static K1 annotation state without playing K0/K1 motion.
+- [x] Reduce the Hero name and Logo base dimensions from K0 onward while leaving the language/theme controls and website designation unchanged.
+- [ ] Verify the compact Hero composition at desktop, intermediate and narrow mobile widths.
 
 ### 3.3 K1 — SVG Annotation
 
@@ -137,6 +140,7 @@ The active application is a deliberately small Vue page. The old page compositio
 - [ ] Make Part surfaces blend into the page background at the end of the transition.
 - [ ] Change cursor color, reduce its blink frequency and stop its blinking while keeping the underline visible.
 - [ ] Verify the complete transition in both Light and Dark modes.
+- [ ] Confirm K3 does not introduce a second Hero scale-down; the K0 compact base sizing is retained until the Hero leaves through the established page movement.
 
 ## 5. Phase 3 — Part.01 introduction reveal
 
