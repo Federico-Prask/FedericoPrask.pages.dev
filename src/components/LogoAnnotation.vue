@@ -19,9 +19,9 @@ const props = withDefaults(defineProps<{ k2Started?: boolean; k2Phase?: "idle" |
   >
     <!-- The exact supplied FP mark, including its rounded plate frame, is retained as a solid outline. -->
     <g id="annotation-persistent-guides" class="axis-guides" data-k2-disposition="preserve">
-      <path id="guide-plate-h-01" data-source="plate" data-axis="h" data-start="56,0" d="M 0 0 L 256 0" data-k2-persistent="true" data-guide-y="0" />
+      <path id="guide-plate-h-01" data-source="plate" data-axis="h" data-start="56,0" d="M 0 0 L 256 0" data-k2-persistent="true" data-guide-y="0" style="--guide-y: 0;" />
       <path id="guide-plate-v-01" data-source="plate" data-axis="v" data-start="256,56" d="M 256 0 L 256 256" />
-      <path id="guide-plate-h-02" data-source="plate" data-axis="h" data-start="200,256" d="M 0 256 L 256 256" data-k2-persistent="true" data-guide-y="256" />
+      <path id="guide-plate-h-02" data-source="plate" data-axis="h" data-start="200,256" d="M 0 256 L 256 256" data-k2-persistent="true" data-guide-y="256" style="--guide-y: 256;" />
       <path id="guide-plate-v-02" data-source="plate" data-axis="v" data-start="0,200" d="M 0 0 L 0 256" />
       <path id="guide-mono-h-01" data-source="monogram" data-axis="h" data-start="52,40" d="M 0 40 L 256 40" />
       <path id="guide-mono-v-01" data-source="monogram" data-axis="v" data-start="219,106" d="M 219 0 L 219 256" />
@@ -30,13 +30,13 @@ const props = withDefaults(defineProps<{ k2Started?: boolean; k2Phase?: "idle" |
       <path id="guide-mono-v-03" data-source="monogram" data-axis="v" data-start="121,256" d="M 121 0 L 121 256" />
       <path id="guide-mono-h-03" data-source="monogram" data-axis="h" data-start="121,159" d="M 0 159 L 256 159" />
       <path id="guide-mono-v-04" data-source="monogram" data-axis="v" data-start="187,125" d="M 187 0 L 187 256" />
-      <path id="guide-mono-h-04" data-source="monogram" data-axis="h" data-start="153,72" d="M 0 72 L 256 72" data-k2-persistent="true" data-guide-y="72" />
+      <path id="guide-mono-h-04" data-source="monogram" data-axis="h" data-start="153,72" d="M 0 72 L 256 72" data-k2-persistent="true" data-guide-y="72" style="--guide-y: 72;" />
       <path id="guide-mono-v-05" data-source="monogram" data-axis="v" data-start="86,72" d="M 86 0 L 86 256" />
       <path id="guide-mono-h-05" data-source="monogram" data-axis="h" data-start="86,102" d="M 0 102 L 256 102" />
       <path id="guide-mono-v-06" data-source="monogram" data-axis="v" data-start="148,102" d="M 148 0 L 148 256" />
-      <path id="guide-mono-h-06" data-source="monogram" data-axis="h" data-start="148,131" d="M 0 131 L 256 131" data-k2-persistent="true" data-guide-y="131" />
+      <path id="guide-mono-h-06" data-source="monogram" data-axis="h" data-start="148,131" d="M 0 131 L 256 131" data-k2-persistent="true" data-guide-y="131" style="--guide-y: 131;" />
       <path id="guide-mono-v-07" data-source="monogram" data-axis="v" data-start="86,131" d="M 86 0 L 86 256" />
-      <path id="guide-mono-h-07" data-source="monogram" data-axis="h" data-start="86,199" d="M 0 199 L 256 199" data-k2-persistent="true" data-guide-y="199" />
+      <path id="guide-mono-h-07" data-source="monogram" data-axis="h" data-start="86,199" d="M 0 199 L 256 199" data-k2-persistent="true" data-guide-y="199" style="--guide-y: 199;" />
       <path id="guide-mono-v-08" data-source="monogram" data-axis="v" data-start="52,199" d="M 52 0 L 52 256" />
     </g>
 
