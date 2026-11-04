@@ -26,12 +26,13 @@ The active application is a deliberately small Vue page. The old page compositio
 - The Logo uses the original SVG viewBox, path data and fills.
 - K0 now has a source-level two-stage prototype: opacity-and-blur plate entrance, reverse contour trace of the original monogram path, then the original solid fill. The contour interpretation, plate focus-in appearance, theme inversion and timing still require browser review.
 - K1 now has a source-derived construction view of the complete FP Logo: solid plate/monogram outlines, nineteen unshifted full-span dashed guides using the dedicated theme-adaptive `--site-guide` token (light blue in Light mode, dark blue in Dark mode), bracketed start coordinates and solid Force handles at eight rounded corners. K0/K1 are not yet visually approved.
-- K2 now has a source-level prototype: five original horizontal guide paths converge to the bottom edge of the Title Page, expand into five page-wide rules, and lead into the four sequential Part titles with underline cursors. The implementation and theme tokens are source-checked; animation timing, browser rendering and input behavior remain unverified.
+- K2 has been rewritten at source level: the five original horizontal SVG path nodes recompose below the Hero, expand horizontally during a real one-viewport In-Out Cubic document scroll, then separate vertically with top-to-bottom stagger before four simultaneous Out Cubic title reveals. The annotation SVG remains at its measured Logo size; it is not stretched to the viewport. Desktop title line-box size is derived from 0.4 of the Part row height, while mobile retains the current size. Source files are fetched and checked; local build, animation rendering and input behavior remain unverified.
+- The Part title CSS now targets SF Pro Display Heavy (weight 800), but the variable font file has not yet been uploaded; local font-face declarations remain pending.
 - K3–K5 are not implemented.
 - The four content Parts are not implemented.
 - A local production build and browser visual review have not been completed.
 
-**Next implementation target:** run the local app and visually inspect K0/K1, then exercise the complete K2 transition. Confirm the annotation overlay begins at the exact Logo bounds, all five selected paths converge to the Title Page bottom, expand across the viewport, and reveal the four titles in order. Check both themes and narrow viewports before treating the motion as approved.
+**Next implementation target:** run a local production build, then browser-test the rewritten K2 sequence. Verify the five original SVG paths move from their K1 coordinates to the compact stack, the browser scrolls exactly one Hero-height with In-Out Cubic, the rules travel outward for slightly longer with Out Cubic, and the five rules separate top-to-bottom before the four titles begin their simultaneous type-in reveal. Check desktop/mobile, both themes, scrollbar input and reduced motion.
 
 ## 2. Foundation and repository cleanup
 
@@ -108,18 +109,18 @@ The active application is a deliberately small Vue page. The old page compositio
 
 ### 4.1 K2 — First-scroll framework choreography
 
-- [ ] Replace the old fixed-overlay viewport-stretch prototype; do not stretch the annotation SVG to the viewport.
-- [ ] Preserve and animate only the five original horizontal path elements: `guide-plate-h-01`, `guide-mono-h-04`, `guide-mono-h-06`, `guide-mono-h-07`, `guide-plate-h-02`.
-- [ ] Convert those five paths to 0.35px solid framework rules with the existing inverse blue theme mapping; hide all other construction guides and fade out the Logo outline, coordinates and Force handles.
-- [ ] Recompose the five original paths into a compact parallel group below the Hero, each moving from its own original K1 coordinate.
-- [ ] Add a real one-viewport document scroll using In-Out Cubic; do not emulate it with a Hero-only translate.
-- [ ] During document scroll, expand the five rules horizontally with Out Cubic; the line travel duration must be slightly longer than the scroll duration.
-- [ ] After scroll completion, separate the five rules vertically into their final framework positions with top-to-bottom staggered start times.
-- [ ] Add the following full-viewport framework stage to the document so the Hero can physically leave the viewport.
-- [ ] Reveal all four Part titles only after line expansion; all four type-in reveals must start simultaneously and use a sufficiently long Out Cubic deceleration.
-- [ ] Use a shared left inset for title text and rule endpoints.
-- [ ] Use a baseline-aligned single-color underline cursor with binary 0%/100% opacity blink.
-- [ ] Set desktop title size/line-box height to at least 0.4 of the adjacent rule spacing; preserve the current mobile title size.
+- [x] Replace the old fixed-overlay viewport-stretch prototype; do not stretch the annotation SVG to the viewport.
+- [x] Preserve and animate only the five original horizontal path elements: `guide-plate-h-01`, `guide-mono-h-04`, `guide-mono-h-06`, `guide-mono-h-07`, `guide-plate-h-02`.
+- [x] Convert those five paths to 0.35px solid framework rules with the existing inverse blue theme mapping; hide all other construction guides and fade out the Logo outline, coordinates and Force handles.
+- [x] Recompose the five original paths into a compact parallel group below the Hero, each moving from its own original K1 coordinate.
+- [x] Add a real one-viewport document scroll using In-Out Cubic; do not emulate it with a Hero-only translate.
+- [x] During document scroll, expand the five rules horizontally with Out Cubic; the line travel duration must be slightly longer than the scroll duration.
+- [x] After scroll completion, separate the five rules vertically into their final framework positions with top-to-bottom staggered start times.
+- [x] Add the following full-viewport framework stage to the document so the Hero can physically leave the viewport.
+- [x] Reveal all four Part titles only after line expansion; all four type-in reveals must start simultaneously and use a sufficiently long Out Cubic deceleration.
+- [x] Use a shared left inset for title text and rule endpoints.
+- [x] Use a baseline-aligned single-color underline cursor with binary 0%/100% opacity blink.
+- [x] Set desktop title size/line-box height to at least 0.4 of the adjacent rule spacing; preserve the current mobile title size.
 - [ ] Verify wheel, touch, keyboard and scrollbar-triggered input; confirm K2 runs once and upward scrolling never reverses it.
 - [ ] Verify line transforms, scroll position, title layout, cursor alignment and both themes in desktop/mobile browsers.
 ### 4.2 K3 — Framework and theme transition
@@ -198,9 +199,9 @@ The active application is a deliberately small Vue page. The old page compositio
 
 ### Part title typeface
 
-- [ ] Remove the superseded Climate Crisis Google Fonts import.
-- [ ] Inspect the uploaded SF Pro variable font's metadata and identify the Text, Display and Rounded family faces and supported axes.
-- [ ] Define local `@font-face` declarations for the supplied families and select SF Pro Display Heavy for the Part titles.
+- [x] Remove the superseded Climate Crisis Google Fonts import and point Part titles at SF Pro Display Heavy (CSS weight 800).
+- [!] Inspect the SF Pro variable font metadata after the owner uploads it; identify the Text, Display and Rounded family faces and supported axes.
+- [ ] Define local `@font-face` declarations for the supplied families and load SF Pro Display Heavy for the Part titles.
 - [ ] Verify the font loads from local assets and the desktop/mobile size rules remain correct.
 
 ## 8. Current next actions
