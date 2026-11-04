@@ -27,10 +27,11 @@ The active application is a deliberately small Vue page. The old page compositio
 - K1 has a source-derived construction view of the complete FP Logo: solid plate/monogram outlines, nineteen dashed guides, coordinate labels and Force handles. K0/K1 are not yet visually approved.
 - K2 has been rewritten at source level. The five original paths become full viewport-width rules during the first movement, while the document scrolls 22% of the Hero height with In-Out Cubic. After a short hold, the lowest line becomes the visual anchor; the remaining document scroll and the four upper lines move with matching Out Cubic timing, unfolding upward from the anchor. The annotation SVG is not stretched. Four Part titles then reveal together, character by character. Source files are fetched and checked; local build, animation rendering and input behavior remain unverified.
 - Part titles use the original local SF Pro variable TTF at public/fonts/SF-Pro.ttf. Its wght axis (1–1000) and opsz axis (17–28) are confirmed; titles request weight 800 (Heavy), and the TTF is preloaded. Browser rendering still requires verification.
-- K3–K5 and the four content Parts are not implemented.
+- K3 is implemented at source level: dashed side boundaries move inward to the measured Hero-name inset, the five horizontal rules shorten to that span, titles and extension rules scale down, Light/Dark palettes transition together, Part surfaces blend into the page, and the cursor slows to a visible stop. Local build and browser review remain pending.
+- K4–K5 and the four content Parts are not implemented.
 - A local production build and browser visual review have not been completed.
 
-**Next implementation target:** pull dev, run the local app, and verify K0–K2 in the browser. In particular, check that SF Pro Display Heavy is actually loaded, that the glyph weight is visibly Heavy, and that the four cursors start together. Also verify the first-stage full-width rules, fixed lower-line anchor, upward unfolding, matched Out Cubic page scroll, desktop/mobile sizing, both themes and reduced motion.
+**Next implementation target:** pull dev, run the local app, and verify K0–K3 in the browser. Check the compact K0 Hero dimensions at desktop/mobile sizes, SF Pro Display Heavy loading, the complete K0–K2 choreography, the measured Hero-name boundary inset, the K3 title/extension-line reduction, both destination palettes, cursor deceleration, theme switching and reduced motion.
 
 ## 2. Foundation and repository cleanup
 
@@ -85,6 +86,7 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Apply whole-Logo inversion in Light mode while retaining the original colors in Dark mode, with a 100ms filter transition.
 - [ ] Verify the opacity-and-blur plate entrance and theme inversion in Light and Dark modes and at narrow viewport widths.
 - [ ] Verify the bounded responsive Logo sizing at desktop, intermediate and narrow viewport widths.
+- [ ] Verify the compact K0 name/Logo composition at desktop, intermediate and narrow viewport widths; confirm the DARK / LANGUAGE controls and website designation retain their prior sizes.
 - [x] Make reduced-motion users enter the static K1 annotation state without playing K0/K1 motion.
 - [x] Reduce the Hero name and Logo base dimensions from K0 onward while leaving the language/theme controls and website designation unchanged.
 - [ ] Verify the compact Hero composition at desktop, intermediate and narrow mobile widths.
@@ -134,13 +136,16 @@ The active application is a deliberately small Vue page. The old page compositio
 
 ### 4.2 K3 — Framework and theme transition
 
-- [ ] Move the left and right dashed boundaries inward from outside the scene.
-- [ ] Shrink the Part frames, titles and title rules in a coordinated layout transformation.
-- [ ] Transition the entire scene palette, including backgrounds, text, borders, dividers, cursor and Part surfaces.
-- [ ] Make Part surfaces blend into the page background at the end of the transition.
-- [ ] Change cursor color, reduce its blink frequency and stop its blinking while keeping the underline visible.
-- [ ] Verify the complete transition in both Light and Dark modes.
-- [ ] Confirm K3 does not introduce a second Hero scale-down; the K0 compact base sizing is retained until the Hero leaves through the established page movement.
+- [x] Move both dashed boundaries inward from outside the scene, using the Hero-name left edge as the left inset and mirroring it on the right.
+- [x] Shorten all five horizontal framework rules to the span between the final boundaries.
+- [x] Move the Part-title container to the boundary inset; scale titles and their extension rules to the first-pass 0.72 ratio.
+- [x] Transition the page, Part text, rules, boundaries, cursor and surfaces through one K3 content-theme state.
+- [x] Blend Part surfaces into the page background.
+- [x] Decelerate cursor blinking and leave the underline visible.
+- [x] Keep the Hero at its compact K0 base size; do not add a second K3 Hero scale-down.
+- [ ] Verify measured boundary alignment and title/extension geometry in the browser.
+- [ ] Verify the complete transition in both Light and Dark modes, including a theme change during/after K3.
+- [ ] Verify cursor timing, mobile fit and reduced-motion final state.
 
 ## 5. Phase 3 — Part.01 introduction reveal
 
