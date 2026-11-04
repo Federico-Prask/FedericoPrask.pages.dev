@@ -280,6 +280,7 @@ function updateAnnotationBounds() {
   if (!markSpaceRef.value || k2Started.value) return;
   if (titlePageRef.value) {
     heroHeight.value = titlePageRef.value.getBoundingClientRect().height;
+    viewport.value = { ...viewport.value, height: heroHeight.value };
   }
   const rect = markSpaceRef.value.getBoundingClientRect();
   annotationBounds.value = {
@@ -291,10 +292,10 @@ function updateAnnotationBounds() {
 }
 
 function handleResize() {
-  viewport.value = { width: window.innerWidth, height: window.innerHeight };
-  if (!k2Started.value && titlePageRef.value) {
+  if (titlePageRef.value) {
     heroHeight.value = titlePageRef.value.getBoundingClientRect().height;
   }
+  viewport.value = { width: window.innerWidth, height: heroHeight.value };
   updateAnnotationBounds();
 }
 
@@ -640,6 +641,9 @@ onBeforeUnmount(() => {
 .framework-title {
   display: flex;
   align-items: baseline;
+  align-self: center;
+  width: max-content;
+  max-width: 100%;
   min-width: 0;
   font-family: "SF Pro Display", var(--font-heading);
   font-size: var(--framework-title-size);
