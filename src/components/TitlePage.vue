@@ -104,6 +104,7 @@ function updateAnnotationBounds() {
     width: `${rect.width}px`,
     height: `${rect.height}px`,
     "--annotation-unit": `${rect.height / 256}px`,
+    "--annotation-top": `${rect.top}px`,
   };
 }
 
