@@ -433,7 +433,7 @@ The five surviving paths are selected from the original K1 SVG guide elements:
 
 These are the original SVG elements, not newly drawn substitutes. Their source coordinates identify their K1 construction positions only; K2 animates the same elements into the five final framework positions.
 
-All vertical guide paths and the three unselected horizontal guide paths are temporary construction guides. They disappear during K2. Do not retain vertical guides as Part side boundaries; those belong to the later K3 boundary animation.
+All vertical guide paths and the four unselected horizontal guide paths are temporary construction guides. They disappear during K2. Do not retain vertical guides as Part side boundaries; those belong to the later K3 boundary animation.
 
 ### 6.4 Convert the five guides into framework rules
 
