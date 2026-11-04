@@ -122,6 +122,8 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Use a baseline-aligned single-color underline cursor with binary 0%/100% opacity blink.
 - [x] Set desktop title size/line-box height to at least 0.4 of the adjacent rule spacing; preserve the current mobile title size.
 - [ ] Verify wheel, touch, keyboard and scrollbar-triggered input; confirm K2 runs once and upward scrolling never reverses it.
+- [ ] Verify that the initial 22% document movement leaves the Hero visible and the five-line group has moderate spacing.
+- [ ] Verify that the second movement makes the five lines spring outward while the document scrolls the remaining distance.
 - [ ] Verify line transforms, scroll position, title layout, cursor alignment and both themes in desktop/mobile browsers.
 ### 4.2 K3 — Framework and theme transition
 
@@ -201,7 +203,7 @@ The active application is a deliberately small Vue page. The old page compositio
 
 - [x] Remove the superseded Climate Crisis Google Fonts import and point Part titles at SF Pro Display Heavy (CSS weight 800).
 - [!] Inspect the SF Pro variable font metadata after the owner uploads it; identify the Text, Display and Rounded family faces and supported axes.
-- [ ] Define local `@font-face` declarations for the supplied families and load SF Pro Display Heavy for the Part titles.
+- [ ] Define local `@font-face` declarations referencing assets in `public/fonts/` and load SF Pro Display Heavy for the Part titles.
 - [ ] Verify the font loads from local assets and the desktop/mobile size rules remain correct.
 
 ## 8. Current next actions
