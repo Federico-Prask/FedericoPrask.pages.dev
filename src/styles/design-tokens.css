@@ -9,8 +9,8 @@
  * - Brand tokens preserve the established blue identity.
  * - Neutral tokens provide the current light/dark reference surfaces.
  *
- * Final content-stage surface mapping will be calibrated visually before K3
- * is implemented; do not treat these reference values as final animation stops.
+ * K3 has a first-pass blue-neutral content palette; browser review is still
+ * required before treating the destination values as final.
  */
 
 @theme {
