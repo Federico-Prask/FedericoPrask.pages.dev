@@ -116,6 +116,11 @@ function handleFrameworkTransitionEnd(event: TransitionEvent) {
   }
 }
 
+function handleAnnotationOverlayTransitionEnd(event: TransitionEvent) {
+  handleAnnotationFadeEnd(event);
+  handleFrameworkTransitionEnd(event);
+}
+
 onMounted(() => {
   updateAnnotationBounds();
   window.addEventListener("resize", updateAnnotationBounds, { passive: true });
@@ -234,8 +239,7 @@ function handleAnnotationFadeEnd(event: TransitionEvent) {
       'is-expanded': k2Phase === 'expanding' || k2Phase === 'titles',
     }"
     :style="annotationStyle"
-    aria-hidden="true"
-    @transitionend.self="handleFrameworkTransitionEnd"
+    @transitionend.self="handleAnnotationOverlayTransitionEnd"
   >
     <LogoAnnotation :k2-started="k2Started" :k2-phase="k2Phase" />
     <div v-if="k2Phase === 'titles'" class="framework-titles">
@@ -399,6 +403,10 @@ function handleAnnotationFadeEnd(event: TransitionEvent) {
 
 .title-page__logo-normal.is-inverted {
   filter: invert(1);
+}
+
+.title-page__logo-sequence.is-crossfade .title-page__logo-normal {
+  opacity: 0;
 }
 
 .title-page__logo-annotation {
