@@ -9,12 +9,14 @@ const props = withDefaults(
     k2Phase?: K2Phase;
     k2LineTransforms?: Record<string, string>;
     k2LineDelays?: Record<string, string>;
+    k3Started?: boolean;
   }>(),
   {
     k2Started: false,
     k2Phase: "idle",
     k2LineTransforms: () => ({}),
     k2LineDelays: () => ({}),
+    k3Started: false,
   },
 );
 
@@ -35,6 +37,7 @@ function k2PathStyle(id: string) {
       'is-k2-started': props.k2Started,
       'is-k2-recompose': props.k2Phase === 'recompose',
       'is-k2-expand': props.k2Phase === 'expand',
+      'is-k3': props.k3Started,
     }"
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 256 256"
@@ -223,7 +226,7 @@ function k2PathStyle(id: string) {
 }
 
 .logo-annotation.is-k2-started .axis-guides path[data-k2-persistent="true"] {
-  stroke: var(--site-framework-rule);
+  stroke: var(--site-hero-rule);
   stroke-width: 0.35;
   stroke-dasharray: none;
 }
@@ -244,6 +247,14 @@ function k2PathStyle(id: string) {
     transform 1100ms cubic-bezier(0.333333, 1, 0.666667, 1),
     stroke 420ms ease,
     stroke-width 420ms ease;
+}
+
+.logo-annotation.is-k3 .axis-guides path[data-k2-persistent="true"] {
+  stroke: var(--site-framework-rule);
+  transition:
+    transform 1500ms cubic-bezier(0.333333, 1, 0.666667, 1),
+    stroke 1500ms cubic-bezier(0.333333, 1, 0.666667, 1),
+    stroke-width 1500ms cubic-bezier(0.333333, 1, 0.666667, 1);
 }
 
 .coordinates {
