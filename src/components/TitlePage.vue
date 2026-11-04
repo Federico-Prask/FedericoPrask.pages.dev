@@ -917,6 +917,12 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 760px) {
+  .framework-title__extension {
+    flex-basis: 2rem;
+    width: 2rem;
+    margin-inline-start: 0.55rem;
+  }
+
   .title-page {
     padding-block-start: 5.5rem;
     padding-inline: clamp(1.25rem, 6vw, 2rem);
@@ -949,7 +955,7 @@ onBeforeUnmount(() => {
 
 @media (max-width: 360px) {
   .title-page__name {
-    font-size: clamp(3.55rem, 16vw, 4rem);
+    font-size: clamp(2.95rem, 13.4vw, 3.35rem);
   }
 }
 
