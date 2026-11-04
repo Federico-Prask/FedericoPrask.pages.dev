@@ -18,10 +18,17 @@ const logoStage = ref<LogoStage>(prefersReducedMotion ? "waiting" : "reveal");
 
 const k2Started = ref(false);
 let touchStartY: number | null = null;
+let pendingK2 = false;
+let lastScrollY = 0;
 
 function beginK2() {
-  if (k2Started.value || logoStage.value !== "waiting") return;
+  if (k2Started.value) return;
+  if (logoStage.value !== "waiting") {
+    pendingK2 = true;
+    return;
+  }
   k2Started.value = true;
+  pendingK2 = false;
 }
 
 function handleWheel(event: WheelEvent) {
@@ -37,11 +44,16 @@ function handleTouchMove(event: TouchEvent) {
   if (touchStartY !== null && currentY !== undefined && touchStartY - currentY > 8) {
     beginK2();
   }
-  touchStartY = currentY ?? null;
 }
 
 function handleTouchEnd() {
   touchStartY = null;
+}
+
+function handleDocumentScroll() {
+  const currentY = window.scrollY;
+  if (currentY > lastScrollY) beginK2();
+  lastScrollY = currentY;
 }
 
 function isInteractiveTarget(target: EventTarget | null): boolean {
@@ -58,21 +70,24 @@ function handleKeydown(event: KeyboardEvent) {
 }
 
 onMounted(() => {
-  window.addEventListener("wheel", handleWheel, { passive: true });
-  window.addEventListener("touchstart", handleTouchStart, { passive: true });
-  window.addEventListener("touchmove", handleTouchMove, { passive: true });
-  window.addEventListener("touchend", handleTouchEnd, { passive: true });
-  window.addEventListener("touchcancel", handleTouchEnd, { passive: true });
-  window.addEventListener("keydown", handleKeydown);
+  lastScrollY = window.scrollY;
+  window.addEventListener("wheel", handleWheel, { passive: true, capture: true });
+  window.addEventListener("touchstart", handleTouchStart, { passive: true, capture: true });
+  window.addEventListener("touchmove", handleTouchMove, { passive: true, capture: true });
+  window.addEventListener("touchend", handleTouchEnd, { passive: true, capture: true });
+  window.addEventListener("touchcancel", handleTouchEnd, { passive: true, capture: true });
+  window.addEventListener("keydown", handleKeydown, true);
+  window.addEventListener("scroll", handleDocumentScroll, { passive: true });
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener("wheel", handleWheel);
-  window.removeEventListener("touchstart", handleTouchStart);
-  window.removeEventListener("touchmove", handleTouchMove);
-  window.removeEventListener("touchend", handleTouchEnd);
-  window.removeEventListener("touchcancel", handleTouchEnd);
-  window.removeEventListener("keydown", handleKeydown);
+  window.removeEventListener("wheel", handleWheel, true);
+  window.removeEventListener("touchstart", handleTouchStart, true);
+  window.removeEventListener("touchmove", handleTouchMove, true);
+  window.removeEventListener("touchend", handleTouchEnd, true);
+  window.removeEventListener("touchcancel", handleTouchEnd, true);
+  window.removeEventListener("keydown", handleKeydown, true);
+  window.removeEventListener("scroll", handleDocumentScroll);
 });
 
 function handleLogoRevealEnd() {
@@ -84,6 +99,7 @@ function handleLogoRevealEnd() {
 function handleAnnotationFadeEnd(event: TransitionEvent) {
   if (event.propertyName === "opacity" && logoStage.value === "crossfade") {
     logoStage.value = "waiting";
+    if (pendingK2) beginK2();
   }
 }
 </script>
