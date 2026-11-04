@@ -1,6 +1,22 @@
 @import "tailwindcss";
 @import "./styles/design-tokens.css";
 
+@font-face {
+  font-family: "SF Pro Display";
+  src: url("/fonts/SF-Pro.woff") format("woff");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SF Pro Display";
+  src: url("/fonts/SF-Pro-Italic.woff") format("woff");
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
 /* Dark mode is explicitly controlled by the theme preference. */
 @custom-variant dark (&:where(.dark, .dark *));
 
