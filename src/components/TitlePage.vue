@@ -316,8 +316,9 @@ function handleKeydown(event: KeyboardEvent) {
 function updateAnnotationBounds() {
   if (!markSpaceRef.value || k2Started.value) return;
   if (titlePageRef.value) {
-    heroHeight.value = titlePageRef.value.getBoundingClientRect().height;
-    viewport.value = { ...viewport.value, height: heroHeight.value };
+    const pageRect = titlePageRef.value.getBoundingClientRect();
+    heroHeight.value = pageRect.height;
+    viewport.value = { width: pageRect.width, height: pageRect.height };
   }
   const rect = markSpaceRef.value.getBoundingClientRect();
   annotationBounds.value = {
@@ -330,9 +331,10 @@ function updateAnnotationBounds() {
 
 function handleResize() {
   if (titlePageRef.value) {
-    heroHeight.value = titlePageRef.value.getBoundingClientRect().height;
+    const pageRect = titlePageRef.value.getBoundingClientRect();
+    heroHeight.value = pageRect.height;
+    viewport.value = { width: pageRect.width, height: pageRect.height };
   }
-  viewport.value = { width: window.innerWidth, height: heroHeight.value };
   updateAnnotationBounds();
 }
 
