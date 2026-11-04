@@ -20,6 +20,9 @@ const k2Started = ref(false);
 const k2Phase = ref<K2Phase>("idle");
 const titlePageRef = ref<HTMLElement | null>(null);
 const markSpaceRef = ref<HTMLElement | null>(null);
+const nameRef = ref<HTMLElement | null>(null);
+const k3Started = ref(false);
+const heroNameInset = ref(0);
 
 const annotationBounds = ref({ left: 0, top: 0, width: 0, height: 0 });
 const viewport = ref({
@@ -43,8 +46,9 @@ const frameworkParts = [
   "Part.04 Beyond",
 ] as const;
 
-const frameworkCursorDelay =
-  Math.max(...frameworkParts.map((part) => part.length - 1)) * 36 + 420 + "ms";
+const frameworkTitleRevealDuration =
+  Math.max(...frameworkParts.map((part) => part.length - 1)) * 36 + 420;
+const frameworkCursorDelay = frameworkTitleRevealDuration + "ms";
 
 const annotationStyle = computed(() => ({
   left: annotationBounds.value.left + "px",
@@ -59,6 +63,10 @@ const horizontalInset = computed(() =>
 
 const verticalInset = computed(() =>
   Math.max(28, Math.min(72, viewport.value.height * 0.07)),
+);
+
+const frameworkInset = computed(() =>
+  Math.max(0, Math.min(heroNameInset.value, viewport.value.width / 2 - 1)),
 );
 
 const compactLineGap = computed(() => {
@@ -104,9 +112,11 @@ const k2LineTransforms = computed<Record<string, string>>(() => {
         ? finalBottomY - (lineDefinitions.length - 1 - index) * finalRowGap
         : compactTopY + index * compactLineGap.value;
 
-      // All five rules become edge-to-edge during Stage A. Stage C changes
-      // their vertical positions only; horizontal width never changes again.
-      return [line.id, makeLineMatrix(line.y, 0, targetY, width)];
+      // K2 keeps the rules edge-to-edge. K3 draws them inward to the
+      // measured Hero-name inset, matching the two new vertical boundaries.
+      const inset = k3Started.value ? frameworkInset.value : 0;
+      const targetWidth = k3Started.value ? width - inset * 2 : width;
+      return [line.id, makeLineMatrix(line.y, inset, targetY, targetWidth)];
     }),
   );
 });
@@ -126,18 +136,39 @@ const frameworkTitlesStyle = computed(() => {
   const bounds = annotationBounds.value;
   const { width, height } = viewport.value;
   const rowHeight = (height - verticalInset.value * 2) / 4;
+  const inset = k3Started.value ? frameworkInset.value : horizontalInset.value;
   return {
-    left: horizontalInset.value - bounds.left + "px",
+    left: inset - bounds.left + "px",
     top: heroHeight.value + verticalInset.value - bounds.top + "px",
-    width: width - horizontalInset.value * 2 + "px",
+    width: width - inset * 2 + "px",
     height: height - verticalInset.value * 2 + "px",
     "--framework-title-size": rowHeight / 2.5 + "px",
+    "--framework-title-scale": k3Started.value ? "0.72" : "1",
+    "--framework-title-rule-scale": k3Started.value ? "0.72" : "1",
   };
 });
+
+const frameworkBoundaryTop = computed(
+  () => heroHeight.value + verticalInset.value - annotationBounds.value.top,
+);
+const frameworkBoundaryHeight = computed(
+  () => viewport.value.height - verticalInset.value * 2,
+);
+const frameworkBoundaryLeftStyle = computed(() => ({
+  left: frameworkInset.value - annotationBounds.value.left + "px",
+  top: frameworkBoundaryTop.value + "px",
+  height: frameworkBoundaryHeight.value + "px",
+}));
+const frameworkBoundaryRightStyle = computed(() => ({
+  left: viewport.value.width - frameworkInset.value - annotationBounds.value.left + "px",
+  top: frameworkBoundaryTop.value + "px",
+  height: frameworkBoundaryHeight.value + "px",
+}));
 
 let k2RecomposeTimer: number | undefined;
 let k2SettleTimer: number | undefined;
 let k2ExpandTimer: number | undefined;
+let k3StartTimer: number | undefined;
 let scrollFrame: number | undefined;
 let touchStartY: number | null = null;
 let pendingK2 = false;
@@ -150,6 +181,7 @@ const K2_SETTLE_HOLD = 170;
 const K2_OPEN_SCROLL_DURATION = 1100;
 const K2_LINE_EXPAND_DURATION = 1100;
 const K2_LINE_STAGGER = 65;
+const K3_CURSOR_HOLD_CYCLES = 2;
 
 function easeInOutCubic(value: number): number {
   return value < 0.5
@@ -203,6 +235,12 @@ function scrollImmediatelyToFramework() {
   lastScrollY = window.scrollY;
 }
 
+function beginK3() {
+  if (k3Started.value) return;
+  k3Started.value = true;
+  document.documentElement.classList.add("k3-content-theme");
+}
+
 function beginK2() {
   if (k2Started.value) return;
   if (logoStage.value !== "waiting") {
@@ -216,6 +254,7 @@ function beginK2() {
   if (prefersReducedMotion) {
     k2Phase.value = "titles";
     scrollImmediatelyToFramework();
+    beginK3();
     return;
   }
 
@@ -246,6 +285,10 @@ function beginK2() {
         K2_LINE_EXPAND_DURATION + (lineDefinitions.length - 1) * K2_LINE_STAGGER;
       k2ExpandTimer = window.setTimeout(() => {
         k2Phase.value = "titles";
+        k3StartTimer = window.setTimeout(
+          beginK3,
+          frameworkTitleRevealDuration + K3_CURSOR_HOLD_CYCLES * 900,
+        );
       }, Math.max(totalExpandTime, K2_OPEN_SCROLL_DURATION) + 80);
     }, K2_SETTLE_HOLD);
   }, K2_RECOMPOSE_DURATION);
@@ -323,6 +366,8 @@ function updateAnnotationBounds() {
     heroHeight.value = pageRect.height;
     viewport.value = { width: pageRect.width, height: pageRect.height };
   }
+  const nameRect = nameRef.value?.getBoundingClientRect();
+  if (nameRect) heroNameInset.value = nameRect.left;
   const rect = markSpaceRef.value.getBoundingClientRect();
   annotationBounds.value = {
     left: rect.left + window.scrollX,
@@ -372,7 +417,9 @@ onBeforeUnmount(() => {
   if (k2RecomposeTimer !== undefined) window.clearTimeout(k2RecomposeTimer);
   if (k2SettleTimer !== undefined) window.clearTimeout(k2SettleTimer);
   if (k2ExpandTimer !== undefined) window.clearTimeout(k2ExpandTimer);
+  if (k3StartTimer !== undefined) window.clearTimeout(k3StartTimer);
   if (scrollFrame !== undefined) window.cancelAnimationFrame(scrollFrame);
+  document.documentElement.classList.remove("k3-content-theme");
 
   window.removeEventListener("resize", handleResize);
   window.removeEventListener("wheel", handleWheel, true);
@@ -432,7 +479,7 @@ onBeforeUnmount(() => {
 
     <div class="title-page__layout">
       <div class="title-page__identity">
-        <h1 id="page-title" class="title-page__name">
+        <h1 id="page-title" ref="nameRef" class="title-page__name">
           <span>Federico</span>
           <span>Prask</span>
         </h1>
@@ -461,12 +508,16 @@ onBeforeUnmount(() => {
     </div>
   </section>
 
-  <div class="title-page__framework-scroll-stage" aria-hidden="true"></div>
+  <div
+    class="title-page__framework-scroll-stage"
+    :class="{ 'is-k3': k3Started }"
+    aria-hidden="true"
+  ></div>
 
   <div
     v-if="annotationBounds.width"
     class="title-page__logo-annotation"
-    :class="{ 'is-visible': logoStage === 'crossfade' || logoStage === 'waiting' }"
+    :class="{ 'is-visible': logoStage === 'crossfade' || logoStage === 'waiting', 'is-k3': k3Started }"
     :style="annotationStyle"
     @transitionend.self="handleAnnotationFadeEnd"
   >
@@ -475,13 +526,32 @@ onBeforeUnmount(() => {
       :k2-phase="k2Phase"
       :k2-line-transforms="k2LineTransforms"
       :k2-line-delays="k2LineDelays"
+      :k3-started="k3Started"
     />
     <div
       v-if="k2Phase === 'titles'"
+      class="framework-boundary framework-boundary--left"
+      :class="{ 'is-k3': k3Started }"
+      :style="frameworkBoundaryLeftStyle"
+      aria-hidden="true"
+    ></div>
+    <div
+      v-if="k2Phase === 'titles'"
+      class="framework-boundary framework-boundary--right"
+      :class="{ 'is-k3': k3Started }"
+      :style="frameworkBoundaryRightStyle"
+      aria-hidden="true"
+    ></div>
+    <div
+      v-if="k2Phase === 'titles'"
       class="framework-titles"
+      :class="{ 'is-k3': k3Started }"
       :style="frameworkTitlesStyle"
       aria-hidden="true"
     >
+      <div class="framework-surfaces" :class="{ 'is-k3': k3Started }" aria-hidden="true">
+        <span v-for="part in frameworkParts" :key="`surface-${part}`" class="framework-surface"></span>
+      </div>
       <div
         v-for="part in frameworkParts"
         :key="part"
@@ -499,6 +569,7 @@ onBeforeUnmount(() => {
           class="framework-title__cursor"
           :style="{ '--cursor-delay': frameworkCursorDelay }"
         ></span>
+        <span class="framework-title__extension" aria-hidden="true"></span>
       </div>
     </div>
   </div>
@@ -653,6 +724,11 @@ onBeforeUnmount(() => {
 .title-page__framework-scroll-stage {
   min-height: 100svh;
   background: var(--site-hero-background);
+  transition: background-color 1500ms cubic-bezier(0.333333, 1, 0.666667, 1);
+}
+
+.title-page__framework-scroll-stage.is-k3 {
+  background: var(--site-page-background);
 }
 
 .title-page__logo-annotation {
@@ -670,6 +746,13 @@ onBeforeUnmount(() => {
   opacity: 1;
 }
 
+.title-page__logo-annotation.is-k3 {
+  color: var(--site-text-primary);
+  transition:
+    opacity 700ms cubic-bezier(0.22, 0.7, 0.24, 1),
+    color 1500ms cubic-bezier(0.333333, 1, 0.666667, 1);
+}
+
 .title-page__logo-annotation > .logo-annotation {
   display: block;
   width: 100%;
@@ -683,6 +766,54 @@ onBeforeUnmount(() => {
   grid-template-rows: repeat(4, minmax(0, 1fr));
   color: var(--site-hero-foreground);
   pointer-events: none;
+  transition:
+    left 1500ms cubic-bezier(0.333333, 1, 0.666667, 1),
+    width 1500ms cubic-bezier(0.333333, 1, 0.666667, 1),
+    color 1500ms cubic-bezier(0.333333, 1, 0.666667, 1);
+}
+
+.framework-titles.is-k3 {
+  color: var(--site-text-primary);
+}
+
+.framework-surfaces {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: repeat(4, minmax(0, 1fr));
+  gap: 0.35rem;
+  pointer-events: none;
+}
+
+.framework-surface {
+  display: block;
+  background: var(--site-panel-background);
+  transition: background-color 1500ms cubic-bezier(0.333333, 1, 0.666667, 1);
+}
+
+.framework-surfaces.is-k3 .framework-surface {
+  background: var(--site-page-background);
+}
+
+.framework-boundary {
+  position: absolute;
+  z-index: 3;
+  width: 0;
+  border-left: 0.65px dashed var(--site-hero-rule-strong);
+  pointer-events: none;
+  transform: translateX(-100vw);
+  transition:
+    transform 1500ms cubic-bezier(0.333333, 1, 0.666667, 1),
+    border-color 1500ms cubic-bezier(0.333333, 1, 0.666667, 1);
+}
+
+.framework-boundary--right {
+  transform: translateX(100vw);
+}
+
+.framework-boundary.is-k3 {
+  border-color: var(--site-framework-rule);
+  transform: translateX(0);
 }
 
 .framework-title {
@@ -700,6 +831,11 @@ onBeforeUnmount(() => {
   letter-spacing: -0.035em;
   line-height: 1;
   white-space: nowrap;
+  position: relative;
+  z-index: 1;
+  transform: scale(var(--framework-title-scale, 1));
+  transform-origin: left center;
+  transition: transform 1500ms cubic-bezier(0.333333, 1, 0.666667, 1);
 }
 
 .framework-title__text {
@@ -728,6 +864,35 @@ onBeforeUnmount(() => {
   transform: translateY(0.12em);
   opacity: 0;
   animation: framework-cursor-blink 900ms steps(1, end) var(--cursor-delay) infinite;
+  transition: border-color 1500ms cubic-bezier(0.333333, 1, 0.666667, 1);
+}
+
+.framework-titles.is-k3 .framework-title__cursor {
+  border-color: var(--site-brand-text);
+  animation: framework-cursor-decelerate 3200ms steps(1, end) forwards;
+}
+
+.framework-title__extension {
+  display: inline-block;
+  flex: 0 0 clamp(4rem, 8vw, 10rem);
+  width: clamp(4rem, 8vw, 10rem);
+  height: 0.35px;
+  margin-inline-start: 0.9rem;
+  background: currentColor;
+  opacity: 0.6;
+  transform: scaleX(var(--framework-title-rule-scale, 1));
+  transform-origin: left center;
+  transition: transform 1500ms cubic-bezier(0.333333, 1, 0.666667, 1);
+}
+
+@keyframes framework-cursor-decelerate {
+  0%, 9.99% { opacity: 1; }
+  10%, 19.99% { opacity: 0; }
+  20%, 34.99% { opacity: 1; }
+  35%, 49.99% { opacity: 0; }
+  50%, 69.99% { opacity: 1; }
+  70%, 84.99% { opacity: 0; }
+  85%, 100% { opacity: 1; }
 }
 
 @keyframes framework-character-pop {
@@ -805,6 +970,16 @@ onBeforeUnmount(() => {
   .framework-title__cursor {
     opacity: 1;
     animation: none;
+  }
+
+  .framework-boundary {
+    border-color: var(--site-framework-rule);
+    transform: translateX(0);
+    transition: none;
+  }
+
+  .framework-title__extension {
+    transform: none;
   }
 }
 </style>
