@@ -267,6 +267,8 @@ function handleAnnotationFadeEnd(event: TransitionEvent) {
 </template>
 
 <style scoped>
+@import url("https://fonts.googleapis.com/css2?family=Climate+Crisis&display=swap");
+
 .title-page {
   position: relative;
   display: grid;
@@ -463,9 +465,9 @@ function handleAnnotationFadeEnd(event: TransitionEvent) {
   display: flex;
   align-items: center;
   padding-inline: clamp(1.5rem, 7vw, 7rem);
-  font-family: var(--font-heading);
+  font-family: "Climate Crisis", var(--font-heading);
   font-size: clamp(1.15rem, 2.7vw, 2.6rem);
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: -0.025em;
   clip-path: inset(0 100% 0 0);
   animation: framework-title-reveal 460ms steps(22, end) forwards;
