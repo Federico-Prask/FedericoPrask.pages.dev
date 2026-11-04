@@ -74,5 +74,10 @@
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+    transition: none;
+  }
+
+  body {
+    transition: none;
   }
 }
