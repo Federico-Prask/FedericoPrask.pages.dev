@@ -9,35 +9,171 @@ const { locale, setLocale } = useI18n();
 const { pref, resolved, cycle } = useTheme();
 
 type LogoStage = "reveal" | "crossfade" | "waiting";
+type K2Phase = "idle" | "recompose" | "travel" | "expand" | "titles";
 
 const prefersReducedMotion =
   typeof window !== "undefined" &&
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const logoStage = ref<LogoStage>(prefersReducedMotion ? "waiting" : "reveal");
-
 const k2Started = ref(false);
-type K2Phase = "idle" | "converging" | "expanding" | "pausing" | "titles";
 const k2Phase = ref<K2Phase>("idle");
 const markSpaceRef = ref<HTMLElement | null>(null);
-const annotationBounds = ref<Record<string, string>>({});
-const annotationStyle = computed(() => {
-  if (k2Phase.value === "expanding" || k2Phase.value === "pausing" || k2Phase.value === "titles") {
-    return {
-      left: "0px",
-      top: "0px",
-      width: "100vw",
-      height: "100svh",
-      "--annotation-unit": annotationBounds.value["--annotation-unit"] ?? "1px",
-    };
-  }
-  return annotationBounds.value;
+
+const annotationBounds = ref({ left: 0, top: 0, width: 0, height: 0 });
+const viewport = ref({
+  width: typeof window === "undefined" ? 0 : window.innerWidth,
+  height: typeof window === "undefined" ? 0 : window.innerHeight,
 });
-let k2ConvergeTimer: number | undefined;
-let k2PauseTimer: number | undefined;
+
+const lineDefinitions = [
+  { id: "guide-plate-h-01", y: 0 },
+  { id: "guide-mono-h-04", y: 72 },
+  { id: "guide-mono-h-06", y: 131 },
+  { id: "guide-mono-h-07", y: 199 },
+  { id: "guide-plate-h-02", y: 256 },
+] as const;
+
+const annotationStyle = computed(() => ({
+  left: annotationBounds.value.left + "px",
+  top: annotationBounds.value.top + "px",
+  width: annotationBounds.value.width + "px",
+  height: annotationBounds.value.height + "px",
+}));
+
+const horizontalInset = computed(() =>
+  Math.max(24, Math.min(64, viewport.value.width * 0.04)),
+);
+
+const verticalInset = computed(() =>
+  Math.max(28, Math.min(72, viewport.value.height * 0.07)),
+);
+
+const compactLineGap = computed(() =>
+  Math.max(6, Math.min(9, viewport.value.height * 0.01)),
+);
+
+function makeLineMatrix(
+  sourceY: number,
+  targetX: number,
+  targetY: number,
+  targetWidth: number,
+): string {
+  const bounds = annotationBounds.value;
+  const unit = bounds.width / 256;
+  if (!unit) return "";
+  const scaleX = targetWidth / bounds.width;
+  const translateX = (targetX - bounds.left) / unit;
+  const translateY = (targetY - bounds.top) / unit - sourceY;
+  return "matrix(" + [scaleX, 0, 0, 1, translateX, translateY].join(", ") + ")";
+}
+
+const k2LineTransforms = computed<Record<string, string>>(() => {
+  const bounds = annotationBounds.value;
+  const { width, height } = viewport.value;
+  if (!bounds.width || !width || !height || k2Phase.value === "idle") return {};
+
+  const compactTop = height + 28;
+  const finalRowGap = (height - verticalInset.value * 2) / 4;
+  const targetWidth = width - horizontalInset.value * 2;
+
+  return Object.fromEntries(
+    lineDefinitions.map((line, index) => {
+      let targetX = (width - bounds.width) / 2;
+      let targetY = compactTop + index * compactLineGap.value;
+      let lineWidth = bounds.width;
+
+      if (k2Phase.value === "travel" || k2Phase.value === "expand" || k2Phase.value === "titles") {
+        targetX = horizontalInset.value;
+        lineWidth = targetWidth;
+      }
+
+      if (k2Phase.value === "expand" || k2Phase.value === "titles") {
+        targetY = height + verticalInset.value + index * finalRowGap;
+      }
+
+      return [
+        line.id,
+        makeLineMatrix(line.y, targetX, targetY, lineWidth),
+      ];
+    }),
+  );
+});
+
+const k2LineDelays = computed<Record<string, string>>(() =>
+  Object.fromEntries(
+    lineDefinitions.map((line, index) => [
+      line.id,
+      k2Phase.value === "expand" ? index * 70 + "ms" : "0ms",
+    ]),
+  ),
+);
+
+const frameworkTitlesStyle = computed(() => {
+  const bounds = annotationBounds.value;
+  const { width, height } = viewport.value;
+  return {
+    left: horizontalInset.value - bounds.left + "px",
+    top: height + verticalInset.value - bounds.top + "px",
+    width: width - horizontalInset.value * 2 + "px",
+    height: height - verticalInset.value * 2 + "px",
+  };
+});
+
+let k2RecomposeTimer: number | undefined;
+let k2TravelTimer: number | undefined;
+let k2ExpandTimer: number | undefined;
+let scrollFrame: number | undefined;
 let touchStartY: number | null = null;
 let pendingK2 = false;
 let lastScrollY = 0;
+
+const K2_RECOMPOSE_DURATION = 760;
+const K2_SCROLL_DURATION = 920;
+const K2_LINE_TRAVEL_DURATION = 1100;
+const K2_LINE_EXPAND_DURATION = 920;
+const K2_LINE_STAGGER = 70;
+
+function easeInOutCubic(value: number): number {
+  return value < 0.5
+    ? 4 * value * value * value
+    : 1 - Math.pow(-2 * value + 2, 3) / 2;
+}
+
+function animateDocumentScroll(targetY: number, duration: number) {
+  if (scrollFrame !== undefined) window.cancelAnimationFrame(scrollFrame);
+
+  const startY = window.scrollY;
+  const distance = targetY - startY;
+  const startTime = performance.now();
+  const previousBehavior = document.documentElement.style.scrollBehavior;
+  document.documentElement.style.scrollBehavior = "auto";
+
+  const frame = (now: number) => {
+    const progress = Math.min(1, (now - startTime) / duration);
+    const eased = easeInOutCubic(progress);
+    window.scrollTo(0, startY + distance * eased);
+
+    if (progress < 1) {
+      scrollFrame = window.requestAnimationFrame(frame);
+    } else {
+      scrollFrame = undefined;
+      window.scrollTo(0, targetY);
+      document.documentElement.style.scrollBehavior = previousBehavior;
+      lastScrollY = targetY;
+    }
+  };
+
+  scrollFrame = window.requestAnimationFrame(frame);
+}
+
+function scrollImmediatelyToFramework() {
+  const previousBehavior = document.documentElement.style.scrollBehavior;
+  document.documentElement.style.scrollBehavior = "auto";
+  window.scrollTo(0, viewport.value.height);
+  document.documentElement.style.scrollBehavior = previousBehavior;
+  lastScrollY = window.scrollY;
+}
 
 function beginK2() {
   if (k2Started.value) return;
@@ -45,20 +181,37 @@ function beginK2() {
     pendingK2 = true;
     return;
   }
+
   k2Started.value = true;
   pendingK2 = false;
+
   if (prefersReducedMotion) {
     k2Phase.value = "titles";
+    scrollImmediatelyToFramework();
     return;
   }
-  k2Phase.value = "converging";
-  k2ConvergeTimer = window.setTimeout(() => {
-    k2Phase.value = "expanding";
-  }, 420);
+
+  k2Phase.value = "recompose";
+  k2RecomposeTimer = window.setTimeout(() => {
+    k2Phase.value = "travel";
+    animateDocumentScroll(viewport.value.height, K2_SCROLL_DURATION);
+
+    k2TravelTimer = window.setTimeout(() => {
+      k2Phase.value = "expand";
+      const totalExpandTime =
+        K2_LINE_EXPAND_DURATION + (lineDefinitions.length - 1) * K2_LINE_STAGGER;
+      k2ExpandTimer = window.setTimeout(() => {
+        k2Phase.value = "titles";
+      }, totalExpandTime + 80);
+    }, K2_LINE_TRAVEL_DURATION);
+  }, K2_RECOMPOSE_DURATION);
 }
 
 function handleWheel(event: WheelEvent) {
-  if (event.deltaY > 0) beginK2();
+  if (event.deltaY > 0 && !k2Started.value) {
+    event.preventDefault();
+    beginK2();
+  }
 }
 
 function handleTouchStart(event: TouchEvent) {
@@ -67,7 +220,13 @@ function handleTouchStart(event: TouchEvent) {
 
 function handleTouchMove(event: TouchEvent) {
   const currentY = event.touches[0]?.clientY;
-  if (touchStartY !== null && currentY !== undefined && touchStartY - currentY > 8) {
+  if (
+    !k2Started.value &&
+    touchStartY !== null &&
+    currentY !== undefined &&
+    touchStartY - currentY > 8
+  ) {
+    event.preventDefault();
     beginK2();
   }
 }
@@ -78,8 +237,9 @@ function handleTouchEnd() {
 
 function handleDocumentScroll() {
   const currentY = window.scrollY;
-  if (currentY > lastScrollY) beginK2();
+  const movedDown = currentY > lastScrollY;
   lastScrollY = currentY;
+  if (movedDown && !k2Started.value) beginK2();
 }
 
 function isInteractiveTarget(target: EventTarget | null): boolean {
@@ -88,69 +248,45 @@ function isInteractiveTarget(target: EventTarget | null): boolean {
 }
 
 function handleKeydown(event: KeyboardEvent) {
-  if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
-  if (isInteractiveTarget(event.target)) return;
-  if (event.key === "ArrowDown" || event.key === "PageDown" || event.key === " " || event.key === "End") {
-    beginK2();
+  if (
+    event.defaultPrevented ||
+    event.altKey ||
+    event.ctrlKey ||
+    event.metaKey ||
+    event.shiftKey ||
+    isInteractiveTarget(event.target)
+  ) {
+    return;
+  }
+
+  if (
+    event.key === "ArrowDown" ||
+    event.key === "PageDown" ||
+    event.key === " " ||
+    event.key === "End"
+  ) {
+    if (!k2Started.value) {
+      event.preventDefault();
+      beginK2();
+    }
   }
 }
 
 function updateAnnotationBounds() {
-  if (k2Started.value || !markSpaceRef.value) return;
+  if (!markSpaceRef.value || k2Started.value) return;
   const rect = markSpaceRef.value.getBoundingClientRect();
   annotationBounds.value = {
-    left: `${rect.left}px`,
-    top: `${rect.top}px`,
-    width: `${rect.width}px`,
-    height: `${rect.height}px`,
-    "--annotation-unit": `${rect.height / 256}px`,
-    "--annotation-top": `${rect.top}px`,
+    left: rect.left + window.scrollX,
+    top: rect.top + window.scrollY,
+    width: rect.width,
+    height: rect.height,
   };
 }
 
-function handleFrameworkTransitionEnd(event: TransitionEvent) {
-  if (
-    k2Phase.value === "expanding" &&
-    event.target === event.currentTarget &&
-    (event.propertyName === "width" || event.propertyName === "height")
-  ) {
-    k2Phase.value = "pausing";
-    k2PauseTimer = window.setTimeout(() => {
-      k2Phase.value = "titles";
-    }, 180);
-  }
-}
-
-function handleAnnotationOverlayTransitionEnd(event: TransitionEvent) {
-  handleAnnotationFadeEnd(event);
-  handleFrameworkTransitionEnd(event);
-}
-
-onMounted(() => {
+function handleResize() {
+  viewport.value = { width: window.innerWidth, height: window.innerHeight };
   updateAnnotationBounds();
-  window.addEventListener("resize", updateAnnotationBounds, { passive: true });
-  lastScrollY = window.scrollY;
-  window.addEventListener("wheel", handleWheel, { passive: true, capture: true });
-  window.addEventListener("touchstart", handleTouchStart, { passive: true, capture: true });
-  window.addEventListener("touchmove", handleTouchMove, { passive: true, capture: true });
-  window.addEventListener("touchend", handleTouchEnd, { passive: true, capture: true });
-  window.addEventListener("touchcancel", handleTouchEnd, { passive: true, capture: true });
-  window.addEventListener("keydown", handleKeydown, true);
-  window.addEventListener("scroll", handleDocumentScroll, { passive: true });
-});
-
-onBeforeUnmount(() => {
-  if (k2ConvergeTimer !== undefined) window.clearTimeout(k2ConvergeTimer);
-  if (k2PauseTimer !== undefined) window.clearTimeout(k2PauseTimer);
-  window.removeEventListener("resize", updateAnnotationBounds);
-  window.removeEventListener("wheel", handleWheel, true);
-  window.removeEventListener("touchstart", handleTouchStart, true);
-  window.removeEventListener("touchmove", handleTouchMove, true);
-  window.removeEventListener("touchend", handleTouchEnd, true);
-  window.removeEventListener("touchcancel", handleTouchEnd, true);
-  window.removeEventListener("keydown", handleKeydown, true);
-  window.removeEventListener("scroll", handleDocumentScroll);
-});
+}
 
 function handleLogoRevealEnd() {
   if (logoStage.value === "reveal") {
@@ -164,10 +300,48 @@ function handleAnnotationFadeEnd(event: TransitionEvent) {
     if (pendingK2) beginK2();
   }
 }
+
+onMounted(() => {
+  updateAnnotationBounds();
+  lastScrollY = window.scrollY;
+
+  window.addEventListener("resize", handleResize, { passive: true });
+  window.addEventListener("wheel", handleWheel, { passive: false, capture: true });
+  window.addEventListener("touchstart", handleTouchStart, { passive: true, capture: true });
+  window.addEventListener("touchmove", handleTouchMove, { passive: false, capture: true });
+  window.addEventListener("touchend", handleTouchEnd, { passive: true, capture: true });
+  window.addEventListener("touchcancel", handleTouchEnd, { passive: true, capture: true });
+  window.addEventListener("keydown", handleKeydown, true);
+  window.addEventListener("scroll", handleDocumentScroll, { passive: true });
+});
+
+onBeforeUnmount(() => {
+  if (k2RecomposeTimer !== undefined) window.clearTimeout(k2RecomposeTimer);
+  if (k2TravelTimer !== undefined) window.clearTimeout(k2TravelTimer);
+  if (k2ExpandTimer !== undefined) window.clearTimeout(k2ExpandTimer);
+  if (scrollFrame !== undefined) window.cancelAnimationFrame(scrollFrame);
+
+  window.removeEventListener("resize", handleResize);
+  window.removeEventListener("wheel", handleWheel, true);
+  window.removeEventListener("touchstart", handleTouchStart, true);
+  window.removeEventListener("touchmove", handleTouchMove, true);
+  window.removeEventListener("touchend", handleTouchEnd, true);
+  window.removeEventListener("touchcancel", handleTouchEnd, true);
+  window.removeEventListener("keydown", handleKeydown, true);
+  window.removeEventListener("scroll", handleDocumentScroll);
+});
+</script>
+
 </script>
 
 <template>
-  <section id="title-page" class="title-page" :class="{ 'has-started-k2': k2Started }" aria-labelledby="page-title">
+  <section
+    id="title-page"
+    ref="titlePageRef"
+    class="title-page"
+    :class="{ 'has-started-k2': k2Started }"
+    aria-labelledby="page-title"
+  >
     <div class="title-page__controls" role="group" :aria-label="locale === 'zh' ? '页面设置' : 'Page settings'">
       <div class="title-page__language" role="group" :aria-label="locale === 'zh' ? '语言' : 'Language'">
         <button
@@ -231,26 +405,34 @@ function handleAnnotationFadeEnd(event: TransitionEvent) {
           >
             <LogoMark @reveal-end="handleLogoRevealEnd" />
           </div>
-          <!-- Annotation is rendered in a fixed overlay so its original SVG paths can travel into the page framework. -->
         </div>
       </div>
     </div>
   </section>
 
+  <div class="title-page__framework-scroll-stage" aria-hidden="true"></div>
+
   <div
-    v-if="Object.keys(annotationBounds).length"
+    v-if="annotationBounds.width"
     class="title-page__logo-annotation"
-    :class="{
-      'is-visible': logoStage === 'crossfade' || logoStage === 'waiting',
-      'is-expanded': k2Phase === 'expanding' || k2Phase === 'pausing' || k2Phase === 'titles',
-    }"
+    :class="{ 'is-visible': logoStage === 'crossfade' || logoStage === 'waiting' }"
     :style="annotationStyle"
-    @transitionend.self="handleAnnotationOverlayTransitionEnd"
+    @transitionend.self="handleAnnotationFadeEnd"
   >
-    <LogoAnnotation :k2-started="k2Started" :k2-phase="k2Phase" />
-    <div v-if="k2Phase === 'titles'" class="framework-titles">
+    <LogoAnnotation
+      :k2-started="k2Started"
+      :k2-phase="k2Phase"
+      :k2-line-transforms="k2LineTransforms"
+      :k2-line-delays="k2LineDelays"
+    />
+    <div
+      v-if="k2Phase === 'titles'"
+      class="framework-titles"
+      :style="frameworkTitlesStyle"
+      aria-hidden="true"
+    >
       <div
-        v-for="(part, index) in [
+        v-for="part in [
           'Part.01 Introduction',
           'Part.02 Works',
           'Part.03 Milestones',
@@ -258,20 +440,22 @@ function handleAnnotationFadeEnd(event: TransitionEvent) {
         ]"
         :key="part"
         class="framework-title"
-        :style="{ animationDelay: (index * 150) + 'ms' }"
       >
-        <span>{{ part }}</span><span class="framework-title__cursor" aria-hidden="true"></span>
+        <span class="framework-title__text">{{ part }}</span>
+        <span class="framework-title__cursor"></span>
       </div>
     </div>
   </div>
 </template>
 
-<style scoped>
-@import url("https://fonts.googleapis.com/css2?family=Climate+Crisis&display=swap");
+</template>
 
+<style scoped>
 .title-page {
   position: relative;
   display: grid;
+  width: 100%;
+  height: 100svh;
   min-height: 100svh;
   overflow: clip;
   padding: clamp(1.5rem, 4.2vw, 4.5rem);
@@ -399,14 +583,9 @@ function handleAnnotationFadeEnd(event: TransitionEvent) {
 .title-page__logo-normal {
   position: absolute;
   inset: 0;
-  transition: opacity 700ms cubic-bezier(0.22, 0.7, 0.24, 1);
-}
-
-.title-page__logo-normal {
   opacity: 1;
   filter: none;
-  transition: opacity 700ms cubic-bezier(0.22, 0.7, 0.24, 1),
-    filter 100ms ease;
+  transition: opacity 700ms cubic-bezier(0.22, 0.7, 0.24, 1), filter 100ms ease;
 }
 
 .title-page__logo-normal.is-inverted {
@@ -417,78 +596,85 @@ function handleAnnotationFadeEnd(event: TransitionEvent) {
   opacity: 0;
 }
 
+.title-page__framework-scroll-stage {
+  min-height: 100svh;
+  background: var(--site-hero-background);
+}
+
 .title-page__logo-annotation {
-  position: fixed;
+  position: absolute;
   z-index: 20;
-  left: 0;
-  top: 0;
   display: block;
   overflow: visible;
   color: var(--site-hero-foreground);
   pointer-events: none;
   opacity: 0;
-  transition:
-    left 900ms cubic-bezier(0.16, 1, 0.3, 1),
-    top 900ms cubic-bezier(0.16, 1, 0.3, 1),
-    width 900ms cubic-bezier(0.16, 1, 0.3, 1),
-    height 900ms cubic-bezier(0.16, 1, 0.3, 1),
-    opacity 700ms cubic-bezier(0.22, 0.7, 0.24, 1);
+  transition: opacity 700ms cubic-bezier(0.22, 0.7, 0.24, 1);
 }
 
 .title-page__logo-annotation.is-visible {
   opacity: 1;
 }
 
-.title-page__logo-annotation.is-expanded {
-  left: 0;
-  top: 0;
-  width: 100vw;
-  height: 100svh;
-}
-
 .title-page__logo-annotation > .logo-annotation {
   display: block;
   width: 100%;
   height: 100%;
+  overflow: visible;
 }
 
 .framework-titles {
   position: absolute;
-  inset: 0;
   display: grid;
-  grid-template-rows: 28.125% 23.047% 26.563% 22.265%;
+  grid-template-rows: repeat(4, minmax(0, 1fr));
   color: var(--site-hero-foreground);
   pointer-events: none;
 }
 
 .framework-title {
   display: flex;
-  align-items: center;
-  padding-inline: clamp(1.5rem, 7vw, 7rem);
-  font-family: "Climate Crisis", var(--font-heading);
-  font-size: clamp(1.5rem, 3.6vw, 3.4rem);
-  font-weight: 400;
-  letter-spacing: -0.025em;
+  align-items: baseline;
+  min-width: 0;
+  font-family: "SF Pro Display", var(--font-heading);
+  font-size: clamp(3rem, min(10svh, 7vw), 7rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1;
+  white-space: nowrap;
   clip-path: inset(0 100% 0 0);
-  animation: framework-title-reveal 460ms steps(22, end) forwards;
+  animation: framework-title-reveal 1800ms cubic-bezier(0.33, 1, 0.68, 1) both;
+}
+
+.framework-title__text {
+  display: inline-block;
+  line-height: 1;
 }
 
 .framework-title__cursor {
   display: inline-block;
-  width: 1.15em;
-  height: 0.08em;
-  margin-inline-start: 0.16em;
-  border-bottom: 1px solid currentColor;
-  transform: translateY(0.16em);
-  animation: framework-cursor-blink 900ms steps(2, end) infinite;
+  flex: 0 0 0.9em;
+  width: 0.9em;
+  height: 0;
+  margin-inline-start: 0.13em;
+  border-bottom: 0.06em solid currentColor;
+  transform: translateY(0.12em);
+  animation: framework-cursor-blink 900ms steps(1, end) infinite;
 }
 
 @keyframes framework-title-reveal {
-  to { clip-path: inset(0 0 0 0); }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
 }
 
 @keyframes framework-cursor-blink {
-  50% { opacity: 0; }
+  0%, 49.999% {
+    opacity: 1;
+  }
+
+  50%, 100% {
+    opacity: 0;
+  }
 }
 
 @media (max-width: 760px) {
@@ -515,6 +701,11 @@ function handleAnnotationFadeEnd(event: TransitionEvent) {
     width: clamp(12rem, 42vw, 16rem);
     justify-self: center;
   }
+
+  .framework-title {
+    font-size: clamp(1.5rem, 3.6vw, 3.4rem);
+    letter-spacing: -0.025em;
+  }
 }
 
 @media (max-width: 360px) {
@@ -539,4 +730,6 @@ function handleAnnotationFadeEnd(event: TransitionEvent) {
     animation: none;
   }
 }
+</style>
+
 </style>
