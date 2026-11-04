@@ -193,6 +193,12 @@ The active application is a deliberately small Vue page. The old page compositio
 - [ ] Verify locally that K0 crossfades into the complete K1 annotation and that the normal Logo is fully gone.
 - [ ] Verify the complete FP Logo outline, all nineteen dashed guides and their bracketed start-coordinate labels, and all solid Force handles remain visible in the K1 waiting state.
 
+### Part title typeface trial
+
+- [x] Add a temporary Google Fonts import for Climate Crisis and apply it to the four Part titles only.
+- [ ] Review the typeface in the browser for scale, readability, line spacing and visual fit.
+- [ ] If selected, replace the remote font dependency with a locally hosted `.woff2` asset and verify the local `@font-face` load.
+
 ## 8. Current next actions
 
 1. Run the local app and inspect the opacity-and-blur plate entrance, reverse contour trace, final fill and K1 handoff; decide whether the contour trace matches the intended F-to-P growth.
