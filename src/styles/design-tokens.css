@@ -69,6 +69,20 @@
   --site-brand-text: #5b7da3;
 }
 
+/* K3 content palette: cool blue-neutral surfaces with the existing brand blues. */
+:root.k3-content-theme {
+  --site-page-background: #eaf0f7;
+  --site-page-background-soft: #dfe8f2;
+  --site-panel-background: #f5f8fc;
+  --site-text-primary: #1b2b3d;
+  --site-text-secondary: #455b73;
+  --site-text-muted: #64788f;
+  --site-rule: rgb(27 43 61 / 20%);
+  --site-rule-strong: rgb(27 43 61 / 48%);
+  --site-framework-rule: #5b7da3;
+  --site-brand-text: #476486;
+}
+
 :root.dark {
   color-scheme: dark;
 
@@ -93,6 +107,19 @@
   --site-guide: #5b7da3;
   --site-framework-rule: #a9c5e4;
   --site-brand-strong: #9cb8d7;
+  --site-brand-text: #b5cfe9;
+}
+
+:root.dark.k3-content-theme {
+  --site-page-background: #0f1d2e;
+  --site-page-background-soft: #14263b;
+  --site-panel-background: #1b3048;
+  --site-text-primary: #e6eef8;
+  --site-text-secondary: #b7c8da;
+  --site-text-muted: #879bb2;
+  --site-rule: rgb(230 238 248 / 17%);
+  --site-rule-strong: rgb(230 238 248 / 42%);
+  --site-framework-rule: #a9c5e4;
   --site-brand-text: #b5cfe9;
 }
 
