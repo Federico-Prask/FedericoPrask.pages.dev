@@ -18,6 +18,7 @@ const prefersReducedMotion =
 const logoStage = ref<LogoStage>(prefersReducedMotion ? "waiting" : "reveal");
 const k2Started = ref(false);
 const k2Phase = ref<K2Phase>("idle");
+const titlePageRef = ref<HTMLElement | null>(null);
 const markSpaceRef = ref<HTMLElement | null>(null);
 
 const annotationBounds = ref({ left: 0, top: 0, width: 0, height: 0 });
@@ -25,6 +26,7 @@ const viewport = ref({
   width: typeof window === "undefined" ? 0 : window.innerWidth,
   height: typeof window === "undefined" ? 0 : window.innerHeight,
 });
+const heroHeight = ref(viewport.value.height);
 
 const lineDefinitions = [
   { id: "guide-plate-h-01", y: 0 },
@@ -73,7 +75,7 @@ const k2LineTransforms = computed<Record<string, string>>(() => {
   const { width, height } = viewport.value;
   if (!bounds.width || !width || !height || k2Phase.value === "idle") return {};
 
-  const compactTop = height + 28;
+  const compactTop = heroHeight.value + 28;
   const finalRowGap = (height - verticalInset.value * 2) / 4;
   const targetWidth = width - horizontalInset.value * 2;
 
@@ -89,7 +91,7 @@ const k2LineTransforms = computed<Record<string, string>>(() => {
       }
 
       if (k2Phase.value === "expand" || k2Phase.value === "titles") {
-        targetY = height + verticalInset.value + index * finalRowGap;
+        targetY = heroHeight.value + verticalInset.value + index * finalRowGap;
       }
 
       return [
@@ -115,7 +117,7 @@ const frameworkTitlesStyle = computed(() => {
   const rowHeight = (height - verticalInset.value * 2) / 4;
   return {
     left: horizontalInset.value - bounds.left + "px",
-    top: height + verticalInset.value - bounds.top + "px",
+    top: heroHeight.value + verticalInset.value - bounds.top + "px",
     width: width - horizontalInset.value * 2 + "px",
     height: height - verticalInset.value * 2 + "px",
     "--framework-title-size": rowHeight / 2.5 + "px",
@@ -172,7 +174,7 @@ function animateDocumentScroll(targetY: number, duration: number) {
 function scrollImmediatelyToFramework() {
   const previousBehavior = document.documentElement.style.scrollBehavior;
   document.documentElement.style.scrollBehavior = "auto";
-  window.scrollTo(0, viewport.value.height);
+  window.scrollTo(0, heroHeight.value);
   document.documentElement.style.scrollBehavior = previousBehavior;
   lastScrollY = window.scrollY;
 }
@@ -196,7 +198,7 @@ function beginK2() {
   k2Phase.value = "recompose";
   k2RecomposeTimer = window.setTimeout(() => {
     k2Phase.value = "travel";
-    animateDocumentScroll(viewport.value.height, K2_SCROLL_DURATION);
+    animateDocumentScroll(heroHeight.value, K2_SCROLL_DURATION);
 
     k2TravelTimer = window.setTimeout(() => {
       k2Phase.value = "expand";
@@ -276,6 +278,9 @@ function handleKeydown(event: KeyboardEvent) {
 
 function updateAnnotationBounds() {
   if (!markSpaceRef.value || k2Started.value) return;
+  if (titlePageRef.value) {
+    heroHeight.value = titlePageRef.value.getBoundingClientRect().height;
+  }
   const rect = markSpaceRef.value.getBoundingClientRect();
   annotationBounds.value = {
     left: rect.left + window.scrollX,
@@ -287,6 +292,9 @@ function updateAnnotationBounds() {
 
 function handleResize() {
   viewport.value = { width: window.innerWidth, height: window.innerHeight };
+  if (!k2Started.value && titlePageRef.value) {
+    heroHeight.value = titlePageRef.value.getBoundingClientRect().height;
+  }
   updateAnnotationBounds();
 }
 
@@ -332,8 +340,6 @@ onBeforeUnmount(() => {
   window.removeEventListener("keydown", handleKeydown, true);
   window.removeEventListener("scroll", handleDocumentScroll);
 });
-</script>
-
 </script>
 
 <template>
@@ -448,8 +454,6 @@ onBeforeUnmount(() => {
       </div>
     </div>
   </div>
-</template>
-
 </template>
 
 <style scoped>
@@ -732,6 +736,4 @@ onBeforeUnmount(() => {
     animation: none;
   }
 }
-</style>
-
 </style>
