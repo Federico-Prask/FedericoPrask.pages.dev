@@ -21,18 +21,15 @@ A task is not complete merely because code has been written. Build, runtime and 
 The active application is a deliberately small Vue page. The old page composition and its component tree have been removed from this branch. The supplied FP Logo is now rendered by an inline SVG component.
 
 **Current implementation boundary:**
-- The full-screen Title Page structure exists.
-- Language and theme controls remain available.
-- The Logo uses the original SVG viewBox, path data and fills.
-- K0 now has a source-level two-stage prototype: opacity-and-blur plate entrance, reverse contour trace of the original monogram path, then the original solid fill. The contour interpretation, plate focus-in appearance, theme inversion and timing still require browser review.
-- K1 now has a source-derived construction view of the complete FP Logo: solid plate/monogram outlines, nineteen unshifted full-span dashed guides using the dedicated theme-adaptive `--site-guide` token (light blue in Light mode, dark blue in Dark mode), bracketed start coordinates and solid Force handles at eight rounded corners. K0/K1 are not yet visually approved.
-- K2 has been rewritten at source level: the five original paths regroup below the Hero at moderate spacing while the document moves down 22% of the Hero height, leaving the Hero visible. After a short hold, the five lines spring outward horizontally and vertically as the document completes its scroll to the framework stage. The annotation SVG remains at its measured Logo size; it is not stretched to the viewport. Four titles reveal together after the lines finish. Desktop title line-box size is derived from 0.4 of the Part row height, while mobile retains the current size. Source files are fetched and checked; local build, animation rendering and input behavior remain unverified.
-- The Part title CSS now targets SF Pro Display Heavy (weight 800), but the variable font file has not yet been uploaded; local font-face declarations remain pending.
-- K3–K5 are not implemented.
-- The four content Parts are not implemented.
+- The full-screen Title Page structure exists, with Chinese/English and theme controls.
+- K0 has a source-level two-stage prototype: opacity-and-blur plate entrance, reverse contour trace of the original monogram path, then the original solid fill. Visual interpretation and timing still require browser review.
+- K1 has a source-derived construction view of the complete FP Logo: solid plate/monogram outlines, nineteen dashed guides, coordinate labels and Force handles. K0/K1 are not yet visually approved.
+- K2 has been rewritten at source level. The five original paths become full viewport-width rules during the first movement, while the document scrolls 22% of the Hero height with In-Out Cubic. After a short hold, the lowest line becomes the visual anchor; the remaining document scroll and the four upper lines move with matching Out Cubic timing, unfolding upward from the anchor. The annotation SVG is not stretched. Four Part titles then reveal together, character by character. Source files are fetched and checked; local build, animation rendering and input behavior remain unverified.
+- Part titles use the local SF Pro Display variable font with CSS weight 800 (Heavy); the font is preloaded from public/fonts/SF-Pro.woff. Internal font metadata and browser rendering still require verification.
+- K3–K5 and the four content Parts are not implemented.
 - A local production build and browser visual review have not been completed.
 
-**Next implementation target:** run a local production build, then browser-test the rewritten K2 sequence. Verify the five original SVG paths move from their K1 coordinates to the compact stack, the browser scrolls exactly one Hero-height with In-Out Cubic, the rules travel outward for slightly longer with Out Cubic, and the five rules separate top-to-bottom before the four titles begin their simultaneous type-in reveal. Check desktop/mobile, both themes, scrollbar input and reduced motion.
+**Next implementation target:** pull dev, run the local app, and verify K0–K2 in the browser. In particular, check that SF Pro Display Heavy is actually loaded, that the glyph weight is visibly Heavy, and that the four cursors start together. Also verify the first-stage full-width rules, fixed lower-line anchor, upward unfolding, matched Out Cubic page scroll, desktop/mobile sizing, both themes and reduced motion.
 
 ## 2. Foundation and repository cleanup
 
@@ -208,12 +205,11 @@ The active application is a deliberately small Vue page. The old page compositio
 
 ### Part title typeface
 
-- [x] Remove the superseded Climate Crisis Google Fonts import, load the local SF Pro Display family and set Part titles to Semibold (CSS weight 600), not Heavy.
-- [x] Add local `@font-face` declarations for `public/fonts/SF-Pro.woff` and `public/fonts/SF-Pro-Italic.woff` under the Part-title family alias `SF Pro Display`, with a declared variable weight range.
-- [ ] Review the initial SF Pro Display Semibold weight (600) in the browser; adjust if needed.
-- [!] Confirm whether SF Pro Display or SF Pro Text is the preferred family.
+- [x] Load the local SF Pro Display variable font from `public/fonts/SF-Pro.woff` and request Display Heavy (CSS weight 800), not Semibold.
+- [x] Preload the normal variable font in `index.html` so it is fetched before the Part title reveal.
+- [x] Keep the italic font-face registration available at `public/fonts/SF-Pro-Italic.woff`.
 - [!] Inspect the uploaded font's internal name records and variation axes; confirm how Text, Display and Rounded are represented before adding aliases for the other families.
-- [ ] Verify that SF Pro Display Semibold resolves correctly from the local variable font and that the desktop/mobile size rules remain correct.
+- [ ] Verify in the browser that the local SF Pro Display Heavy face is loaded and visibly rendered at weight 800, and that the desktop/mobile size rules remain correct.
 
 ## 8. Current next actions
 
