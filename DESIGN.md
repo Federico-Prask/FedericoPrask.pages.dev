@@ -450,23 +450,28 @@ Use the dedicated `--site-framework-rule` token. Do not reuse `--site-guide`, wh
 
 ### 6.5 K2 motion sequence
 
-K2 is a discrete choreography triggered by the first downward user input. It is not tied continuously to scroll progress. The browser document itself scrolls down by one viewport so the Hero physically moves upward and completely leaves the visible area.
+K2 is a discrete choreography triggered by the first downward user input. The browser document itself scrolls; the Hero must move upward through the viewport rather than being translated independently.
 
-**Stage A — Recompose the original paths below the Hero**
+**Stage A — Short initial movement and a moderately spaced line group**
 
-The five selected original SVG path elements move directly from their own K1 coordinates into a compact stack of five parallel rules immediately below the Hero's document section. Their spacing is deliberately small. This stage changes the transforms of the original path elements; it must not stretch the entire annotation SVG or replace the paths with HTML borders or newly drawn SVG lines.
+At the start, the five original SVG paths move directly from their K1 positions into a parallel group just below the Hero's document section. Their spacing is **not extremely tight**: the intermediate gap is 24% of the final Part-row gap, clamped to 22–48 CSS px. The document begins moving downward at the same time, but travels only **22% of the Hero height**. The Hero therefore remains clearly visible while the five lines gather near the lower edge of the viewport.
 
-**Stage B — Scroll the document while the rules travel outward**
+The original SVG path elements are transformed individually. Do not stretch the annotation SVG itself or replace the five paths with HTML borders or newly drawn SVG lines.
 
-The page scrolls from the Hero to the following full-viewport framework stage using an **In-Out Cubic** curve. At the same time, all five rules begin an **Out Cubic** displacement, expanding horizontally from the Logo-width line group toward the page-wide rule width. The line-motion duration is slightly longer than the document-scroll duration. This overlap is intentional: the Hero moves out while the compact line group comes into view and opens across the page.
+**Stage B — Brief held composition**
 
-**Stage C — Stagger the five rules into their framework positions**
+After the initial line regrouping and short document movement finish, hold the intermediate composition for 170ms. At this point the Hero is still visible, and the five rules are separated enough to read as five distinct lines rather than a tightly compressed bundle.
 
-After the document reaches the framework stage, the rules separate vertically to their final positions. Their animation start times are staggered from top to bottom; they must not all start together. The final five positions define the four Part regions and the outer top/bottom limits.
+**Stage C — The lines spring the page open**
 
-The five lines are inset from the page edges. Part titles use the same horizontal inset as the line starts, keeping the left title edge and rule edge aligned. The framework must be composed from the five original SVG elements only. The Logo annotation SVG viewport itself stays at the Logo's measured K1 size; only the selected paths travel outside it. Do not resize or stretch the SVG overlay to the viewport.
+The five lines now move outward into their final framework positions. They expand both horizontally toward the shared page inset and vertically to the five Part boundaries. The vertical movement starts in order from the top line to the bottom line, with a 65ms stagger between starts.
 
-Use Out Cubic for the path travel and vertical separation. Initial source timings are 760 ms for recomposition, 920 ms for document scroll (In-Out Cubic), 1,100 ms for simultaneous horizontal travel, and 920 ms for vertical separation plus top-to-bottom stagger. These are implementation starting points and remain subject to browser review.
+At the same time, the document completes its scroll from the 22% intermediate position to one full Hero height. The Hero moves completely above the viewport as the rules spread apart, so the movement should read as though the lines are physically opening the page into its four-Part structure.
+
+Use In-Out Cubic for the remaining document scroll. Use a spring-like Out Cubic path transition with a restrained overshoot for the outward line movement; the line motion continues slightly longer than the document scroll. Initial source timings: 720ms for initial line regrouping, 560ms for the first 22% document movement, 170ms intermediate hold, 1,020ms for the remaining document scroll, and 1,120ms per line for the outward movement, plus 65ms stagger per line.
+
+The five final rules and all four title rows share one horizontal inset. The annotation SVG remains at its measured K1 Logo bounds throughout. Only the five original path elements travel beyond the Logo bounds.
+
 
 ### 6.6 Part title reveal
 
@@ -1353,7 +1358,7 @@ The K0 completion listener is bound directly to the final monogram-fill path. Be
 
 ### 19.8 Part title typeface transition — SF Pro variable font pending
 
-The Climate Crisis trial is superseded. The intended title family is **SF Pro Display**, using its Heavy weight from the variable font asset the owner plans to upload. The supplied variable font is expected to contain the SF Pro Text, SF Pro Display and SF Pro Rounded families. Do not guess the internal family names, supported weight range, or variation axes: inspect the uploaded font before defining local `@font-face` declarations. The final site should load the provided font locally rather than depend on Google Fonts. Until the asset is available, the font-face configuration remains pending.
+The Climate Crisis trial is superseded. The intended title family is **SF Pro Display**, using its Heavy weight from the variable font asset the owner plans to upload. The supplied variable font is expected to contain the SF Pro Text, SF Pro Display and SF Pro Rounded families. The asset will be stored under `public/fonts/` and loaded with local `@font-face` declarations. Do not guess the internal family names, supported weight range, or variation axes: inspect the uploaded font before defining local `@font-face` declarations. The final site should load the provided font locally from `public/fonts/` rather than depend on Google Fonts. Until the asset is available, the font-face configuration remains pending.
 
 ### 19.9 Part title size refinement
 
