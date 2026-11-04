@@ -1358,3 +1358,14 @@ The Climate Crisis trial is superseded. The intended title family is **SF Pro Di
 ### 19.9 Part title size refinement
 
 The current mobile size is considered approximately correct and must be retained. Desktop titles were still too small. The desktop rule must be viewport-height-aware and ensure the title size/line-box height is at least 0.4 times the distance between adjacent rules. The mobile breakpoint keeps the existing `clamp(1.5rem, 3.6vw, 3.4rem)` size unchanged. The final title weight is SF Pro Display Heavy after the variable font asset is inspected and installed.
+
+
+### 19.10 K2 source rewrite — browser verification pending
+
+The previous K2 implementation that collapsed all five guides to the Title Page bottom and enlarged the annotation SVG to viewport dimensions has been removed. The new source implementation keeps the annotation overlay at its measured K1 Logo bounds and applies independent matrix transforms to the same five original SVG path nodes. A second full-viewport document stage provides a real one-screen scroll destination.
+
+The current source choreography is: (1) 760ms Out Cubic recomposition of the five original paths into a compact stack below the Hero; (2) a 920ms document scroll using In-Out Cubic, concurrent with 1,100ms Out Cubic horizontal rule travel; (3) 920ms Out Cubic vertical separation with 70ms top-to-bottom start staggering; and (4) a simultaneous 1,800ms Out Cubic clipped type-in reveal for all four titles. The document scroll is implemented with an animation-frame loop and an explicit In-Out Cubic easing function. Reduced-motion mode jumps directly to the completed framework state.
+
+The five rules use a 0.35px stroke and share a horizontal inset with the title text. Desktop title line-box size is calculated as 0.4 of the framework row height; the existing mobile size remains unchanged. The four underline cursors use one current text color and binary opacity. The title family is set to SF Pro Display Heavy (CSS weight 800), but the variable font asset is not yet present, so the local font-face setup remains pending.
+
+This is a source-level rewrite only. **No local production build or browser verification has been run.** In particular, verify SVG path transform interpolation, the real document scroll, timing overlap, title clipping, responsive size and reduced-motion behavior before treating K2 as approved.
