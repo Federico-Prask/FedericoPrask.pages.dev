@@ -1365,12 +1365,17 @@ The Climate Crisis trial is superseded. The intended title family is **SF Pro Di
 The current mobile size is considered approximately correct and must be retained. Desktop titles were still too small. The desktop rule must be viewport-height-aware and ensure the title size/line-box height is at least 0.4 times the distance between adjacent rules. The mobile breakpoint keeps the existing `clamp(1.5rem, 3.6vw, 3.4rem)` size unchanged. The final title weight is SF Pro Display Heavy after the variable font asset is inspected and installed.
 
 
-### 19.10 K2 source rewrite — browser verification pending
+### 19.10 K2 source rewrite — partial-scroll / spring-open revision
 
-The previous K2 implementation that collapsed all five guides to the Title Page bottom and enlarged the annotation SVG to viewport dimensions has been removed. The new source implementation keeps the annotation overlay at its measured K1 Logo bounds and applies independent matrix transforms to the same five original SVG path nodes. A second full-viewport document stage provides a real one-screen scroll destination.
+The previous K2 implementation that collapsed all five guides into a very tight group, scrolled the entire Hero away immediately, and enlarged the annotation SVG to viewport dimensions has been removed. The annotation overlay stays at its measured K1 Logo bounds and applies independent matrix transforms to the same five original SVG path nodes. A second full-viewport document stage provides the real scroll destination.
 
-The current source choreography is: (1) 760ms Out Cubic recomposition of the five original paths into a compact stack below the Hero; (2) a 920ms document scroll using In-Out Cubic, concurrent with 1,100ms Out Cubic horizontal rule travel; (3) 920ms Out Cubic vertical separation with 70ms top-to-bottom start staggering; and (4) a simultaneous 1,800ms Out Cubic clipped type-in reveal for all four titles. The document scroll is implemented with an animation-frame loop and an explicit In-Out Cubic easing function. Reduced-motion mode jumps directly to the completed framework state.
+The current sequence is:
+1. The five original paths recompose over 720ms into a moderately spaced group below the Hero. The intermediate line gap is 24% of the final Part-row gap, clamped to 22–48 CSS px.
+2. At the same time, the document scrolls only 22% of the Hero height over 560ms with In-Out Cubic. The Hero remains clearly visible.
+3. The intermediate composition holds for 170ms.
+4. The rules move outward to the final five framework positions while the document completes the remaining scroll over 1,020ms with In-Out Cubic. Each path uses a spring-like Out easing over 1,120ms, with 65ms top-to-bottom staggering. The five rules widen to the shared page inset and spread vertically, creating the impression that they open the page.
+5. All four titles begin their 1,800ms Out Cubic clipped type-in reveal together after the line motion completes.
 
-The five rules use a 0.35px stroke and share a horizontal inset with the title text. Desktop title line-box size is calculated as 0.4 of the framework row height; the existing mobile size remains unchanged. The four underline cursors use one current text color and binary opacity. The title family is set to SF Pro Display Heavy (CSS weight 800), but the variable font asset is not yet present, so the local font-face setup remains pending.
+The five rules use a 0.35px stroke and share a horizontal inset with the title text. Desktop title line-box size is calculated as 0.4 of the Part row height; the existing mobile size remains unchanged. The four underline cursors use one current text color and binary opacity. Part titles target SF Pro Display Heavy (CSS weight 800); the variable font asset is expected at `public/fonts/`, but has not yet been uploaded, so local font-face declarations remain pending.
 
-This is a source-level rewrite only. **No local production build or browser verification has been run.** In particular, verify SVG path transform interpolation, the real document scroll, timing overlap, title clipping, responsive size and reduced-motion behavior before treating K2 as approved.
+This is a source-level rewrite only. **No local production build or browser verification has been run.** Verify the initial partial scroll, the intermediate line spacing, the outward line motion, the completed document scroll, title clipping, responsive size and reduced-motion behavior before treating K2 as approved.
