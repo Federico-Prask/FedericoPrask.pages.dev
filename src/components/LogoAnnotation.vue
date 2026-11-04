@@ -34,7 +34,6 @@ function k2PathStyle(id: string) {
     :class="{
       'is-k2-started': props.k2Started,
       'is-k2-recompose': props.k2Phase === 'recompose',
-      'is-k2-travel': props.k2Phase === 'travel',
       'is-k2-expand': props.k2Phase === 'expand',
     }"
     xmlns="http://www.w3.org/2000/svg"
@@ -236,13 +235,6 @@ function k2PathStyle(id: string) {
 .logo-annotation.is-k2-recompose .axis-guides path[data-k2-persistent="true"] {
   transition:
     transform 760ms cubic-bezier(0.33, 1, 0.68, 1),
-    stroke 420ms ease,
-    stroke-width 420ms ease;
-}
-
-.logo-annotation.is-k2-travel .axis-guides path[data-k2-persistent="true"] {
-  transition:
-    transform 1100ms cubic-bezier(0.33, 1, 0.68, 1),
     stroke 420ms ease,
     stroke-width 420ms ease;
 }
