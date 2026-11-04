@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import LogoMark from "./LogoMark.vue";
 
-type K2Phase = "idle" | "recompose" | "travel" | "expand" | "titles";
+type K2Phase = "idle" | "recompose" | "settled" | "expand" | "titles";
 
 const props = withDefaults(
   defineProps<{
@@ -249,7 +249,7 @@ function k2PathStyle(id: string) {
 
 .logo-annotation.is-k2-expand .axis-guides path[data-k2-persistent="true"] {
   transition:
-    transform 920ms cubic-bezier(0.33, 1, 0.68, 1),
+    transform 1120ms cubic-bezier(0.16, 1.14, 0.3, 1),
     stroke 420ms ease,
     stroke-width 420ms ease;
 }
