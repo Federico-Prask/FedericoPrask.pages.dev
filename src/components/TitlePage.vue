@@ -36,6 +36,13 @@ const lineDefinitions = [
   { id: "guide-plate-h-02", y: 256 },
 ] as const;
 
+const frameworkParts = [
+  "Part.01 Introduction",
+  "Part.02 Works",
+  "Part.03 Milestones",
+  "Part.04 Beyond",
+] as const;
+
 const annotationStyle = computed(() => ({
   left: annotationBounds.value.left + "px",
   top: annotationBounds.value.top + "px",
@@ -77,26 +84,26 @@ const k2LineTransforms = computed<Record<string, string>>(() => {
   const { width, height } = viewport.value;
   if (!bounds.width || !width || !height || k2Phase.value === "idle") return {};
 
-  const compactTop = heroHeight.value + 28;
-  const finalRowGap = (height - verticalInset.value * 2) / 4;
-  const targetWidth = width - horizontalInset.value * 2;
+  const initialScroll = heroHeight.value * K2_INITIAL_SCROLL_RATIO;
+  const compactBottomY = initialScroll + heroHeight.value - verticalInset.value;
+  const compactTopY =
+    compactBottomY - (lineDefinitions.length - 1) * compactLineGap.value;
+
+  // The lowest rule moves in document coordinates by the same distance as
+  // the page scroll, keeping it visually anchored in the viewport.
+  const finalBottomY = compactBottomY + (heroHeight.value - initialScroll);
+  const finalRowGap = (height - verticalInset.value * 2) / (lineDefinitions.length - 1);
+  const isExpanding = k2Phase.value === "expand" || k2Phase.value === "titles";
 
   return Object.fromEntries(
     lineDefinitions.map((line, index) => {
-      let targetX = (width - bounds.width) / 2;
-      let targetY = compactTop + index * compactLineGap.value;
-      let lineWidth = bounds.width;
+      const targetY = isExpanding
+        ? finalBottomY - (lineDefinitions.length - 1 - index) * finalRowGap
+        : compactTopY + index * compactLineGap.value;
 
-      if (k2Phase.value === "expand" || k2Phase.value === "titles") {
-        targetX = horizontalInset.value;
-        lineWidth = targetWidth;
-        targetY = heroHeight.value + verticalInset.value + index * finalRowGap;
-      }
-
-      return [
-        line.id,
-        makeLineMatrix(line.y, targetX, targetY, lineWidth),
-      ];
+      // All five rules become edge-to-edge during Stage A. Stage C changes
+      // their vertical positions only; horizontal width never changes again.
+      return [line.id, makeLineMatrix(line.y, 0, targetY, width)];
     }),
   );
 });
@@ -105,7 +112,9 @@ const k2LineDelays = computed<Record<string, string>>(() =>
   Object.fromEntries(
     lineDefinitions.map((line, index) => [
       line.id,
-      k2Phase.value === "expand" ? index * 70 + "ms" : "0ms",
+      k2Phase.value === "expand"
+        ? (lineDefinitions.length - 1 - index) * K2_LINE_STAGGER + "ms"
+        : "0ms",
     ]),
   ),
 );
@@ -135,8 +144,8 @@ const K2_RECOMPOSE_DURATION = 720;
 const K2_INITIAL_SCROLL_DURATION = 560;
 const K2_INITIAL_SCROLL_RATIO = 0.22;
 const K2_SETTLE_HOLD = 170;
-const K2_OPEN_SCROLL_DURATION = 1020;
-const K2_LINE_EXPAND_DURATION = 1120;
+const K2_OPEN_SCROLL_DURATION = 1100;
+const K2_LINE_EXPAND_DURATION = 1100;
 const K2_LINE_STAGGER = 65;
 
 function easeInOutCubic(value: number): number {
@@ -145,7 +154,15 @@ function easeInOutCubic(value: number): number {
     : 1 - Math.pow(-2 * value + 2, 3) / 2;
 }
 
-function animateDocumentScroll(targetY: number, duration: number) {
+function easeOutCubic(value: number): number {
+  return 1 - Math.pow(1 - value, 3);
+}
+
+function animateDocumentScroll(
+  targetY: number,
+  duration: number,
+  easing: "in-out-cubic" | "out-cubic" = "in-out-cubic",
+) {
   if (scrollFrame !== undefined) window.cancelAnimationFrame(scrollFrame);
 
   const startY = window.scrollY;
@@ -156,7 +173,10 @@ function animateDocumentScroll(targetY: number, duration: number) {
 
   const frame = (now: number) => {
     const progress = Math.min(1, (now - startTime) / duration);
-    const eased = easeInOutCubic(progress);
+    const eased =
+      easing === "out-cubic"
+        ? easeOutCubic(progress)
+        : easeInOutCubic(progress);
     window.scrollTo(0, startY + distance * eased);
 
     if (progress < 1) {
@@ -213,7 +233,11 @@ function beginK2() {
     // the framework while the document completes its upward-moving scroll.
     k2SettleTimer = window.setTimeout(() => {
       k2Phase.value = "expand";
-      animateDocumentScroll(heroHeight.value, K2_OPEN_SCROLL_DURATION);
+      animateDocumentScroll(
+        heroHeight.value,
+        K2_OPEN_SCROLL_DURATION,
+        "out-cubic",
+      );
 
       const totalExpandTime =
         K2_LINE_EXPAND_DURATION + (lineDefinitions.length - 1) * K2_LINE_STAGGER;
@@ -454,17 +478,22 @@ onBeforeUnmount(() => {
       aria-hidden="true"
     >
       <div
-        v-for="part in [
-          'Part.01 Introduction',
-          'Part.02 Works',
-          'Part.03 Milestones',
-          'Part.04 Beyond',
-        ]"
+        v-for="part in frameworkParts"
         :key="part"
         class="framework-title"
       >
-        <span class="framework-title__text">{{ part }}</span>
-        <span class="framework-title__cursor"></span>
+        <span class="framework-title__text">
+          <span
+            v-for="(character, index) in part.split('')"
+            :key="`${part}-${index}`"
+            class="framework-title__character"
+            :style="{ '--character-delay': `${index * 36}ms` }"
+          >{{ character === " " ? "\u00A0" : character }}</span>
+        </span>
+        <span
+          class="framework-title__cursor"
+          :style="{ '--cursor-delay': `${(part.length - 1) * 36 + 420}ms` }"
+        ></span>
       </div>
     </div>
   </div>
@@ -664,13 +693,22 @@ onBeforeUnmount(() => {
   letter-spacing: -0.035em;
   line-height: 1;
   white-space: nowrap;
-  clip-path: inset(0 100% 0 0);
-  animation: framework-title-reveal 1800ms cubic-bezier(0.33, 1, 0.68, 1) both;
 }
 
 .framework-title__text {
-  display: inline-block;
+  display: inline-flex;
+  align-items: baseline;
+  white-space: pre;
   line-height: 1;
+}
+
+.framework-title__character {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.42em) scale(0.94);
+  transform-origin: center bottom;
+  animation: framework-character-pop 420ms cubic-bezier(0.33, 1, 0.68, 1) both;
+  animation-delay: var(--character-delay);
 }
 
 .framework-title__cursor {
@@ -681,12 +719,19 @@ onBeforeUnmount(() => {
   margin-inline-start: 0.13em;
   border-bottom: 0.06em solid currentColor;
   transform: translateY(0.12em);
-  animation: framework-cursor-blink 900ms steps(1, end) infinite;
+  opacity: 0;
+  animation: framework-cursor-blink 900ms steps(1, end) var(--cursor-delay) infinite;
 }
 
-@keyframes framework-title-reveal {
+@keyframes framework-character-pop {
+  from {
+    opacity: 0;
+    transform: translateY(0.42em) scale(0.94);
+  }
+
   to {
-    clip-path: inset(0 0 0 0);
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -744,12 +789,14 @@ onBeforeUnmount(() => {
     transition: none;
   }
 
-  .framework-title {
-    clip-path: none;
+  .framework-title__character {
+    opacity: 1;
+    transform: none;
     animation: none;
   }
 
   .framework-title__cursor {
+    opacity: 1;
     animation: none;
   }
 }
