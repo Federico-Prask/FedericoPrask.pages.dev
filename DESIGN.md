@@ -1347,3 +1347,8 @@ The K0 completion listener is bound directly to the final monogram-fill path. Be
 ### 19.8 Part title typeface trial — Climate Crisis
 
 A temporary typography trial loads **Climate Crisis** from Google Fonts for the four K2 Part titles only. The font is applied to the Part title labels, not the Hero name or other page typography. This is an evaluation setup for visual review, not the final deployment strategy. Google Fonts availability may vary by visitor network; before production, bundle the chosen `.woff2` file under the site's local font assets and load it with `@font-face`. The visual fit, readability and final font weight remain subject to browser review.
+
+
+### 19.9 Climate Crisis scale refinement
+
+The first visual feedback on Climate Crisis was that the Part titles felt undersized and slightly too heavy. Increase the responsive title size from `clamp(1.15rem, 2.7vw, 2.6rem)` to `clamp(1.5rem, 3.6vw, 3.4rem)`. Keep the typeface at CSS weight 400 for this iteration; assess the larger scale in the browser before introducing artificial stroke thinning or changing the font. Mobile uses the same enlarged rule for now; verify that it remains legible and fits the available line width.
