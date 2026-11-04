@@ -466,7 +466,7 @@ function handleAnnotationFadeEnd(event: TransitionEvent) {
   align-items: center;
   padding-inline: clamp(1.5rem, 7vw, 7rem);
   font-family: "Climate Crisis", var(--font-heading);
-  font-size: clamp(1.15rem, 2.7vw, 2.6rem);
+  font-size: clamp(1.5rem, 3.6vw, 3.4rem);
   font-weight: 400;
   letter-spacing: -0.025em;
   clip-path: inset(0 100% 0 0);
