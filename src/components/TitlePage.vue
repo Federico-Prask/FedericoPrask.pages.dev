@@ -17,12 +17,12 @@ const prefersReducedMotion =
 const logoStage = ref<LogoStage>(prefersReducedMotion ? "waiting" : "reveal");
 
 const k2Started = ref(false);
-type K2Phase = "idle" | "converging" | "expanding" | "titles";
+type K2Phase = "idle" | "converging" | "expanding" | "pausing" | "titles";
 const k2Phase = ref<K2Phase>("idle");
 const markSpaceRef = ref<HTMLElement | null>(null);
 const annotationBounds = ref<Record<string, string>>({});
 const annotationStyle = computed(() => {
-  if (k2Phase.value === "expanding" || k2Phase.value === "titles") {
+  if (k2Phase.value === "expanding" || k2Phase.value === "pausing" || k2Phase.value === "titles") {
     return {
       left: "0px",
       top: "0px",
@@ -34,6 +34,7 @@ const annotationStyle = computed(() => {
   return annotationBounds.value;
 });
 let k2ConvergeTimer: number | undefined;
+let k2PauseTimer: number | undefined;
 let touchStartY: number | null = null;
 let pendingK2 = false;
 let lastScrollY = 0;
@@ -112,7 +113,10 @@ function handleFrameworkTransitionEnd(event: TransitionEvent) {
     event.target === event.currentTarget &&
     (event.propertyName === "width" || event.propertyName === "height")
   ) {
-    k2Phase.value = "titles";
+    k2Phase.value = "pausing";
+    k2PauseTimer = window.setTimeout(() => {
+      k2Phase.value = "titles";
+    }, 180);
   }
 }
 
@@ -136,6 +140,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   if (k2ConvergeTimer !== undefined) window.clearTimeout(k2ConvergeTimer);
+  if (k2PauseTimer !== undefined) window.clearTimeout(k2PauseTimer);
   window.removeEventListener("resize", updateAnnotationBounds);
   window.removeEventListener("wheel", handleWheel, true);
   window.removeEventListener("touchstart", handleTouchStart, true);
@@ -236,7 +241,7 @@ function handleAnnotationFadeEnd(event: TransitionEvent) {
     class="title-page__logo-annotation"
     :class="{
       'is-visible': logoStage === 'crossfade' || logoStage === 'waiting',
-      'is-expanded': k2Phase === 'expanding' || k2Phase === 'titles',
+      'is-expanded': k2Phase === 'expanding' || k2Phase === 'pausing' || k2Phase === 'titles',
     }"
     :style="annotationStyle"
     @transitionend.self="handleAnnotationOverlayTransitionEnd"
