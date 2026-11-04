@@ -25,7 +25,7 @@ The active application is a deliberately small Vue page. The old page compositio
 - K0 has a source-level two-stage prototype: opacity-and-blur plate entrance, reverse contour trace of the original monogram path, then the original solid fill. Visual interpretation and timing still require browser review.
 - K1 has a source-derived construction view of the complete FP Logo: solid plate/monogram outlines, nineteen dashed guides, coordinate labels and Force handles. K0/K1 are not yet visually approved.
 - K2 has been rewritten at source level. The five original paths become full viewport-width rules during the first movement, while the document scrolls 22% of the Hero height with In-Out Cubic. After a short hold, the lowest line becomes the visual anchor; the remaining document scroll and the four upper lines move with matching Out Cubic timing, unfolding upward from the anchor. The annotation SVG is not stretched. Four Part titles then reveal together, character by character. Source files are fetched and checked; local build, animation rendering and input behavior remain unverified.
-- Part titles use the local SF Pro Display variable font with CSS weight 800 (Heavy); the font is preloaded from public/fonts/SF-Pro.woff. Internal font metadata and browser rendering still require verification.
+- Part titles use the original local SF Pro variable TTF at public/fonts/SF-Pro.ttf. Its wght axis (1–1000) and opsz axis (17–28) are confirmed; titles request weight 800 (Heavy), and the TTF is preloaded. Browser rendering still requires verification.
 - K3–K5 and the four content Parts are not implemented.
 - A local production build and browser visual review have not been completed.
 
@@ -205,11 +205,12 @@ The active application is a deliberately small Vue page. The old page compositio
 
 ### Part title typeface
 
-- [x] Load the local SF Pro Display variable font from `public/fonts/SF-Pro.woff` and request Display Heavy (CSS weight 800), not Semibold.
-- [x] Preload the normal variable font in `index.html` so it is fetched before the Part title reveal.
-- [x] Keep the italic font-face registration available at `public/fonts/SF-Pro-Italic.woff`.
-- [!] Inspect the uploaded font's internal name records and variation axes; confirm how Text, Display and Rounded are represented before adding aliases for the other families.
-- [ ] Verify in the browser that the local SF Pro Display Heavy face is loaded and visibly rendered at weight 800, and that the desktop/mobile size rules remain correct.
+- [x] Register the original variable TTF at `public/fonts/SF-Pro.ttf`; its `wght` axis spans 1–1000 and its `opsz` axis spans 17–28.
+- [x] Request SF Pro Display Heavy with CSS weight 800; enable optical sizing for the `opsz` axis.
+- [x] Preload the original variable TTF in `index.html` so it is fetched before the Part title reveal.
+- [x] Keep the separate italic WOFF face at `public/fonts/SF-Pro-Italic.woff`, registered as static weight 400.
+- [!] Determine whether separate Text / Display / Rounded aliases or additional font files are needed; the inspected TTF identifies its family as SF Pro and exposes only `opsz` and `wght` axes.
+- [ ] Verify in the browser that the original variable TTF is loaded and visibly renders weight 800, and that the desktop/mobile size rules remain correct.
 
 ## 8. Current next actions
 
