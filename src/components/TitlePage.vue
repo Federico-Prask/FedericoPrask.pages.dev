@@ -27,7 +27,7 @@ const annotationStyle = computed(() => {
       left: "0px",
       top: "0px",
       width: "100vw",
-      height: "100vh",
+      height: "100svh",
       "--annotation-unit": annotationBounds.value["--annotation-unit"] ?? "1px",
     };
   }
@@ -441,7 +441,7 @@ function handleAnnotationFadeEnd(event: TransitionEvent) {
   left: 0;
   top: 0;
   width: 100vw;
-  height: 100vh;
+  height: 100svh;
 }
 
 .title-page__logo-annotation > .logo-annotation {
