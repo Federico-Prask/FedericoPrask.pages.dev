@@ -26,11 +26,12 @@ The active application is a deliberately small Vue page. The old page compositio
 - The Logo uses the original SVG viewBox, path data and fills.
 - K0 now has a source-level two-stage prototype: opacity-and-blur plate entrance, reverse contour trace of the original monogram path, then the original solid fill. The contour interpretation, plate focus-in appearance, theme inversion and timing still require browser review.
 - K1 now has a source-derived construction view of the complete FP Logo: solid plate/monogram outlines, nineteen unshifted full-span dashed guides using the dedicated theme-adaptive `--site-guide` token (light blue in Light mode, dark blue in Dark mode), bracketed start coordinates and solid Force handles at eight rounded corners. K0/K1 are not yet visually approved.
-- K2–K5 are not implemented.
+- K2 now has a source-level prototype: five original horizontal guide paths converge to the bottom edge of the Title Page, expand into five page-wide rules, and lead into the four sequential Part titles with underline cursors. The implementation and theme tokens are source-checked; animation timing, browser rendering and input behavior remain unverified.
+- K3–K5 are not implemented.
 - The four content Parts are not implemented.
 - A local production build and browser visual review have not been completed.
 
-**Next implementation target:** run and visually inspect the K0/K1 prototype. The K1 guide paths now follow their exact source coordinates and span the original Logo frame; coordinate-label placement, handle scale and line rhythm still need browser review. Preserve the complete FP Logo outline through the K1 waiting state; it disappears only when K2 begins.
+**Next implementation target:** run the local app and visually inspect K0/K1, then exercise the complete K2 transition. Confirm the annotation overlay begins at the exact Logo bounds, all five selected paths converge to the Title Page bottom, expand across the viewport, and reveal the four titles in order. Check both themes and narrow viewports before treating the motion as approved.
 
 ## 2. Foundation and repository cleanup
 
@@ -110,12 +111,13 @@ The active application is a deliberately small Vue page. The old page compositio
 - [ ] Verify all K2 navigation inputs in the browser: wheel, touch swipe measured from the initial touch point, keyboard navigation, and actual downward document scrolling. Inputs received during K1 must be queued and applied once the annotation reaches its waiting state.
 - [x] Make the trigger one-shot; upward scrolling must not reverse or replay it.
 - [x] Fade out and then hide coordinate labels, Force nodes, Force handles and the complete original FP Logo outline when K2 begins, while leaving the original persistent guide group untouched.
-- [ ] Preserve exactly five original horizontal guide paths: `guide-plate-h-01`, `guide-mono-h-04`, `guide-mono-h-06`, `guide-mono-h-07`, `guide-plate-h-02`; remove the other horizontal guides and all vertical guides from the K2 framework.
-- [ ] Convert the five surviving paths from dashed guides into 0.5px solid rules; use dark blue `#5b7da3` in Light mode and light blue `#a9c5e4` in Dark mode.
-- [ ] Move the five original paths to the bottom boundary of the entire Title Page composition, then expand them vertically into the five ordered page-wide framework boundaries with fast Out Cubic motion.
-- [ ] Pause briefly after the five-line framework expansion.
-- [ ] Reveal the four Part titles in vertical order.
-- [ ] Attach a blinking underline cursor to every Part title.
+- [x] Preserve exactly five original horizontal guide paths: `guide-plate-h-01`, `guide-mono-h-04`, `guide-mono-h-06`, `guide-mono-h-07`, `guide-plate-h-02`; hide the other horizontal guides and all vertical guides from the K2 framework.
+- [x] Convert the five surviving paths from dashed guides into 0.5px solid rules; use dark blue `#5b7da3` in Light mode and light blue `#a9c5e4` in Dark mode.
+- [x] Move the five original paths to the bottom boundary of the entire Title Page composition, then expand them vertically into the five ordered page-wide framework boundaries with fast Out Cubic motion.
+- [x] Pause briefly after the five-line framework expansion (initial source timing: 180ms).
+- [x] Reveal the four Part titles in vertical order using a rapid clipped reveal.
+- [x] Attach a blinking underline cursor to every Part title.
+- [ ] Verify K2 convergence, page-width expansion, title placement and cursor behavior in the browser at desktop and mobile widths, in both themes.
 
 ### 4.2 K3 — Framework and theme transition
 
@@ -196,6 +198,6 @@ The active application is a deliberately small Vue page. The old page compositio
 1. Run the local app and inspect the opacity-and-blur plate entrance, reverse contour trace, final fill and K1 handoff; decide whether the contour trace matches the intended F-to-P growth.
 2. Check Logo sizing at several viewport widths; tune the minimum, preferred and maximum sizes if the Logo still feels too sensitive to window width.
 3. Review and calibrate revised K0/K1 in a local browser, including the full waiting state, reduced-motion behavior and responsive sizes.
-4. Implement K2 against the persistent guide elements; do not recreate the lines.
+4. Browser-test the K2 prototype, tune the line and title motion, and keep the five original guide paths as the only framework rules.
 5. Update this file and `DESIGN.md` after each completed implementation slice.
 6. Do not mark visual verification tasks complete until they have been checked in a browser.
