@@ -1342,3 +1342,8 @@ The Logo sizing is also being decoupled from small viewport-width changes. Deskt
 ### 19.7 K0-to-K1 handoff reliability correction
 
 The K0 completion listener is bound directly to the final monogram-fill path. Because Vue scoped styles may rewrite component-local keyframe identifiers, the handler does not compare `AnimationEvent.animationName` with the source-level keyframe name; the listener's placement on the dedicated final-fill path is the event filter. It emits the completion event when that path's animation ends, allowing TitlePage to advance from K0 reveal to the K1 annotation crossfade. This is a source-level correction; local runtime behavior and the complete K1 annotation still require browser verification.
+
+
+### 19.8 Part title typeface trial — Climate Crisis
+
+A temporary typography trial loads **Climate Crisis** from Google Fonts for the four K2 Part titles only. The font is applied to the Part title labels, not the Hero name or other page typography. This is an evaluation setup for visual review, not the final deployment strategy. Google Fonts availability may vary by visitor network; before production, bundle the chosen `.woff2` file under the site's local font assets and load it with `@font-face`. The visual fit, readability and final font weight remain subject to browser review.
