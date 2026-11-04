@@ -507,6 +507,8 @@ This is a directional movement, not a plain opacity fade.
 
 Both sides move toward the center simultaneously. As they enter the content region, the width of each Part becomes narrower.
 
+The final left boundary is aligned to the measured left edge of the Hero's “Federico Prask” name. Use that element's actual left offset from the viewport, not an independently guessed percentage. The right boundary mirrors the same inset from the right viewport edge. The five horizontal framework rules and the Part-title container finish at these same left and right limits.
+
 The final result should resemble a clean page-edge framework: strong enough to define the content width, but light enough not to make every Part look like a card.
 
 ### 7.3 Part title scaling
@@ -520,7 +522,7 @@ At the same time as the side boundaries move inward:
 
 The title must not remain oversized after the boundaries have already reached their final position.
 
-The exact scale ratio and transformation origin remain open for visual tuning.
+The first source implementation uses a 0.72 title scale with a left-center transform origin; the attached extension line scales with the title, while the five horizontal separators shorten to the new boundary span. Treat the ratio as a first-pass value for browser tuning.
 
 ### 7.4 Synchronized theme transition
 
@@ -540,6 +542,8 @@ The following properties must transition together:
 The transition should use coordinated color interpolation. Do not make the background change first and then animate text, borders and the cursor independently after it.
 
 The colors must maintain readable contrast throughout the transition, not only at the beginning and end.
+
+The first source implementation uses a cool blue-neutral destination palette: Light mode targets a pale blue surface (hex #eaf0f7) with dark blue-gray text, while Dark mode targets a deep blue surface (hex #0f1d2e) with light blue-gray text. These are initial tuning values, not final visual approval.
 
 The same principle applies in both Light and Dark modes, with different destination palettes.
 
@@ -562,6 +566,8 @@ Its behavior:
 5. It remains visible after stopping, in the final content-compatible color.
 
 Do not remove the cursor at the end of K3.
+
+The current sequence allows the synchronized cursors to complete two 900ms blink cycles after the longest title finishes before K3 begins. K3 then eases the blinking down over approximately 3.2 seconds. Both timings remain subject to browser review.
 
 ### 7.7 K3 end state
 
@@ -1128,7 +1134,7 @@ The following are intentionally not fixed yet. They should be resolved through v
 - Exact SVG line positions and which explicit line IDs persist through K2.
 - Final Light and Dark destination colors for the content stage.
 - Whether the deep-blue extension color is used, and where.
-- Final Part boundary inset and dashed-line pattern.
+- Final Part boundary dash pattern and title-scale ratio after browser review.
 
 ### 16.2 Motion details
 
@@ -1354,3 +1360,11 @@ The current source sequence is:
 Rules remain 0.35px solid. Title text retains its page-edge inset; desktop title size/line-box height remains 0.4 of each Part-row height, while the existing mobile size is unchanged. The normal face is loaded from public/fonts/SF-Pro.ttf, whose wght axis spans 1–1000 and whose opsz axis spans 17–28; the existing SF-Pro-Italic.woff remains a separate italic face registered at weight 400. Part titles request weight 800 (Heavy) with optical sizing enabled. Separate Text/Display/Rounded aliases have not yet been established from the inspected font metadata.
 
 This is a source-level implementation only. **No local production build or browser verification has been run.** Check the full-width Stage A composition, the lower-rule viewport anchor, bottom-to-top upward unfolding, matched Out Cubic scroll, character pop timing, title size, responsive behavior and reduced-motion state before treating K2 as approved.
+
+### 19.11 K3 source implementation — measured page-edge framework
+
+K3 now starts automatically after the Part titles have appeared and their shared cursors have completed two initial blink cycles. The left/right dashed boundaries move inward from outside the scene. Their final horizontal positions are derived from the measured left edge of the Hero name; the right boundary mirrors the same inset. The five existing horizontal SVG rules shorten to the span between those boundaries, and the Part-title container moves to the same inset. Titles and their short extension rules scale to 0.72 from a left-center origin.
+
+A single k3-content-theme class activates the first-pass Light/Dark blue-neutral palettes. The page and framework surfaces, Part titles, SVG rules, vertical boundaries and cursors transition together. Part surfaces blend into the page background. Cursor blinking slows through a 3.2-second sequence and ends with the underline visible. Reduced-motion mode skips the transition and presents the final framework immediately.
+
+This is source-level implementation only. **No local production build or browser verification has been run.** Verify boundary alignment against the actual Hero name, title and extension-line scale, row spacing, both palettes, cursor deceleration, theme switching during/after K3, mobile fit and reduced-motion behavior.
