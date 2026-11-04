@@ -196,7 +196,8 @@ The active application is a deliberately small Vue page. The old page compositio
 ### Part title typeface trial
 
 - [x] Add a temporary Google Fonts import for Climate Crisis and apply it to the four Part titles only.
-- [ ] Review the typeface in the browser for scale, readability, line spacing and visual fit.
+- [x] Increase the responsive Climate Crisis Part title size for the next visual review; retain CSS weight 400 (the current trial's lightest setting).
+- [ ] Review the enlarged typeface in the browser for perceived weight, readability, line spacing and fit at desktop and mobile widths.
 - [ ] If selected, replace the remote font dependency with a locally hosted `.woff2` asset and verify the local `@font-face` load.
 
 ## 8. Current next actions
