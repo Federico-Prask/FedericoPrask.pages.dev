@@ -3,7 +3,7 @@
 > **Document status:** Active design specification  
 > **Target branch:** `dev`  
 > **Project:** Federico Prask — Personal Website  
-> **Last updated:** 2026-11-03  
+> **Last updated:** 2026-11-04  
 >
 > This document is the source of truth for the redesign. Implementation decisions should follow it. If a later discussion changes a confirmed requirement, update this document before or together with the corresponding code change.
 
@@ -456,7 +456,7 @@ The destination is not under the name, subtitle, Logo, or an individual title. I
 
 From that shared boundary, the five lines expand vertically into the five ordered framework positions and horizontally across the page width. Their final spacing establishes four Part regions, with one boundary above Part.01 and one below Part.04.
 
-Use a fast ease-out motion in the Out Cubic family. The result should feel like the compact construction diagram opening into a page-wide editorial framework.
+Use a fast ease-out motion in the Out Cubic family. The result should feel like the compact construction diagram opening into a page-wide editorial framework. The initial implementation uses a 420 ms convergence, a 900 ms expansion and a short 180 ms pause before the title reveal; these timings remain provisional until browser review.
 
 Do not duplicate the lines, create HTML borders, or draw replacement SVG paths. Preserve the five selected original SVG elements throughout the transformation.
 
