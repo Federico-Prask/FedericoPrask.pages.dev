@@ -208,11 +208,12 @@ The active application is a deliberately small Vue page. The old page compositio
 
 ### Part title typeface
 
-- [x] Remove the superseded Climate Crisis Google Fonts import and point Part titles at SF Pro Display Heavy (CSS weight 800).
+- [x] Remove the superseded Climate Crisis Google Fonts import, load the local SF Pro Display family and set Part titles to Semibold (CSS weight 600), not Heavy.
 - [x] Add local `@font-face` declarations for `public/fonts/SF-Pro.woff` and `public/fonts/SF-Pro-Italic.woff` under the Part-title family alias `SF Pro Display`, with a declared variable weight range.
-- [!] Confirm the intended non-Heavy title weight and whether to use the SF Pro Display or SF Pro Text family.
+- [ ] Review the initial SF Pro Display Semibold weight (600) in the browser; adjust if needed.
+- [!] Confirm whether SF Pro Display or SF Pro Text is the preferred family.
 - [!] Inspect the uploaded font's internal name records and variation axes; confirm how Text, Display and Rounded are represented before adding aliases for the other families.
-- [ ] Verify that the selected SF Pro family and weight resolve correctly in the browser and that the desktop/mobile size rules remain correct.
+- [ ] Verify that SF Pro Display Semibold resolves correctly from the local variable font and that the desktop/mobile size rules remain correct.
 
 ## 8. Current next actions
 
