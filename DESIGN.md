@@ -1329,11 +1329,11 @@ The K0 completion listener is bound directly to the final monogram-fill path. Be
 
 ### 19.8 Part title typeface transition — SF Pro variable font pending
 
-The Climate Crisis trial is superseded. The dev branch contains `public/fonts/SF-Pro.woff` and `public/fonts/SF-Pro-Italic.woff`, registered locally under the CSS family alias `SF Pro Display`. Part titles now use weight 600 (Semibold), not Heavy. This is an initial non-Heavy setting for visual review; the exact weight and whether SF Pro Display or SF Pro Text is the preferred family can still be refined. The font is loaded locally, not through Google Fonts. Internal name records and variation axes remain unverified.
+The Climate Crisis trial is superseded. The dev branch contains `public/fonts/SF-Pro.woff` and `public/fonts/SF-Pro-Italic.woff`, registered locally under the CSS family alias `SF Pro Display`. Part titles use SF Pro Display Heavy (weight 800). The normal variable font is preloaded from the local asset path so the display face is available before the title animation. The font is loaded locally, not through Google Fonts. Internal name records and variation axes remain unverified.
 
 ### 19.9 Part title size refinement
 
-The current mobile size is considered approximately correct and must be retained. Desktop titles were still too small. The desktop rule must be viewport-height-aware and ensure the title size/line-box height is at least 0.4 times the distance between adjacent rules. The mobile breakpoint keeps the existing `clamp(1.5rem, 3.6vw, 3.4rem)` size unchanged. Part titles currently use SF Pro Display Semibold (weight 600) as the initial non-Heavy setting.
+The current mobile size is considered approximately correct and must be retained. Desktop titles were still too small. The desktop rule must be viewport-height-aware and ensure the title size/line-box height is at least 0.4 times the distance between adjacent rules. The mobile breakpoint keeps the existing `clamp(1.5rem, 3.6vw, 3.4rem)` size unchanged. Part titles use SF Pro Display Heavy (weight 800).
 
 
 ### 19.10 K2 source rewrite — full-width rules and upward unfolding
@@ -1347,6 +1347,6 @@ The current source sequence is:
 4. The remaining document scroll uses 1100ms Out Cubic. The lowest rule receives a matching document-space translation over the same duration and easing, so it stays visually anchored in the viewport. The four upper rules then unfold upward from that anchor, starting with the rule immediately above it and staggering upward by 65ms. The rule width does not change during this stage.
 5. After the uppermost rule finishes, all four Part titles start together. Each title is rendered character by character; every glyph pops upward into place with a 36ms per-character delay and a 420ms Out Cubic transition. All four underline cursors use one shared start delay calculated from the longest title, so their blink cycles start and remain synchronized; they share the title color and binary opacity blinking.
 
-Rules remain 0.35px solid. Title text retains its page-edge inset; desktop title size/line-box height remains 0.4 of each Part-row height, while the existing mobile size is unchanged. SF-Pro.woff and SF-Pro-Italic.woff are present under public/fonts/ on dev and are locally registered as the SF Pro Display family with a variable weight range. Part titles currently use weight 600 (Semibold), not Heavy. Internal font metadata / Text–Display–Rounded family mapping still needs direct verification.
+Rules remain 0.35px solid. Title text retains its page-edge inset; desktop title size/line-box height remains 0.4 of each Part-row height, while the existing mobile size is unchanged. SF-Pro.woff and SF-Pro-Italic.woff are present under public/fonts/ on dev and are locally registered as the SF Pro Display family with a variable weight range. Part titles use weight 800 (Heavy). Internal font metadata / Text–Display–Rounded family mapping still needs direct verification.
 
 This is a source-level implementation only. **No local production build or browser verification has been run.** Check the full-width Stage A composition, the lower-rule viewport anchor, bottom-to-top upward unfolding, matched Out Cubic scroll, character pop timing, title size, responsive behavior and reduced-motion state before treating K2 as approved.
