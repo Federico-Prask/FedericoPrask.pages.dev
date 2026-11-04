@@ -144,7 +144,6 @@ const frameworkTitlesStyle = computed(() => {
     height: height - verticalInset.value * 2 + "px",
     "--framework-title-size": rowHeight / 2.5 + "px",
     "--framework-title-scale": k3Started.value ? "0.72" : "1",
-    "--framework-title-rule-scale": k3Started.value ? "0.72" : "1",
   };
 });
 
@@ -880,9 +879,9 @@ onBeforeUnmount(() => {
   margin-inline-start: 0.9rem;
   background: currentColor;
   opacity: 0.6;
-  transform: scaleX(var(--framework-title-rule-scale, 1));
-  transform-origin: left center;
-  transition: transform 1500ms cubic-bezier(0.333333, 1, 0.666667, 1);
+  transition:
+    background-color 1500ms cubic-bezier(0.333333, 1, 0.666667, 1),
+    opacity 1500ms cubic-bezier(0.333333, 1, 0.666667, 1);
 }
 
 @keyframes framework-cursor-decelerate {
@@ -957,7 +956,14 @@ onBeforeUnmount(() => {
 @media (prefers-reduced-motion: reduce) {
   .title-page__control,
   .title-page__logo-normal,
-  .title-page__logo-annotation {
+  .title-page__logo-annotation,
+  .title-page__logo-annotation.is-k3,
+  .title-page__framework-scroll-stage,
+  .framework-titles,
+  .framework-title,
+  .framework-boundary,
+  .framework-surface,
+  .framework-title__extension {
     transition: none;
   }
 
@@ -967,7 +973,8 @@ onBeforeUnmount(() => {
     animation: none;
   }
 
-  .framework-title__cursor {
+  .framework-title__cursor,
+  .framework-titles.is-k3 .framework-title__cursor {
     opacity: 1;
     animation: none;
   }
