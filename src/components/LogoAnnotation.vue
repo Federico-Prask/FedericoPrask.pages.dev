@@ -234,14 +234,14 @@ function k2PathStyle(id: string) {
 
 .logo-annotation.is-k2-recompose .axis-guides path[data-k2-persistent="true"] {
   transition:
-    transform 760ms cubic-bezier(0.33, 1, 0.68, 1),
+    transform 720ms cubic-bezier(0.33, 1, 0.68, 1),
     stroke 420ms ease,
     stroke-width 420ms ease;
 }
 
 .logo-annotation.is-k2-expand .axis-guides path[data-k2-persistent="true"] {
   transition:
-    transform 1120ms cubic-bezier(0.16, 1.14, 0.3, 1),
+    transform 1100ms cubic-bezier(0.33, 1, 0.68, 1),
     stroke 420ms ease,
     stroke-width 420ms ease;
 }
