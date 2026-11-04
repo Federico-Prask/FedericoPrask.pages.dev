@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import LogoMark from "./LogoMark.vue";
 
-const props = withDefaults(defineProps<{ k2Started?: boolean; k2Phase?: "idle" | "converging" | "expanding" | "titles" }>(), {
+const props = withDefaults(defineProps<{ k2Started?: boolean; k2Phase?: "idle" | "converging" | "expanding" | "pausing" | "titles" }>(), {
   k2Started: false,
   k2Phase: "idle",
 });
