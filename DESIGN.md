@@ -183,6 +183,8 @@ The Title Page uses a left/right composition:
 
 The left side presents the owner's name and the website designation. The name is the principal typographic anchor.
 
+The initial Hero composition uses a deliberately reduced base scale for the two primary visual elements—the name and the FP Logo—rather than allowing them to dominate the full viewport. This compact sizing is present from K0 and remains consistent through K1 and K2; it is not a scale-down animation reserved for K3. The current first sizing pass reduces the name and Logo dimensions to approximately 84% of their previous CSS sizing and slightly narrows the overall layout width and inter-column gap. The `DARK` and `LANGUAGE` controls and the “Personal Website” / “个人网站” designation are excluded and retain their existing sizes. The measured left edge of the Hero name remains the reference for K3's final left boundary; the right boundary mirrors that inset.
+
 The right side displays the supplied Logo asset at `public/images/fp-logo.svg`. The SVG has a `0 0 256 256` viewBox and exactly two path elements: a white rounded-square background and a black FP monogram. The source paths currently have no animation-specific IDs or grouping. Preserve both path geometries and their fills; any animation wrapper or IDs must be added without redrawing or changing the mark.
 
 ### 3.4 Typography
@@ -372,7 +374,7 @@ After K1 finishes, the scene remains still while waiting for the first downward 
 
 At this point:
 
-- The Title Page and left-side text remain unchanged.
+- The Title Page and left-side text remain at their compact K0 base scale; K1 introduces no additional resizing.
 - The normal filled Logo is no longer visible.
 - The complete original FP Logo outline remains visible, including the rounded background-plate frame.
 - All nineteen source-derived dashed guides remain visible, with their coordinate labels at the corresponding segment starts.
@@ -490,6 +492,8 @@ This is one coordinated transition, not several unrelated effects.
 ### 7.1 Hero departure
 
 By the end of K3, the Hero / Title Page content is no longer visible.
+
+The Hero's name and Logo already use their reduced base dimensions from K0. Do not add a second Hero scale-down effect in K3; its departure follows the established page movement. The `DARK` and `LANGUAGE` controls and the website designation are not part of the Hero scale reduction.
 
 The page continues from the Part titles and horizontal separators established in K2.
 
