@@ -2,7 +2,7 @@
 
 > **Project:** Federico Prask — Personal Website  
 > **Branch:** `dev`  
-> **Last updated:** 2026-11-03  
+> **Last updated:** 2026-11-04  
 > **Design authority:** `DESIGN.md`
 >
 > This file tracks implementation work only. It must not redefine visual or interaction requirements. When a design decision changes, update `DESIGN.md` first, then update the corresponding task here.
@@ -110,10 +110,10 @@ The active application is a deliberately small Vue page. The old page compositio
 - [ ] Verify all K2 navigation inputs in the browser: wheel, touch swipe measured from the initial touch point, keyboard navigation, and actual downward document scrolling. Inputs received during K1 must be queued and applied once the annotation reaches its waiting state.
 - [x] Make the trigger one-shot; upward scrolling must not reverse or replay it.
 - [x] Fade out and then hide coordinate labels, Force nodes, Force handles and the complete original FP Logo outline when K2 begins, while leaving the original persistent guide group untouched.
-- [ ] Preserve the original designated SVG guide-line elements; do not replace them with newly created borders.
-- [ ] Move the surviving guides to the bottom boundary of the entire Title Page composition.
-- [ ] Expand guide spacing horizontally with the specified fast Out Cubic character.
-- [ ] Pause briefly after guide expansion.
+- [ ] Preserve exactly five original horizontal guide paths: `guide-plate-h-01`, `guide-mono-h-04`, `guide-mono-h-06`, `guide-mono-h-07`, `guide-plate-h-02`; remove the other horizontal guides and all vertical guides from the K2 framework.
+- [ ] Convert the five surviving paths from dashed guides into 0.5px solid rules; use dark blue `#5b7da3` in Light mode and light blue `#a9c5e4` in Dark mode.
+- [ ] Move the five original paths to the bottom boundary of the entire Title Page composition, then expand them vertically into the five ordered page-wide framework boundaries with fast Out Cubic motion.
+- [ ] Pause briefly after the five-line framework expansion.
 - [ ] Reveal the four Part titles in vertical order.
 - [ ] Attach a blinking underline cursor to every Part title.
 
