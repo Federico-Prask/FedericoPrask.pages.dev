@@ -112,8 +112,14 @@ const k2LineTransforms = computed<Record<string, string>>(() => {
         ? finalBottomY - (lineDefinitions.length - 1 - index) * finalRowGap
         : compactTopY + index * compactLineGap.value;
 
-      // These five guides remain full-width through K2 and every later stage.
-      return [line.id, makeLineMatrix(line.y, 0, targetY, width)];
+      // Keep every horizontal guide full-width. K3 compresses only the
+      // vertical distance between the five lines around their shared center.
+      const lineCenter =
+        finalBottomY - ((lineDefinitions.length - 1) * finalRowGap) / 2;
+      const compressedY = k3Started.value
+        ? lineCenter + (targetY - lineCenter) * 0.72
+        : targetY;
+      return [line.id, makeLineMatrix(line.y, 0, compressedY, width)];
     }),
   );
 });
@@ -132,15 +138,19 @@ const k2LineDelays = computed<Record<string, string>>(() =>
 const frameworkTitlesStyle = computed(() => {
   const bounds = annotationBounds.value;
   const { width, height } = viewport.value;
-  const rowHeight = (height - verticalInset.value * 2) / 4;
+  const stageTop = heroHeight.value + verticalInset.value - bounds.top;
+  const stageHeight = height - verticalInset.value * 2;
   const inset = k3Started.value ? frameworkInset.value : horizontalInset.value;
+  const compression = k3Started.value ? 0.72 : 1;
+  const titleAreaHeight = stageHeight * compression;
+  const rowHeight = stageHeight / 4;
   return {
     left: inset - bounds.left + "px",
-    top: heroHeight.value + verticalInset.value - bounds.top + "px",
+    top: stageTop + (stageHeight - titleAreaHeight) / 2 + "px",
     width: width - inset * 2 + "px",
-    height: height - verticalInset.value * 2 + "px",
+    height: titleAreaHeight + "px",
     "--framework-title-size": rowHeight / 2.5 + "px",
-    "--framework-title-scale": k3Started.value ? "0.72" : "1",
+    "--framework-title-scale": compression,
   };
 });
 
@@ -768,16 +778,22 @@ onBeforeUnmount(() => {
   width: 0;
   border-left: 0.35px solid var(--site-hero-rule);
   pointer-events: none;
-  transform: scaleY(0);
-  transform-origin: center center;
   transition:
     transform 1500ms cubic-bezier(0.333333, 1, 0.666667, 1),
     border-color 1500ms cubic-bezier(0.333333, 1, 0.666667, 1);
 }
 
+.framework-vertical-line--left {
+  transform: translateX(-100vw);
+}
+
+.framework-vertical-line--right {
+  transform: translateX(100vw);
+}
+
 .framework-vertical-line.is-k3 {
   border-color: var(--site-framework-rule);
-  transform: scaleY(1);
+  transform: translateX(0);
 }
 
 .framework-title {
@@ -931,7 +947,7 @@ onBeforeUnmount(() => {
 
   .framework-vertical-line {
     border-color: var(--site-framework-rule);
-    transform: scaleY(1);
+    transform: translateX(0);
     transition: none;
   }
 }

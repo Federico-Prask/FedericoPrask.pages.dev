@@ -507,22 +507,23 @@ This is a directional movement, not a plain opacity fade.
 
 Both vertical guides appear at the Hero-name inset and its mirrored right-side position. The left position is measured from the actual left edge of “Federico Prask”; it is not an independently guessed percentage.
 
-The vertical guides are continuous page-height lines, not the short sides of a rectangular card. They appear by scaling vertically from their midpoint (scaleY 0 to 1), not by translating inward from outside. Their width, solid stroke, color and visual weight match the five horizontal rules.
+The vertical guides are continuous page-height lines, not the short sides of a rectangular card. They begin outside the left and right edges and translate horizontally inward to their final positions. They do not grow vertically.
 
-All five horizontal rules remain full viewport width throughout K2 and K3. They are never shortened to meet the vertical guides. The rules are continuous layout guides, not card borders.
+As the vertical guides move inward, all four Part titles scale down at the same time. The five horizontal rules remain full viewport width; their vertical spacing compresses together around the center of the five-line group. They are never shortened horizontally. The lines are continuous layout guides, not card borders.
 
 ### 7.3 Part title scaling
 
 At the same time as the side boundaries move inward:
 
 - Each Part title scales down.
-- The title scale is coordinated with its narrowed text area.
+- The title scale is coordinated with the inward-moving vertical guides.
+- The four title rows compress vertically together with the spacing between the five horizontal rules.
 - The existing short underline cursor remains attached to the end of the title and scales with it.
 - Do not add a separate long extension line after the cursor.
 
 The title must not remain oversized after the boundaries have already reached their final position.
 
-The first source implementation uses a 0.72 title scale with a left-center transform origin. The underline cursor remains the only line attached to the title. There is no additional extension rule.
+The first source implementation uses a 0.72 title scale with a left-center transform origin. The horizontal rules retain full width while their vertical spacing compresses to 72% around the group's center. The underline cursor remains the only line attached to the title. There is no additional extension rule.
 
 ### 7.4 Synchronized theme transition
 
@@ -536,7 +537,7 @@ The following properties must transition together:
 | Part title | Hero-compatible monochrome | Content text color |
 | Horizontal rules | Hero-compatible line color | Content boundary color |
 | Left/right boundaries | Hero-compatible dashed lines | Content boundary color |
-| Part background | Initial framework surface | Same color as the page background at the bottom |
+| Part background | No separate title background block | Same surface as the page background |
 | Cursor | High-contrast Hero color | Content-compatible color |
 
 The transition should use coordinated color interpolation. Do not make the background change first and then animate text, borders and the cursor independently after it.
@@ -576,8 +577,8 @@ At the end of K3:
 - The Hero content is gone.
 - The four Parts form a vertical framework.
 - The left and right dashed boundaries have reached their final positions.
-- Part titles and their extension lines have reached their reduced sizes.
-- Page background, title text, borders, separators, Part surfaces and cursors use the content visual system.
+- Part titles and the spacing between horizontal rules have reached their reduced sizes.
+- Page background, title text, vertical guides, horizontal rules and cursors use the content visual system.
 - The cursor remains visible but no longer blinks.
 
 ---
@@ -1363,10 +1364,10 @@ This is a source-level implementation only. **No local production build or brows
 
 ### 19.11 K3 source implementation — measured page-edge framework
 
-K3 starts automatically after the Part titles have appeared and their shared cursors have completed two initial blink cycles. The two vertical rules occupy the measured Hero-name inset and its mirrored right-side position. They span the viewport height continuously and appear by vertical scaling from their midpoint. Their 0.35px solid stroke and color match the five horizontal rules. The horizontal rules remain full viewport width; K3 never shortens them.
+K3 starts automatically after the Part titles have appeared and their shared cursors have completed two initial blink cycles. The two vertical rules occupy the measured Hero-name inset and its mirrored right-side position. They span the viewport height continuously and translate horizontally inward from the two screen edges. Their 0.35px solid stroke and color match the five horizontal rules.
 
-The Part-title container aligns to the vertical guides and the titles scale to 0.72 from a left-center origin. The existing short underline cursor remains attached to each title. No additional extension line or Part background rectangles are created.
+As the vertical rules move inward, the four Part titles scale down to 0.72. All five horizontal rules remain full viewport width while their vertical spacing compresses to 72% around the group's center. The title rows compress to the same vertical span. The existing short underline cursor remains attached to each title. No additional extension line or Part background rectangles are created.
 
 A single k3-content-theme class activates the Light/Dark blue-neutral palettes. The page background, Part titles, horizontal rules, vertical rules and cursors transition together. Cursor blinking slows through a 3.2-second sequence and ends with the underline visible. Reduced-motion mode skips the transition and presents the final framework immediately.
 
-This is source-level implementation only. **No local production build or browser verification has been run.** Verify boundary alignment against the actual Hero name, title and extension-line scale, row spacing, both palettes, cursor deceleration, theme switching during/after K3, mobile fit and reduced-motion behavior.
+This is source-level implementation only. **No local production build or browser verification has been run.** Verify boundary alignment against the actual Hero name, simultaneous title scaling and horizontal-rule spacing compression, both palettes, cursor deceleration, theme switching during/after K3, mobile fit and reduced-motion behavior.

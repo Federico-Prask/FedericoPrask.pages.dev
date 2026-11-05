@@ -137,15 +137,15 @@ The active application is a deliberately small Vue page. The old page compositio
 ### 4.2 K3 — Framework and theme transition
 
 - [x] Add two continuous viewport-height vertical rules at the measured Hero-name inset and its mirrored right position.
-- [x] Reveal the vertical rules by scaleY from the midpoint, not by moving them in from outside.
-- [x] Keep all five horizontal rules full viewport width throughout K2 and K3.
+- [x] Move both vertical rules horizontally inward from the left and right screen edges.
+- [x] Keep all five horizontal rules full viewport width throughout K2 and K3 while compressing the vertical spacing between them.
 - [x] Give horizontal and vertical rules the same 0.35px solid stroke and shared theme colors.
 - [x] Align the Part-title container with the vertical guides and scale titles to the first-pass 0.72 ratio.
 - [x] Remove the four Part background rectangles and the extra title extension line; retain only the original underline cursor.
 - [x] Transition the page, titles, rules and cursor through one K3 content-theme state, with a darker, lower-saturation Dark palette.
 - [x] Decelerate cursor blinking and leave the underline visible.
 - [x] Keep the Hero at its compact K0 base size; do not add a second K3 Hero scale-down.
-- [ ] Verify measured vertical-guide alignment, infinite line behavior and title scaling in the browser.
+- [ ] Verify measured vertical-guide alignment, horizontal-rule spacing compression, simultaneous title scaling and infinite line behavior in the browser.
 - [ ] Verify the complete transition in both Light and Dark modes, including a theme change during/after K3.
 - [ ] Verify cursor timing, mobile fit and reduced-motion final state.
 
