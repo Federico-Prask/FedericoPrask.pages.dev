@@ -742,9 +742,7 @@ The names may change in code, but the ordering and state boundaries must remain 
 
 ### 10.3 Timing
 
-No exact duration is fixed in this document.
-
-The relative ordering is fixed, but the following parameters must be tuned in-browser:
+Values recorded for implemented stages are first-pass source parameters, not visual approval. The relative ordering is fixed, and the following parameters must still be calibrated in-browser:
 
 - K0 Logo extension direction, distance and duration.
 - K1 crossfade duration.
