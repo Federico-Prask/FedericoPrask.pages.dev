@@ -23,6 +23,8 @@ const markSpaceRef = ref<HTMLElement | null>(null);
 const nameRef = ref<HTMLElement | null>(null);
 const k3Started = ref(false);
 const k3Progress = ref(0);
+const k4Started = ref(false);
+const k4Progress = ref(0);
 const heroNameInset = ref(0);
 
 const annotationBounds = ref({ left: 0, top: 0, width: 0, height: 0 });
@@ -67,6 +69,7 @@ const frameworkInset = computed(() =>
 );
 
 const FRAMEWORK_RULE_STROKE_WIDTH = 0.35;
+const K4_PART01_HEIGHT_RATIO = 0.6;
 
 const k3Geometry = computed(() => {
   const { width, height } = viewport.value;
@@ -97,6 +100,19 @@ const k3Geometry = computed(() => {
     titleAreaHeight: stageHeight * compression,
     boundaryInset,
     titleInset,
+  };
+});
+
+const k4Geometry = computed(() => {
+  const compactRowHeight = k3Geometry.value.titleAreaHeight / 4;
+  const targetRowHeight = viewport.value.height * K4_PART01_HEIGHT_RATIO;
+  const expansion = Math.max(0, targetRowHeight - compactRowHeight) * k4Progress.value;
+
+  return {
+    compactRowHeight,
+    firstRowHeight: compactRowHeight + expansion,
+    extraHeight: expansion,
+    totalHeight: k3Geometry.value.titleAreaHeight + expansion,
   };
 });
 
@@ -149,7 +165,8 @@ const k2LineTransforms = computed<Record<string, string>>(() => {
         finalBottomY - ((lineDefinitions.length - 1) * finalRowGap) / 2;
       const compressedY =
         lineCenter + (targetY - lineCenter) * k3Geometry.value.compression;
-      return [line.id, makeLineMatrix(line.y, 0, compressedY, width)];
+      const k4Offset = index === 0 ? 0 : k4Geometry.value.extraHeight;
+      return [line.id, makeLineMatrix(line.y, 0, compressedY + k4Offset, width)];
     }),
   );
 });
@@ -177,11 +194,19 @@ const frameworkTitlesStyle = computed(() => {
       (geometry.stageHeight - geometry.titleAreaHeight) / 2 +
       "px",
     width: width - geometry.titleInset * 2 + "px",
-    height: geometry.titleAreaHeight + "px",
+    height: k4Geometry.value.totalHeight + "px",
     "--framework-title-size": geometry.titleFontSize + "px",
     "--framework-title-scale": geometry.compression,
+    "--framework-first-row-height": k4Geometry.value.firstRowHeight + "px",
+    "--framework-compact-row-height": k4Geometry.value.compactRowHeight + "px",
+    "--framework-first-title-offset":
+      (k4Geometry.value.compactRowHeight - geometry.titleFontSize) / 2 + "px",
   };
 });
+
+const frameworkScrollStageStyle = computed(() => ({
+  minHeight: `calc(100svh + ${k4Geometry.value.extraHeight}px)`,
+}));
 
 const frameworkVerticalLeftStyle = computed(() => ({
   left: k3Geometry.value.boundaryInset + "px",
@@ -199,6 +224,7 @@ let k2SettleTimer: number | undefined;
 let k2ExpandTimer: number | undefined;
 let k3StartTimer: number | undefined;
 let k3Frame: number | undefined;
+let k4Frame: number | undefined;
 let scrollFrame: number | undefined;
 let touchStartY: number | null = null;
 let pendingK2 = false;
@@ -212,6 +238,7 @@ const K2_OPEN_SCROLL_DURATION = 1100;
 const K2_LINE_EXPAND_DURATION = 1100;
 const K2_LINE_STAGGER = 65;
 const K3_GEOMETRY_DURATION = 1500;
+const K4_GEOMETRY_DURATION = 1250;
 const K3_CURSOR_HOLD_CYCLES = 2;
 
 function easeInOutCubic(value: number): number {
@@ -266,9 +293,35 @@ function scrollImmediatelyToFramework() {
   lastScrollY = window.scrollY;
 }
 
+function beginK4() {
+  if (k4Started.value) return;
+  k4Started.value = true;
+
+  if (prefersReducedMotion) {
+    k4Progress.value = 1;
+    return;
+  }
+
+  const startTime = performance.now();
+  const frame = (now: number) => {
+    const progress = Math.min(1, (now - startTime) / K4_GEOMETRY_DURATION);
+    k4Progress.value = easeOutCubic(progress);
+
+    if (progress < 1) {
+      k4Frame = window.requestAnimationFrame(frame);
+    } else {
+      k4Frame = undefined;
+      k4Progress.value = 1;
+    }
+  };
+
+  k4Frame = window.requestAnimationFrame(frame);
+}
+
 function animateK3Geometry() {
   if (prefersReducedMotion) {
     k3Progress.value = 1;
+    beginK4();
     return;
   }
 
@@ -282,6 +335,7 @@ function animateK3Geometry() {
     } else {
       k3Frame = undefined;
       k3Progress.value = 1;
+      beginK4();
     }
   };
 
@@ -473,6 +527,7 @@ onBeforeUnmount(() => {
   if (k2ExpandTimer !== undefined) window.clearTimeout(k2ExpandTimer);
   if (k3StartTimer !== undefined) window.clearTimeout(k3StartTimer);
   if (k3Frame !== undefined) window.cancelAnimationFrame(k3Frame);
+  if (k4Frame !== undefined) window.cancelAnimationFrame(k4Frame);
   if (scrollFrame !== undefined) window.cancelAnimationFrame(scrollFrame);
   document.documentElement.classList.remove("k3-content-theme");
 
@@ -566,6 +621,7 @@ onBeforeUnmount(() => {
   <div
     class="title-page__framework-scroll-stage"
     :class="{ 'is-k3': k3Started }"
+    :style="frameworkScrollStageStyle"
     aria-hidden="true"
   ></div>
 
@@ -817,7 +873,9 @@ onBeforeUnmount(() => {
   position: absolute;
   z-index: 2;
   display: grid;
-  grid-template-rows: repeat(4, minmax(0, 1fr));
+  grid-template-rows:
+    minmax(0, var(--framework-first-row-height, 1fr))
+    repeat(3, minmax(0, var(--framework-compact-row-height, 1fr)));
   color: var(--site-hero-foreground);
   pointer-events: none;
   transition: color 1500ms cubic-bezier(0.333333, 1, 0.666667, 1);
@@ -860,6 +918,11 @@ onBeforeUnmount(() => {
   z-index: 1;
   transform: scale(var(--framework-title-scale, 1));
   transform-origin: left center;
+}
+
+.framework-title:first-child {
+  align-self: start;
+  margin-block-start: var(--framework-first-title-offset, 0px);
 }
 
 .framework-title__text {
