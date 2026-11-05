@@ -27,7 +27,7 @@ The active application is a deliberately small Vue page. The old page compositio
 - K1 has a source-derived construction view of the complete FP Logo: solid plate/monogram outlines, nineteen dashed guides, coordinate labels and Force handles. K0/K1 are not yet visually approved.
 - K2 has been rewritten at source level. The five original paths become full viewport-width rules during the first movement, while the document scrolls 22% of the Hero height with In-Out Cubic. After a short hold, the lowest line becomes the visual anchor; the remaining document scroll and the four upper lines move with matching Out Cubic timing, unfolding upward from the anchor. The annotation SVG is not stretched. Four Part titles then reveal together, character by character. Source files are fetched and checked; local build, animation rendering and input behavior remain unverified.
 - Part titles use the original local SF Pro variable TTF at public/fonts/SF-Pro.ttf. Its wght axis (1–1000) and opsz axis (17–28) are confirmed; titles request weight 800 (Heavy), and the TTF is preloaded. Browser rendering still requires verification.
-- K3 is implemented at source level: full-height vertical rules scale into view at the measured Hero-name inset, the five horizontal rules remain full viewport width, titles scale down with their existing underline cursor, no Part background blocks or extra extension lines are used, Light/Dark palettes transition together, and the cursor slows to a visible stop. The Dark palette is intentionally darker and more muted. Local build and browser review remain pending.
+- K3 is implemented at source level with one shared 1500ms Out Cubic progress driver. Full-height vertical rules start exactly at the viewport/browser edges and move inward; title position, title scale, title-row height and full-width horizontal-rule spacing are computed from that same progress. The horizontal clear space from each vertical guide to the title edge is calculated to equal the vertical clear space from the title line box to its adjacent horizontal rule. No Part background blocks or extra extension lines are used; Light/Dark palettes transition together, and the cursor slows to a visible stop. Local build and browser review remain pending.
 - K4–K5 and the four content Parts are not implemented.
 - A local production build and browser visual review have not been completed.
 
@@ -137,15 +137,18 @@ The active application is a deliberately small Vue page. The old page compositio
 ### 4.2 K3 — Framework and theme transition
 
 - [x] Add two continuous viewport-height vertical rules at the measured Hero-name inset and its mirrored right position.
-- [x] Move both vertical rules horizontally inward from the exact viewport edges by only the measured final inset, sharing the 1500ms Out Cubic transition with title/rule compression.
-- [x] Keep all five horizontal rules full viewport width throughout K2 and K3 while compressing the vertical spacing between them.
+- [x] Start both vertical rules exactly at the viewport/browser edges and move them inward by the measured Hero-name inset.
+- [x] Drive vertical guides, title position/scale/row height and horizontal-rule spacing from one shared 1500ms Out Cubic progress value; do not use independent geometry transitions.
+- [x] Calculate the horizontal guide-to-title clear space from the same row geometry as the vertical title-to-horizontal-rule clear space, keeping the two distances equal throughout K3.
+- [x] Keep all five horizontal rules full viewport width throughout K2 and K3 while compressing their vertical spacing around the group center.
 - [x] Give horizontal and vertical rules the same 0.35px solid stroke and shared theme colors.
-- [x] Align the Part-title container with the vertical guides and scale titles to the first-pass 0.72 ratio.
+- [x] Align the Part-title container with the vertical guides and scale titles/row spacing to the final 0.72 ratio.
 - [x] Remove the four Part background rectangles and the extra title extension line; retain only the original underline cursor.
 - [x] Transition the page, titles, rules and cursor through one K3 content-theme state, with a darker, lower-saturation Dark palette.
 - [x] Decelerate cursor blinking and leave the underline visible.
 - [x] Keep the Hero at its compact K0 base size; do not add a second K3 Hero scale-down.
-- [ ] Verify the vertical rules travel in sync with title scaling and horizontal-rule spacing compression, with no premature fast entry.
+- [ ] Verify in the browser that the horizontal distance from each vertical guide to the title edge exactly matches the vertical distance from the title line box to its adjacent horizontal rule throughout the 1500ms K3 motion.
+- [ ] Verify the single shared Out Cubic progress keeps both guides, titles and all five horizontal rules synchronized, with no premature fast entry.
 - [ ] Verify the complete transition in both Light and Dark modes, including a theme change during/after K3.
 - [ ] Verify cursor timing, mobile fit and reduced-motion final state.
 
