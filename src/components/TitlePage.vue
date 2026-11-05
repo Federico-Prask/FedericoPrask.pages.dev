@@ -763,7 +763,9 @@ onBeforeUnmount(() => {
   pointer-events: none;
   transition:
     left 1500ms cubic-bezier(0.333333, 1, 0.666667, 1),
+    top 1500ms cubic-bezier(0.333333, 1, 0.666667, 1),
     width 1500ms cubic-bezier(0.333333, 1, 0.666667, 1),
+    height 1500ms cubic-bezier(0.333333, 1, 0.666667, 1),
     color 1500ms cubic-bezier(0.333333, 1, 0.666667, 1);
 }
 
