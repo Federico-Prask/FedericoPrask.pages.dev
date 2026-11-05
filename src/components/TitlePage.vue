@@ -58,10 +58,6 @@ const annotationStyle = computed(() => ({
   height: annotationBounds.value.height + "px",
 }));
 
-const horizontalInset = computed(() =>
-  Math.max(24, Math.min(64, viewport.value.width * 0.04)),
-);
-
 const verticalInset = computed(() =>
   Math.max(28, Math.min(72, viewport.value.height * 0.07)),
 );
