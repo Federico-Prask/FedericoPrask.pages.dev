@@ -28,10 +28,11 @@ The active application is a deliberately small Vue page. The old page compositio
 - K2 has been rewritten at source level. The five original paths become full viewport-width rules during the first movement, while the document scrolls 22% of the Hero height with In-Out Cubic. After a short hold, the lowest line becomes the visual anchor; the remaining document scroll and the four upper lines move with matching Out Cubic timing, unfolding upward from the anchor. The annotation SVG is not stretched. Four Part titles then reveal together, character by character. Source files are fetched and checked; local build, animation rendering and input behavior remain unverified.
 - Part titles use the original local SF Pro variable TTF at public/fonts/SF-Pro.ttf. Its wght axis (1–1000) and opsz axis (17–28) are confirmed; titles request weight 800 (Heavy), and the TTF is preloaded. Browser rendering still requires verification.
 - K3 is implemented at source level with one shared 1500ms Out Cubic progress driver. Full-height vertical rules start exactly at the viewport/browser edges and move inward; title position, title scale, title-row height and full-width horizontal-rule spacing are computed from that same progress. The horizontal clear space from each vertical guide to the title edge is calculated to equal the vertical clear space from the title line box to its adjacent horizontal rule. No Part background blocks or extra extension lines are used; Light/Dark palettes transition together, and the cursor slows to a visible stop. Local build and browser review remain pending.
-- K4–K5 and the four content Parts are not implemented.
+- K4 is implemented at source level: Part.01 expands to 60% of the measured viewport height over 1250ms Out Cubic; its upper boundary and title stay anchored while the four lower rules and Parts 02–04 move down together. Document flow grows with the expansion, and reduced-motion users enter the final geometry directly. Browser verification remains pending.
+- K5 and the actual content of all four Parts are not implemented.
 - A local production build and browser visual review have not been completed.
 
-**Next implementation target:** pull dev, run the local app, and verify K0–K3 in the browser. Check the compact K0 Hero dimensions at desktop/mobile sizes, SF Pro Display Heavy loading, the complete K0–K2 choreography, the measured Hero-name boundary inset, the K3 title/extension-line reduction, both destination palettes, cursor deceleration, theme switching and reduced motion.
+**Next implementation target:** pull dev, run a local production build, then verify K0–K4 in the browser. Check the compact K0 Hero dimensions at desktop/mobile sizes, SF Pro Display Heavy loading, the complete K0–K2 choreography, the K3 synchronized geometry and both palettes, cursor deceleration, and K4's 60%-viewport expansion, fixed upper boundary, displaced lower Parts, document height and reduced-motion state.
 
 ## 2. Foundation and repository cleanup
 
@@ -156,8 +157,14 @@ The active application is a deliberately small Vue page. The old page compositio
 
 ### 5.1 K4 — Part expansion
 
-- [ ] Expand Part.01 to create room for its content.
-- [ ] Keep Parts 02–04 compact and in their established order.
+- [x] Start K4 automatically after the K3 shared geometry transition completes.
+- [x] Expand Part.01 to a first-row height of 60% of the measured viewport height.
+- [x] Use one shared 1250ms Out Cubic progress value for the expansion geometry.
+- [x] Keep the uppermost horizontal rule fixed and move the four lower rules down by the same expansion offset.
+- [x] Keep the Part.01 title anchored in its original compact header zone; move Parts 02–04 with their unchanged compact row heights.
+- [x] Increase the framework scroll-stage height by the same amount so document flow matches the expanded layout.
+- [x] Skip interpolation and enter the final K4 geometry for reduced-motion users.
+- [ ] Verify the expansion timing, title anchor, rule alignment, lower-Part spacing and page scroll range in the browser.
 
 ### 5.2 K5 — Part fall and content reveal
 
@@ -232,5 +239,6 @@ The active application is a deliberately small Vue page. The old page compositio
 2. Check Logo sizing at several viewport widths; tune the minimum, preferred and maximum sizes if the Logo still feels too sensitive to window width.
 3. Review and calibrate revised K0/K1 in a local browser, including the full waiting state, reduced-motion behavior and responsive sizes.
 4. Browser-test the revised K2 sequence: full-width Stage A rules, the lower-rule viewport anchor, bottom-to-top upward unfolding with matched Out Cubic scroll, and simultaneous character-by-character Part title reveals.
-5. Update this file and `DESIGN.md` after each completed implementation slice.
+5. Browser-test K4: verify the 60%-viewport-height Part.01 canvas, fixed first boundary/title, synchronized lower-rule and title displacement, compact Part.02–04 rows, document flow and reduced-motion state.
+6. Update this file and `DESIGN.md` after each completed implementation slice.
 6. Do not mark visual verification tasks complete until they have been checked in a browser.
