@@ -252,7 +252,6 @@ function k2PathStyle(id: string) {
 .logo-annotation.is-k3 .axis-guides path[data-k2-persistent="true"] {
   stroke: var(--site-framework-rule);
   transition:
-    transform 1500ms cubic-bezier(0.333333, 1, 0.666667, 1),
     stroke 1500ms cubic-bezier(0.333333, 1, 0.666667, 1),
     stroke-width 1500ms cubic-bezier(0.333333, 1, 0.666667, 1);
 }
