@@ -81,9 +81,11 @@ const k3Geometry = computed(() => {
       ? Math.max(rootFontSize * 1.5, Math.min(width * 0.036, rootFontSize * 3.4))
       : rowHeight / 2.5;
   const compression = 1 - 0.28 * k3Progress.value;
+  // Measure the clear gap from the title line box to the inner edge of a
+  // horizontal rule, then reuse exactly that gap beside the vertical guide.
   const verticalGap = Math.max(
     0,
-    (rowHeight - titleFontSize) * compression / 2 - FRAMEWORK_RULE_STROKE_WIDTH / 2,
+    ((rowHeight - titleFontSize) * compression - FRAMEWORK_RULE_STROKE_WIDTH) / 2,
   );
   const boundaryInset = frameworkInset.value * k3Progress.value;
   const titleInset = boundaryInset + FRAMEWORK_RULE_STROKE_WIDTH + verticalGap;
