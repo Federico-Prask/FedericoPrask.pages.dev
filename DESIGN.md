@@ -538,7 +538,7 @@ The following properties must transition together:
 | Page background | Monochrome | Blue-based page palette |
 | Part title | Hero-compatible monochrome | Content text color |
 | Horizontal rules | Hero-compatible line color | Content boundary color |
-| Left/right boundaries | Hero-compatible dashed lines | Content boundary color |
+| Left/right boundaries | Hero-compatible solid rules | Content boundary color |
 | Part background | No separate title background block | Same surface as the page background |
 | Cursor | High-contrast Hero color | Content-compatible color |
 
@@ -1368,7 +1368,7 @@ This is a source-level implementation only. **No local production build or brows
 
 K3 starts automatically after the Part titles have appeared and their shared cursors have completed two initial blink cycles. A single JavaScript animation driver computes p over 1500ms with Out Cubic easing and writes the same progress into the reactive layout geometry every frame. The left and right vertical guides begin exactly at the viewport's browser edges and move inward by the measured Hero-name inset; they span the viewport height continuously and use the same 0.35px solid stroke as the five horizontal rules.
 
-The horizontal and vertical clear spaces are derived from one calculation. For a title row of height R, title line-box height F, shared compression c and rule stroke width w, the vertical clear space is g = ((R - F) * c / 2) - w/2. Each title edge is positioned exactly g + w inside its adjacent vertical guide, so the horizontal clear space equals the vertical clear space to the neighboring horizontal rule. The right side mirrors the same calculation. Title scale, title-row height and the five horizontal-rule intervals all use the same c = 1 - 0.28p, ending at 0.72. This removes independent CSS geometry transitions and keeps relative positions consistent at every intermediate frame.
+The horizontal and vertical clear spaces are derived from one calculation. For a title row of height R, title line-box height F, shared compression c and rule stroke width w, the vertical clear space is g = max(0, ((R - F) * c - w) / 2). Each title edge is positioned exactly g + w inside its adjacent vertical guide, so the horizontal clear space equals the vertical clear space to the neighboring horizontal rule. The right side mirrors the same calculation. Title scale, title-row height and the five horizontal-rule intervals all use the same c = 1 - 0.28p, ending at 0.72. This removes independent CSS geometry transitions and keeps relative positions consistent at every intermediate frame.
 
 All five horizontal rules remain full viewport width while their vertical spacing compresses around the group's center. The existing short underline cursor remains attached to each title. No additional extension line or Part background rectangles are created.
 
