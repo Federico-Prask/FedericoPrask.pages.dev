@@ -507,7 +507,7 @@ This is a directional movement, not a plain opacity fade.
 
 Both vertical guides appear at the Hero-name inset and its mirrored right-side position. The left position is measured from the actual left edge of “Federico Prask”; it is not an independently guessed percentage.
 
-The vertical guides are continuous page-height lines, not the short sides of a rectangular card. They begin outside the left and right edges and translate horizontally inward to their final positions. They do not grow vertically.
+The vertical guides are continuous page-height lines, not the short sides of a rectangular card. They start exactly at the viewport's left and right edges and translate horizontally inward to their final positions. Their travel distance is the measured final inset, not an arbitrary full-viewport offset. They do not grow vertically. The same 1500ms Out Cubic transition is shared with the title scaling and horizontal-rule spacing compression.
 
 As the vertical guides move inward, all four Part titles scale down at the same time. The five horizontal rules remain full viewport width; their vertical spacing compresses together around the center of the five-line group. They are never shortened horizontally. The lines are continuous layout guides, not card borders.
 
@@ -1364,10 +1364,10 @@ This is a source-level implementation only. **No local production build or brows
 
 ### 19.11 K3 source implementation — measured page-edge framework
 
-K3 starts automatically after the Part titles have appeared and their shared cursors have completed two initial blink cycles. The two vertical rules occupy the measured Hero-name inset and its mirrored right-side position. They span the viewport height continuously and translate horizontally inward from the two screen edges. Their 0.35px solid stroke and color match the five horizontal rules.
+K3 starts automatically after the Part titles have appeared and their shared cursors have completed two initial blink cycles. The two vertical rules occupy the measured Hero-name inset and its mirrored right-side position. They span the viewport height continuously and move inward from the exact viewport edges by the measured inset distance. Their 0.35px solid stroke and color match the five horizontal rules. Their 1500ms Out Cubic transition is synchronized with the title and horizontal-rule compression.
 
 As the vertical rules move inward, the four Part titles scale down to 0.72. All five horizontal rules remain full viewport width while their vertical spacing compresses to 72% around the group's center. The title rows compress to the same vertical span. The existing short underline cursor remains attached to each title. No additional extension line or Part background rectangles are created.
 
 A single k3-content-theme class activates the Light/Dark blue-neutral palettes. The page background, Part titles, horizontal rules, vertical rules and cursors transition together. Cursor blinking slows through a 3.2-second sequence and ends with the underline visible. Reduced-motion mode skips the transition and presents the final framework immediately.
 
-This is source-level implementation only. **No local production build or browser verification has been run.** Verify boundary alignment against the actual Hero name, simultaneous title scaling and horizontal-rule spacing compression, both palettes, cursor deceleration, theme switching during/after K3, mobile fit and reduced-motion behavior.
+This is source-level implementation only. **No local production build or browser verification has been run.** Verify boundary alignment against the actual Hero name, synchronized vertical-line travel, simultaneous title scaling and horizontal-rule spacing compression, both palettes, cursor deceleration, theme switching during/after K3, mobile fit and reduced-motion behavior.

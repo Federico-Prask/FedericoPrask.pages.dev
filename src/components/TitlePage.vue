@@ -156,9 +156,11 @@ const frameworkTitlesStyle = computed(() => {
 
 const frameworkVerticalLeftStyle = computed(() => ({
   left: frameworkInset.value + "px",
+  transform: `translateX(${k3Started.value ? 0 : -frameworkInset.value}px)`,
 }));
 const frameworkVerticalRightStyle = computed(() => ({
   left: viewport.value.width - frameworkInset.value + "px",
+  transform: `translateX(${k3Started.value ? 0 : frameworkInset.value}px)`,
 }));
 
 let k2RecomposeTimer: number | undefined;
@@ -526,14 +528,14 @@ onBeforeUnmount(() => {
     />
     <div
       v-if="k2Phase === 'titles'"
-      class="framework-vertical-line framework-vertical-line--left"
+      class="framework-vertical-line"
       :class="{ 'is-k3': k3Started }"
       :style="frameworkVerticalLeftStyle"
       aria-hidden="true"
     ></div>
     <div
       v-if="k2Phase === 'titles'"
-      class="framework-vertical-line framework-vertical-line--right"
+      class="framework-vertical-line"
       :class="{ 'is-k3': k3Started }"
       :style="frameworkVerticalRightStyle"
       aria-hidden="true"
@@ -785,14 +787,6 @@ onBeforeUnmount(() => {
     border-color 1500ms cubic-bezier(0.333333, 1, 0.666667, 1);
 }
 
-.framework-vertical-line--left {
-  transform: translateX(-100vw);
-}
-
-.framework-vertical-line--right {
-  transform: translateX(100vw);
-}
-
 .framework-vertical-line.is-k3 {
   border-color: var(--site-framework-rule);
   transform: translateX(0);
@@ -949,7 +943,6 @@ onBeforeUnmount(() => {
 
   .framework-vertical-line {
     border-color: var(--site-framework-rule);
-    transform: translateX(0);
     transition: none;
   }
 }
