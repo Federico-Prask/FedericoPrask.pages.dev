@@ -22,6 +22,7 @@ const titlePageRef = ref<HTMLElement | null>(null);
 const markSpaceRef = ref<HTMLElement | null>(null);
 const nameRef = ref<HTMLElement | null>(null);
 const k3Started = ref(false);
+const k3Progress = ref(0);
 const heroNameInset = ref(0);
 
 const annotationBounds = ref({ left: 0, top: 0, width: 0, height: 0 });
@@ -68,6 +69,38 @@ const verticalInset = computed(() =>
 const frameworkInset = computed(() =>
   Math.max(0, Math.min(heroNameInset.value, viewport.value.width / 2 - 1)),
 );
+
+const FRAMEWORK_RULE_STROKE_WIDTH = 0.35;
+
+const k3Geometry = computed(() => {
+  const { width, height } = viewport.value;
+  const stageHeight = height - verticalInset.value * 2;
+  const rowHeight = stageHeight / 4;
+  const rootFontSize =
+    typeof document === "undefined"
+      ? 16
+      : Number.parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16;
+  const titleFontSize =
+    width <= 760
+      ? Math.max(rootFontSize * 1.5, Math.min(width * 0.036, rootFontSize * 3.4))
+      : rowHeight / 2.5;
+  const compression = 1 - 0.28 * k3Progress.value;
+  const verticalGap = Math.max(
+    0,
+    (rowHeight - titleFontSize) * compression / 2 - FRAMEWORK_RULE_STROKE_WIDTH / 2,
+  );
+  const boundaryInset = frameworkInset.value * k3Progress.value;
+  const titleInset = boundaryInset + FRAMEWORK_RULE_STROKE_WIDTH + verticalGap;
+
+  return {
+    compression,
+    titleFontSize,
+    stageHeight,
+    titleAreaHeight: stageHeight * compression,
+    boundaryInset,
+    titleInset,
+  };
+});
 
 const compactLineGap = computed(() => {
   const { height } = viewport.value;
@@ -116,9 +149,8 @@ const k2LineTransforms = computed<Record<string, string>>(() => {
       // vertical distance between the five lines around their shared center.
       const lineCenter =
         finalBottomY - ((lineDefinitions.length - 1) * finalRowGap) / 2;
-      const compressedY = k3Started.value
-        ? lineCenter + (targetY - lineCenter) * 0.72
-        : targetY;
+      const compressedY =
+        lineCenter + (targetY - lineCenter) * k3Geometry.value.compression;
       return [line.id, makeLineMatrix(line.y, 0, compressedY, width)];
     }),
   );
@@ -137,36 +169,38 @@ const k2LineDelays = computed<Record<string, string>>(() =>
 
 const frameworkTitlesStyle = computed(() => {
   const bounds = annotationBounds.value;
-  const { width, height } = viewport.value;
+  const { width } = viewport.value;
+  const geometry = k3Geometry.value;
   const stageTop = heroHeight.value + verticalInset.value - bounds.top;
-  const stageHeight = height - verticalInset.value * 2;
-  const inset = k3Started.value ? frameworkInset.value : horizontalInset.value;
-  const compression = k3Started.value ? 0.72 : 1;
-  const titleAreaHeight = stageHeight * compression;
-  const rowHeight = stageHeight / 4;
   return {
-    left: inset - bounds.left + "px",
-    top: stageTop + (stageHeight - titleAreaHeight) / 2 + "px",
-    width: width - inset * 2 + "px",
-    height: titleAreaHeight + "px",
-    "--framework-title-size": rowHeight / 2.5 + "px",
-    "--framework-title-scale": compression,
+    left: geometry.titleInset - bounds.left + "px",
+    top:
+      stageTop +
+      (geometry.stageHeight - geometry.titleAreaHeight) / 2 +
+      "px",
+    width: width - geometry.titleInset * 2 + "px",
+    height: geometry.titleAreaHeight + "px",
+    "--framework-title-size": geometry.titleFontSize + "px",
+    "--framework-title-scale": geometry.compression,
   };
 });
 
 const frameworkVerticalLeftStyle = computed(() => ({
-  left: frameworkInset.value + "px",
-  transform: `translateX(${k3Started.value ? 0 : -frameworkInset.value}px)`,
+  left: k3Geometry.value.boundaryInset + "px",
 }));
 const frameworkVerticalRightStyle = computed(() => ({
-  left: viewport.value.width - frameworkInset.value + "px",
-  transform: `translateX(${k3Started.value ? 0 : frameworkInset.value}px)`,
+  left:
+    viewport.value.width -
+    k3Geometry.value.boundaryInset -
+    FRAMEWORK_RULE_STROKE_WIDTH +
+    "px",
 }));
 
 let k2RecomposeTimer: number | undefined;
 let k2SettleTimer: number | undefined;
 let k2ExpandTimer: number | undefined;
 let k3StartTimer: number | undefined;
+let k3Frame: number | undefined;
 let scrollFrame: number | undefined;
 let touchStartY: number | null = null;
 let pendingK2 = false;
@@ -179,6 +213,7 @@ const K2_SETTLE_HOLD = 170;
 const K2_OPEN_SCROLL_DURATION = 1100;
 const K2_LINE_EXPAND_DURATION = 1100;
 const K2_LINE_STAGGER = 65;
+const K3_GEOMETRY_DURATION = 1500;
 const K3_CURSOR_HOLD_CYCLES = 2;
 
 function easeInOutCubic(value: number): number {
@@ -233,10 +268,33 @@ function scrollImmediatelyToFramework() {
   lastScrollY = window.scrollY;
 }
 
+function animateK3Geometry() {
+  if (prefersReducedMotion) {
+    k3Progress.value = 1;
+    return;
+  }
+
+  const startTime = performance.now();
+  const frame = (now: number) => {
+    const progress = Math.min(1, (now - startTime) / K3_GEOMETRY_DURATION);
+    k3Progress.value = easeOutCubic(progress);
+
+    if (progress < 1) {
+      k3Frame = window.requestAnimationFrame(frame);
+    } else {
+      k3Frame = undefined;
+      k3Progress.value = 1;
+    }
+  };
+
+  k3Frame = window.requestAnimationFrame(frame);
+}
+
 function beginK3() {
   if (k3Started.value) return;
   k3Started.value = true;
   document.documentElement.classList.add("k3-content-theme");
+  animateK3Geometry();
 }
 
 function beginK2() {
@@ -416,6 +474,7 @@ onBeforeUnmount(() => {
   if (k2SettleTimer !== undefined) window.clearTimeout(k2SettleTimer);
   if (k2ExpandTimer !== undefined) window.clearTimeout(k2ExpandTimer);
   if (k3StartTimer !== undefined) window.clearTimeout(k3StartTimer);
+  if (k3Frame !== undefined) window.cancelAnimationFrame(k3Frame);
   if (scrollFrame !== undefined) window.cancelAnimationFrame(scrollFrame);
   document.documentElement.classList.remove("k3-content-theme");
 
@@ -763,12 +822,7 @@ onBeforeUnmount(() => {
   grid-template-rows: repeat(4, minmax(0, 1fr));
   color: var(--site-hero-foreground);
   pointer-events: none;
-  transition:
-    left 1500ms cubic-bezier(0.333333, 1, 0.666667, 1),
-    top 1500ms cubic-bezier(0.333333, 1, 0.666667, 1),
-    width 1500ms cubic-bezier(0.333333, 1, 0.666667, 1),
-    height 1500ms cubic-bezier(0.333333, 1, 0.666667, 1),
-    color 1500ms cubic-bezier(0.333333, 1, 0.666667, 1);
+  transition: color 1500ms cubic-bezier(0.333333, 1, 0.666667, 1);
 }
 
 .framework-titles.is-k3 {
@@ -782,14 +836,11 @@ onBeforeUnmount(() => {
   width: 0;
   border-left: 0.35px solid var(--site-hero-rule);
   pointer-events: none;
-  transition:
-    transform 1500ms cubic-bezier(0.333333, 1, 0.666667, 1),
-    border-color 1500ms cubic-bezier(0.333333, 1, 0.666667, 1);
+  transition: border-color 1500ms cubic-bezier(0.333333, 1, 0.666667, 1);
 }
 
 .framework-vertical-line.is-k3 {
   border-color: var(--site-framework-rule);
-  transform: translateX(0);
 }
 
 .framework-title {
@@ -811,7 +862,6 @@ onBeforeUnmount(() => {
   z-index: 1;
   transform: scale(var(--framework-title-scale, 1));
   transform-origin: left center;
-  transition: transform 1500ms cubic-bezier(0.333333, 1, 0.666667, 1);
 }
 
 .framework-title__text {
@@ -906,7 +956,6 @@ onBeforeUnmount(() => {
   }
 
   .framework-title {
-    font-size: clamp(1.5rem, 3.6vw, 3.4rem);
     letter-spacing: -0.025em;
   }
 }
