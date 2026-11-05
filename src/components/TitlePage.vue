@@ -112,11 +112,8 @@ const k2LineTransforms = computed<Record<string, string>>(() => {
         ? finalBottomY - (lineDefinitions.length - 1 - index) * finalRowGap
         : compactTopY + index * compactLineGap.value;
 
-      // K2 keeps the rules edge-to-edge. K3 draws them inward to the
-      // measured Hero-name inset, matching the two new vertical boundaries.
-      const inset = k3Started.value ? frameworkInset.value : 0;
-      const targetWidth = k3Started.value ? width - inset * 2 : width;
-      return [line.id, makeLineMatrix(line.y, inset, targetY, targetWidth)];
+      // These five guides remain full-width through K2 and every later stage.
+      return [line.id, makeLineMatrix(line.y, 0, targetY, width)];
     }),
   );
 });
@@ -147,21 +144,11 @@ const frameworkTitlesStyle = computed(() => {
   };
 });
 
-const frameworkBoundaryTop = computed(
-  () => heroHeight.value + verticalInset.value - annotationBounds.value.top,
-);
-const frameworkBoundaryHeight = computed(
-  () => viewport.value.height - verticalInset.value * 2,
-);
-const frameworkBoundaryLeftStyle = computed(() => ({
-  left: frameworkInset.value - annotationBounds.value.left + "px",
-  top: frameworkBoundaryTop.value + "px",
-  height: frameworkBoundaryHeight.value + "px",
+const frameworkVerticalLeftStyle = computed(() => ({
+  left: frameworkInset.value + "px",
 }));
-const frameworkBoundaryRightStyle = computed(() => ({
-  left: viewport.value.width - frameworkInset.value - annotationBounds.value.left + "px",
-  top: frameworkBoundaryTop.value + "px",
-  height: frameworkBoundaryHeight.value + "px",
+const frameworkVerticalRightStyle = computed(() => ({
+  left: viewport.value.width - frameworkInset.value + "px",
 }));
 
 let k2RecomposeTimer: number | undefined;
@@ -529,16 +516,16 @@ onBeforeUnmount(() => {
     />
     <div
       v-if="k2Phase === 'titles'"
-      class="framework-boundary framework-boundary--left"
+      class="framework-vertical-line framework-vertical-line--left"
       :class="{ 'is-k3': k3Started }"
-      :style="frameworkBoundaryLeftStyle"
+      :style="frameworkVerticalLeftStyle"
       aria-hidden="true"
     ></div>
     <div
       v-if="k2Phase === 'titles'"
-      class="framework-boundary framework-boundary--right"
+      class="framework-vertical-line framework-vertical-line--right"
       :class="{ 'is-k3': k3Started }"
-      :style="frameworkBoundaryRightStyle"
+      :style="frameworkVerticalRightStyle"
       aria-hidden="true"
     ></div>
     <div
@@ -548,9 +535,6 @@ onBeforeUnmount(() => {
       :style="frameworkTitlesStyle"
       aria-hidden="true"
     >
-      <div class="framework-surfaces" :class="{ 'is-k3': k3Started }" aria-hidden="true">
-        <span v-for="part in frameworkParts" :key="`surface-${part}`" class="framework-surface"></span>
-      </div>
       <div
         v-for="part in frameworkParts"
         :key="part"
@@ -568,7 +552,6 @@ onBeforeUnmount(() => {
           class="framework-title__cursor"
           :style="{ '--cursor-delay': frameworkCursorDelay }"
         ></span>
-        <span class="framework-title__extension" aria-hidden="true"></span>
       </div>
     </div>
   </div>
@@ -778,44 +761,23 @@ onBeforeUnmount(() => {
   color: var(--site-text-primary);
 }
 
-.framework-surfaces {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  grid-template-rows: repeat(4, minmax(0, 1fr));
-  gap: 0.35rem;
-  pointer-events: none;
-}
-
-.framework-surface {
-  display: block;
-  background: var(--site-panel-background);
-  transition: background-color 1500ms cubic-bezier(0.333333, 1, 0.666667, 1);
-}
-
-.framework-surfaces.is-k3 .framework-surface {
-  background: var(--site-page-background);
-}
-
-.framework-boundary {
-  position: absolute;
+.framework-vertical-line {
+  position: fixed;
   z-index: 4;
+  inset-block: 0;
   width: 0;
-  border-left: 0.65px dashed var(--site-hero-rule-strong);
+  border-left: 0.35px solid var(--site-hero-rule);
   pointer-events: none;
-  transform: translateX(-100vw);
+  transform: scaleY(0);
+  transform-origin: center center;
   transition:
     transform 1500ms cubic-bezier(0.333333, 1, 0.666667, 1),
     border-color 1500ms cubic-bezier(0.333333, 1, 0.666667, 1);
 }
 
-.framework-boundary--right {
-  transform: translateX(100vw);
-}
-
-.framework-boundary.is-k3 {
+.framework-vertical-line.is-k3 {
   border-color: var(--site-framework-rule);
-  transform: translateX(0);
+  transform: scaleY(1);
 }
 
 .framework-title {
@@ -874,19 +836,6 @@ onBeforeUnmount(() => {
   animation: framework-cursor-decelerate 3200ms steps(1, end) forwards;
 }
 
-.framework-title__extension {
-  display: inline-block;
-  flex: 0 0 clamp(4rem, 8vw, 10rem);
-  width: clamp(4rem, 8vw, 10rem);
-  height: 0.35px;
-  margin-inline-start: 0.9rem;
-  background: currentColor;
-  opacity: 0.6;
-  transition:
-    background-color 1500ms cubic-bezier(0.333333, 1, 0.666667, 1),
-    opacity 1500ms cubic-bezier(0.333333, 1, 0.666667, 1);
-}
-
 @keyframes framework-cursor-decelerate {
   0%, 9.99% { opacity: 1; }
   10%, 19.99% { opacity: 0; }
@@ -920,12 +869,6 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 760px) {
-  .framework-title__extension {
-    flex-basis: 2rem;
-    width: 2rem;
-    margin-inline-start: 0.55rem;
-  }
-
   .title-page {
     padding-block-start: 5.5rem;
     padding-inline: clamp(1.25rem, 6vw, 2rem);
@@ -970,9 +913,7 @@ onBeforeUnmount(() => {
   .title-page__framework-scroll-stage,
   .framework-titles,
   .framework-title,
-  .framework-boundary,
-  .framework-surface,
-  .framework-title__extension {
+  .framework-vertical-line {
     transition: none;
   }
 
@@ -988,14 +929,10 @@ onBeforeUnmount(() => {
     animation: none;
   }
 
-  .framework-boundary {
+  .framework-vertical-line {
     border-color: var(--site-framework-rule);
-    transform: translateX(0);
+    transform: scaleY(1);
     transition: none;
-  }
-
-  .framework-title__extension {
-    transform: none;
   }
 }
 </style>

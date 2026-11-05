@@ -111,16 +111,16 @@
 }
 
 :root.dark.k3-content-theme {
-  --site-page-background: #0f1d2e;
-  --site-page-background-soft: #14263b;
-  --site-panel-background: #1b3048;
-  --site-text-primary: #e6eef8;
-  --site-text-secondary: #b7c8da;
-  --site-text-muted: #879bb2;
-  --site-rule: rgb(230 238 248 / 17%);
-  --site-rule-strong: rgb(230 238 248 / 42%);
-  --site-framework-rule: #a9c5e4;
-  --site-brand-text: #b5cfe9;
+  --site-page-background: #080d14;
+  --site-page-background-soft: #0b121b;
+  --site-panel-background: #101923;
+  --site-text-primary: #d8dee7;
+  --site-text-secondary: #9daaba;
+  --site-text-muted: #6f7d8e;
+  --site-rule: rgb(216 222 231 / 13%);
+  --site-rule-strong: rgb(216 222 231 / 30%);
+  --site-framework-rule: #596a7e;
+  --site-brand-text: #8495a9;
 }
 
 html {

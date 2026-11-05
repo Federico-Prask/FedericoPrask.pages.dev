@@ -27,7 +27,7 @@ The active application is a deliberately small Vue page. The old page compositio
 - K1 has a source-derived construction view of the complete FP Logo: solid plate/monogram outlines, nineteen dashed guides, coordinate labels and Force handles. K0/K1 are not yet visually approved.
 - K2 has been rewritten at source level. The five original paths become full viewport-width rules during the first movement, while the document scrolls 22% of the Hero height with In-Out Cubic. After a short hold, the lowest line becomes the visual anchor; the remaining document scroll and the four upper lines move with matching Out Cubic timing, unfolding upward from the anchor. The annotation SVG is not stretched. Four Part titles then reveal together, character by character. Source files are fetched and checked; local build, animation rendering and input behavior remain unverified.
 - Part titles use the original local SF Pro variable TTF at public/fonts/SF-Pro.ttf. Its wght axis (1–1000) and opsz axis (17–28) are confirmed; titles request weight 800 (Heavy), and the TTF is preloaded. Browser rendering still requires verification.
-- K3 is implemented at source level: dashed side boundaries move inward to the measured Hero-name inset, the five horizontal rules shorten to that span, titles and extension rules scale down, Light/Dark palettes transition together, Part surfaces blend into the page, and the cursor slows to a visible stop. Local build and browser review remain pending.
+- K3 is implemented at source level: full-height vertical rules scale into view at the measured Hero-name inset, the five horizontal rules remain full viewport width, titles scale down with their existing underline cursor, no Part background blocks or extra extension lines are used, Light/Dark palettes transition together, and the cursor slows to a visible stop. The Dark palette is intentionally darker and more muted. Local build and browser review remain pending.
 - K4–K5 and the four content Parts are not implemented.
 - A local production build and browser visual review have not been completed.
 
@@ -136,14 +136,16 @@ The active application is a deliberately small Vue page. The old page compositio
 
 ### 4.2 K3 — Framework and theme transition
 
-- [x] Move both dashed boundaries inward from outside the scene, using the Hero-name left edge as the left inset and mirroring it on the right.
-- [x] Shorten all five horizontal framework rules to the span between the final boundaries.
-- [x] Move the Part-title container to the boundary inset; scale titles and their extension rules to the first-pass 0.72 ratio.
-- [x] Transition the page, Part text, rules, boundaries, cursor and surfaces through one K3 content-theme state.
-- [x] Blend Part surfaces into the page background.
+- [x] Add two continuous viewport-height vertical rules at the measured Hero-name inset and its mirrored right position.
+- [x] Reveal the vertical rules by scaleY from the midpoint, not by moving them in from outside.
+- [x] Keep all five horizontal rules full viewport width throughout K2 and K3.
+- [x] Give horizontal and vertical rules the same 0.35px solid stroke and shared theme colors.
+- [x] Align the Part-title container with the vertical guides and scale titles to the first-pass 0.72 ratio.
+- [x] Remove the four Part background rectangles and the extra title extension line; retain only the original underline cursor.
+- [x] Transition the page, titles, rules and cursor through one K3 content-theme state, with a darker, lower-saturation Dark palette.
 - [x] Decelerate cursor blinking and leave the underline visible.
 - [x] Keep the Hero at its compact K0 base size; do not add a second K3 Hero scale-down.
-- [ ] Verify measured boundary alignment and title/extension geometry in the browser.
+- [ ] Verify measured vertical-guide alignment, infinite line behavior and title scaling in the browser.
 - [ ] Verify the complete transition in both Light and Dark modes, including a theme change during/after K3.
 - [ ] Verify cursor timing, mobile fit and reduced-motion final state.
 

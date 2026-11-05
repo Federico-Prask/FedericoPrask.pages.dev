@@ -505,24 +505,24 @@ The left and right dashed boundaries begin outside the visible content region an
 
 This is a directional movement, not a plain opacity fade.
 
-Both sides move toward the center simultaneously. As they enter the content region, the width of each Part becomes narrower.
+Both vertical guides appear at the Hero-name inset and its mirrored right-side position. The left position is measured from the actual left edge of “Federico Prask”; it is not an independently guessed percentage.
 
-The final left boundary is aligned to the measured left edge of the Hero's “Federico Prask” name. Use that element's actual left offset from the viewport, not an independently guessed percentage. The right boundary mirrors the same inset from the right viewport edge. The five horizontal framework rules and the Part-title container finish at these same left and right limits.
+The vertical guides are continuous page-height lines, not the short sides of a rectangular card. They appear by scaling vertically from their midpoint (scaleY 0 to 1), not by translating inward from outside. Their width, solid stroke, color and visual weight match the five horizontal rules.
 
-The final result should resemble a clean page-edge framework: strong enough to define the content width, but light enough not to make every Part look like a card.
+All five horizontal rules remain full viewport width throughout K2 and K3. They are never shortened to meet the vertical guides. The rules are continuous layout guides, not card borders.
 
 ### 7.3 Part title scaling
 
 At the same time as the side boundaries move inward:
 
 - Each Part title scales down.
-- The title's scale remains coordinated with its corresponding Part width.
-- The title's horizontal rule / extension line shortens with the title.
-- The title, title line and side boundaries maintain a coherent spatial relationship.
+- The title scale is coordinated with its narrowed text area.
+- The existing short underline cursor remains attached to the end of the title and scales with it.
+- Do not add a separate long extension line after the cursor.
 
 The title must not remain oversized after the boundaries have already reached their final position.
 
-The first source implementation uses a 0.72 title scale with a left-center transform origin; the attached extension line scales with the title, while the five horizontal separators shorten to the new boundary span. Treat the ratio as a first-pass value for browser tuning.
+The first source implementation uses a 0.72 title scale with a left-center transform origin. The underline cursor remains the only line attached to the title. There is no additional extension rule.
 
 ### 7.4 Synchronized theme transition
 
@@ -543,15 +543,15 @@ The transition should use coordinated color interpolation. Do not make the backg
 
 The colors must maintain readable contrast throughout the transition, not only at the beginning and end.
 
-The first source implementation uses a cool blue-neutral destination palette: Light mode targets a pale blue surface (hex #eaf0f7) with dark blue-gray text, while Dark mode targets a deep blue surface (hex #0f1d2e) with light blue-gray text. These are initial tuning values, not final visual approval.
+The first source implementation uses a cool blue-neutral destination palette: Light mode targets a pale blue surface (hex #eaf0f7) with dark blue-gray text. Dark mode targets a much darker, lower-saturation blue-black surface (hex #080d14), with subdued blue-gray text and rules (the framework rule is #596a7e). These are first-pass values for browser review.
 
 The same principle applies in both Light and Dark modes, with different destination palettes.
 
 ### 7.5 Part background blending
 
-The Part framework may initially read as a more visible group of regions. During K3, the Part background colors transition toward the same color used by the page background at the bottom.
+Do not create separate background rectangles, panels or color blocks behind the four Part titles. Titles sit directly on the page surface.
 
-The final layout should not resemble four isolated cards placed on a page. Its structure should be communicated primarily by the outer dashed boundaries, horizontal rules, spacing and typography.
+The final layout is an open framework, not four isolated cards. Its structure is communicated by the continuous page-height vertical rules, the five full-width horizontal rules, spacing and typography.
 
 ### 7.6 Cursor deceleration
 
@@ -1134,7 +1134,7 @@ The following are intentionally not fixed yet. They should be resolved through v
 - Exact SVG line positions and which explicit line IDs persist through K2.
 - Final Light and Dark destination colors for the content stage.
 - Whether the deep-blue extension color is used, and where.
-- Final Part boundary dash pattern and title-scale ratio after browser review.
+- Final framework rule weight and title-scale ratio after browser review.
 
 ### 16.2 Motion details
 
@@ -1363,8 +1363,10 @@ This is a source-level implementation only. **No local production build or brows
 
 ### 19.11 K3 source implementation — measured page-edge framework
 
-K3 now starts automatically after the Part titles have appeared and their shared cursors have completed two initial blink cycles. The left/right dashed boundaries move inward from outside the scene. Their final horizontal positions are derived from the measured left edge of the Hero name; the right boundary mirrors the same inset. The five existing horizontal SVG rules shorten to the span between those boundaries, and the Part-title container moves to the same inset. Titles and their short extension rules scale to 0.72 from a left-center origin.
+K3 starts automatically after the Part titles have appeared and their shared cursors have completed two initial blink cycles. The two vertical rules occupy the measured Hero-name inset and its mirrored right-side position. They span the viewport height continuously and appear by vertical scaling from their midpoint. Their 0.35px solid stroke and color match the five horizontal rules. The horizontal rules remain full viewport width; K3 never shortens them.
 
-A single k3-content-theme class activates the first-pass Light/Dark blue-neutral palettes. The page and framework surfaces, Part titles, SVG rules, vertical boundaries and cursors transition together. Part surfaces blend into the page background. Cursor blinking slows through a 3.2-second sequence and ends with the underline visible. Reduced-motion mode skips the transition and presents the final framework immediately.
+The Part-title container aligns to the vertical guides and the titles scale to 0.72 from a left-center origin. The existing short underline cursor remains attached to each title. No additional extension line or Part background rectangles are created.
+
+A single k3-content-theme class activates the Light/Dark blue-neutral palettes. The page background, Part titles, horizontal rules, vertical rules and cursors transition together. Cursor blinking slows through a 3.2-second sequence and ends with the underline visible. Reduced-motion mode skips the transition and presents the final framework immediately.
 
 This is source-level implementation only. **No local production build or browser verification has been run.** Verify boundary alignment against the actual Hero name, title and extension-line scale, row spacing, both palettes, cursor deceleration, theme switching during/after K3, mobile fit and reduced-motion behavior.
