@@ -501,11 +501,9 @@ The departure of the Hero's content must not cause the overall scene background 
 
 ### 7.2 Left and right boundary movement
 
-The left and right dashed boundaries begin outside the visible content region and move inward toward the center.
+The left and right vertical boundaries begin at the browser's viewport edges and move inward toward the center. This is a directional movement, not a plain opacity fade.
 
-This is a directional movement, not a plain opacity fade.
-
-Both vertical guides appear at the Hero-name inset and its mirrored right-side position. The left position is measured from the actual left edge of “Federico Prask”; it is not an independently guessed percentage.
+Both vertical guides finish at the measured Hero-name inset and its mirrored right-side position. The left final position is measured from the actual left edge of “Federico Prask”; it is not an independently guessed percentage.
 
 The vertical guides are continuous page-height lines, not the short sides of a rectangular card. At the start of K3, the left guide coincides with the viewport's left browser edge and the right guide coincides with its right browser edge. They move horizontally inward by the measured Hero-name inset. They do not grow vertically.
 
