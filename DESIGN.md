@@ -587,17 +587,21 @@ At the end of K3:
 
 ## 8. Part.01 expansion: K4
 
-K4 begins after the Part framework and theme transition are complete.
+K4 begins automatically when the shared K3 framework geometry reaches its final state. It opens Part.01 before any K5 falling motion begins.
 
 ### 8.1 Expand Part.01
 
-Part.01 expands downward to create a sufficiently large content area.
+Part.01 opens downward into a content canvas.
 
-Its title remains at the upper-left portion of the Part. The surrounding boundary structure remains visible.
+The first implementation targets a Part.01 row height of **60% of the measured viewport height**. The current compact row height is preserved as the header zone; the extra height is added below it. This is an initial implementation value and remains subject to browser calibration.
+
+The expansion lasts **1250ms** and uses **Out Cubic** easing. One shared progress value drives the first row height, the movement of the lower rules and titles, and the framework scroll-stage height.
+
+The uppermost horizontal rule remains fixed. The four lower horizontal rules move down by the same incremental distance as the Part.01 row expands. The first title stays in its original position within the compact header zone; the following three titles move with their rows.
+
+The document flow grows by the same amount as the expansion. Do not rely on an overflowing transform that leaves the next Parts in their old document positions.
 
 The expansion should be perceived as the first Part opening into a content canvas, not as a generic accordion opening.
-
-The exact final height is not fixed. It should be determined by the actual Introduction composition and responsive layout.
 
 ### 8.2 Other Parts remain compact
 
@@ -607,16 +611,17 @@ During K4:
 - Part.03 remains compact.
 - Part.04 remains compact.
 
-They remain vertically ordered below Part.01.
+Their row heights and order remain unchanged; they are simply displaced downward by the expansion above them.
 
 Do not start their falling animation during K4. That belongs to K5.
 
 ### 8.3 K4 end state
 
-Part.01 has a sufficiently large empty content area, but its actual content has not yet started revealing.
+Part.01 has a 60%-of-viewport-height empty content area, but its actual content has not yet started revealing.
 
-The other three Parts remain in their compact framework state.
+The other three Parts remain in their compact framework state below Part.01. K5 may begin only after this expansion has completed.
 
+For reduced-motion users, skip the interpolation and enter this final K4 geometry directly.
 ---
 
 ## 9. Part fall and content reveal: K5
@@ -750,7 +755,7 @@ The relative ordering is fixed, but the following parameters must be tuned in-br
 - K3 title scale ratio.
 - K3 color interpolation curve.
 - Cursor starting blink frequency and deceleration curve.
-- K4 expansion height and duration.
+- K4 first-row target height (initially 60% of viewport height) and 1250ms Out Cubic duration.
 - K5 falling distance, acceleration and duration.
 - Text reveal phrase size, delay and opacity duration.
 - Large-component reveal duration.
@@ -1080,6 +1085,9 @@ No new animation library is mandated by this document. First evaluate whether th
 
 **Acceptance criteria**
 
+- Part.01 expands to the 60%-of-viewport-height first-row target using one shared 1250ms Out Cubic progress value.
+- The uppermost rule and Part.01 title remain anchored while the four lower rules and Parts 02–04 move down together.
+- The document flow grows by the same amount as Part.01; no lower Part overlaps or jumps after the animation.
 - Other Parts remain compact throughout K4.
 - Part.02–04 do not fall until K5.
 - Their motion has a perceptible ease-in / falling quality.
