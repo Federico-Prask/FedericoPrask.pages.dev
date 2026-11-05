@@ -507,9 +507,13 @@ This is a directional movement, not a plain opacity fade.
 
 Both vertical guides appear at the Hero-name inset and its mirrored right-side position. The left position is measured from the actual left edge of “Federico Prask”; it is not an independently guessed percentage.
 
-The vertical guides are continuous page-height lines, not the short sides of a rectangular card. They start exactly at the viewport's left and right edges and translate horizontally inward to their final positions. Their travel distance is the measured final inset, not an arbitrary full-viewport offset. They do not grow vertically. The same 1500ms Out Cubic transition is shared with the title scaling and horizontal-rule spacing compression.
+The vertical guides are continuous page-height lines, not the short sides of a rectangular card. At the start of K3, the left guide coincides with the viewport's left browser edge and the right guide coincides with its right browser edge. They move horizontally inward by the measured Hero-name inset. They do not grow vertically.
 
-As the vertical guides move inward, all four Part titles scale down at the same time. The five horizontal rules remain full viewport width; their vertical spacing compresses together around the center of the five-line group. They are never shortened horizontally. The lines are continuous layout guides, not card borders.
+The geometry must be driven by one shared progress value, not by separate CSS transitions that merely happen to have the same duration. Let p run from 0 to 1 using one 1500ms Out Cubic curve. The vertical-guide positions, title size and row-group height, and the vertical spacing between all five full-width horizontal rules must all be calculated from this same p. This guarantees that their relative positions remain mathematically coordinated throughout the motion.
+
+The title must sit inside the two vertical guides with a deliberate horizontal clear space. That horizontal clear space must equal the vertical clear space between the title's line box and either adjacent horizontal rule. Calculate the vertical clear space from the current row height, current title line-box height and the 0.35px rule stroke. Then position the title from the guide using exactly that calculated gap plus the guide stroke width. Mirror the same calculation on the right side. Do not set the title edge directly on top of the vertical guide.
+
+All five horizontal rules remain full viewport width; only their vertical spacing compresses together around the center of the five-line group. They are never shortened horizontally. The lines are continuous layout guides, not card borders.
 
 ### 7.3 Part title scaling
 
@@ -523,7 +527,7 @@ At the same time as the side boundaries move inward:
 
 The title must not remain oversized after the boundaries have already reached their final position.
 
-The first source implementation uses a 0.72 title scale with a left-center transform origin. The horizontal rules retain full width while their vertical spacing compresses to 72% around the group's center. The underline cursor remains the only line attached to the title. There is no additional extension rule.
+The initial title sizing is derived from the same row geometry used to calculate the title-to-rule clear space. During K3, the shared Out Cubic progress changes the horizontal guide positions, title position, title scale, title-row group height and horizontal-rule spacing together. The final title scale and horizontal-rule spacing ratio are both 0.72. At every intermediate frame, the horizontal space from each vertical guide to its neighboring title edge equals the vertical clear space from the title line box to the adjacent horizontal rule. The underline cursor remains the only line attached to the title. There is no additional extension rule.
 
 ### 7.4 Synchronized theme transition
 
@@ -1364,9 +1368,11 @@ This is a source-level implementation only. **No local production build or brows
 
 ### 19.11 K3 source implementation — measured page-edge framework
 
-K3 starts automatically after the Part titles have appeared and their shared cursors have completed two initial blink cycles. The two vertical rules occupy the measured Hero-name inset and its mirrored right-side position. They span the viewport height continuously and move inward from the exact viewport edges by the measured inset distance. Their 0.35px solid stroke and color match the five horizontal rules. Their 1500ms Out Cubic transition is synchronized with the title and horizontal-rule compression.
+K3 starts automatically after the Part titles have appeared and their shared cursors have completed two initial blink cycles. A single JavaScript animation driver computes p over 1500ms with Out Cubic easing and writes the same progress into the reactive layout geometry every frame. The left and right vertical guides begin exactly at the viewport's browser edges and move inward by the measured Hero-name inset; they span the viewport height continuously and use the same 0.35px solid stroke as the five horizontal rules.
 
-As the vertical rules move inward, the four Part titles scale down to 0.72. All five horizontal rules remain full viewport width while their vertical spacing compresses to 72% around the group's center. The title rows compress to the same vertical span. The existing short underline cursor remains attached to each title. No additional extension line or Part background rectangles are created.
+The horizontal and vertical clear spaces are derived from one calculation. For a title row of height R, title line-box height F, shared compression c and rule stroke width w, the vertical clear space is g = ((R - F) * c / 2) - w/2. Each title edge is positioned exactly g + w inside its adjacent vertical guide, so the horizontal clear space equals the vertical clear space to the neighboring horizontal rule. The right side mirrors the same calculation. Title scale, title-row height and the five horizontal-rule intervals all use the same c = 1 - 0.28p, ending at 0.72. This removes independent CSS geometry transitions and keeps relative positions consistent at every intermediate frame.
+
+All five horizontal rules remain full viewport width while their vertical spacing compresses around the group's center. The existing short underline cursor remains attached to each title. No additional extension line or Part background rectangles are created.
 
 A single k3-content-theme class activates the Light/Dark blue-neutral palettes. The page background, Part titles, horizontal rules, vertical rules and cursors transition together. Cursor blinking slows through a 3.2-second sequence and ends with the underline visible. Reduced-motion mode skips the transition and presents the final framework immediately.
 
