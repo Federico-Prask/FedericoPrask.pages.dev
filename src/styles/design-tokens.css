@@ -4,13 +4,11 @@
  * This file defines semantic values only. It deliberately does not define
  * page layout, decorative patterns, or component styling.
  *
- * The Hero and content palettes are separate concepts:
- * - Hero tokens describe the monochrome opening state.
+ * K3 changes typography and structural accents while keeping the page
+ * background identical to the active Hero background.
+ * - Hero tokens describe the persistent page background and opening state.
  * - Brand tokens preserve the established blue identity.
- * - Neutral tokens provide the current light/dark reference surfaces.
- *
- * K3 has a first-pass blue-neutral content palette; browser review is still
- * required before treating the destination values as final.
+ * - Content tokens describe text and structural accents, not a new page fill.
  */
 
 @theme {
@@ -69,7 +67,7 @@
   --site-brand-text: #5b7da3;
 }
 
-/* K3 content palette: cool blue-neutral surfaces with the existing brand blues. */
+/* K3 content accents: blue-neutral typography and rules; retain Hero page background. */
 :root.k3-content-theme {
   --site-page-background: var(--site-hero-background);
   --site-page-background-soft: #dfe8f2;
