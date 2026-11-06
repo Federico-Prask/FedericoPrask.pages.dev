@@ -178,7 +178,7 @@ The active application is a deliberately small Vue page. The old page compositio
 - [ ] Verify the acceleration, unchanged title scale, final off-screen displacement and duplicate rule position in the browser.
 - [x] Reveal Part.01 content from top to bottom and left to right.
 - [x] Reveal ordinary text in short phrase groups, with each complete group as one unit rather than character-by-character.
-- [x] Use the Part-title-style upward pop on each group (0.42em rise, 0.94 to 1 scale, 420ms Out Cubic) with a 58ms stagger.
+- [x] Reveal each group through opacity 0→1 and an upward 0.42em translation (420ms Out Cubic), with a 58ms stagger; do not scale the text.
 - [x] Keep the Introduction in normal document flow so the page grows to fit the complete copy.
 - [x] Provide a reduced-motion presentation with all copy immediately readable.
 - [ ] Verify the complete reveal sequence and reading order in the browser.
