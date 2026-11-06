@@ -25,6 +25,9 @@ const k3Started = ref(false);
 const k3Progress = ref(0);
 const k4Started = ref(false);
 const k4Progress = ref(0);
+const k5Started = ref(false);
+const k5Progress = ref(0);
+const k5DividerCopyTransform = ref("");
 const heroNameInset = ref(0);
 
 const annotationBounds = ref({ left: 0, top: 0, width: 0, height: 0 });
@@ -65,7 +68,14 @@ const verticalInset = computed(() =>
 );
 
 const frameworkInset = computed(() =>
-  Math.max(0, Math.min(heroNameInset.value, viewport.value.width / 2 - 1)),
+  Math.max(
+    0,
+    Math.min(
+      heroNameInset.value,
+      viewport.value.width / 2 - 1,
+      viewport.value.height / 2 - 28,
+    ),
+  ),
 );
 
 const FRAMEWORK_RULE_STROKE_WIDTH = 0.35;
@@ -73,7 +83,10 @@ const K4_PART01_HEIGHT_RATIO = 0.6;
 
 const k3Geometry = computed(() => {
   const { width, height } = viewport.value;
-  const stageHeight = height - verticalInset.value * 2;
+  const stageInset =
+    verticalInset.value +
+    (frameworkInset.value - verticalInset.value) * k3Progress.value;
+  const stageHeight = height - stageInset * 2;
   const rowHeight = stageHeight / 4;
   const rootFontSize =
     typeof document === "undefined"
@@ -97,6 +110,7 @@ const k3Geometry = computed(() => {
     compression,
     titleFontSize,
     stageHeight,
+    stageInset,
     titleAreaHeight: stageHeight * compression,
     boundaryInset,
     titleInset,
@@ -115,6 +129,13 @@ const k4Geometry = computed(() => {
     totalHeight: k3Geometry.value.titleAreaHeight + expansion,
   };
 });
+
+const k5Geometry = computed(() => ({
+  dropDistance: viewport.value.height + k4Geometry.value.totalHeight + 48,
+  dropOffset:
+    (viewport.value.height + k4Geometry.value.totalHeight + 48) * k5Progress.value,
+  scale: 1 - 0.58 * k5Progress.value,
+}));
 
 const compactLineGap = computed(() => {
   const { height } = viewport.value;
@@ -149,8 +170,10 @@ const k2LineTransforms = computed<Record<string, string>>(() => {
 
   // The lowest rule moves in document coordinates by the same distance as
   // the page scroll, keeping it visually anchored in the viewport.
-  const finalBottomY = compactBottomY + (heroHeight.value - initialScroll);
-  const finalRowGap = (height - verticalInset.value * 2) / (lineDefinitions.length - 1);
+  const stageInset = k3Geometry.value.stageInset;
+  const finalBottomY = heroHeight.value + height - stageInset;
+  const finalRowGap =
+    (height - stageInset * 2) / (lineDefinitions.length - 1);
   const isExpanding = k2Phase.value === "expand" || k2Phase.value === "titles";
 
   return Object.fromEntries(
@@ -166,7 +189,11 @@ const k2LineTransforms = computed<Record<string, string>>(() => {
       const compressedY =
         lineCenter + (targetY - lineCenter) * k3Geometry.value.compression;
       const k4Offset = index === 0 ? 0 : k4Geometry.value.extraHeight;
-      return [line.id, makeLineMatrix(line.y, 0, compressedY + k4Offset, width)];
+      const k5Offset = index === 0 ? 0 : k5Geometry.value.dropOffset;
+      return [
+        line.id,
+        makeLineMatrix(line.y, 0, compressedY + k4Offset + k5Offset, width),
+      ];
     }),
   );
 });
@@ -186,7 +213,7 @@ const frameworkTitlesStyle = computed(() => {
   const bounds = annotationBounds.value;
   const { width } = viewport.value;
   const geometry = k3Geometry.value;
-  const stageTop = heroHeight.value + verticalInset.value - bounds.top;
+  const stageTop = heroHeight.value + geometry.stageInset - bounds.top;
   return {
     left: geometry.titleInset - bounds.left + "px",
     top:
@@ -201,6 +228,8 @@ const frameworkTitlesStyle = computed(() => {
     "--framework-compact-row-height": k4Geometry.value.compactRowHeight + "px",
     "--framework-first-title-offset":
       (k4Geometry.value.compactRowHeight - geometry.titleFontSize) / 2 + "px",
+    "--framework-fall-offset": k5Geometry.value.dropOffset + "px",
+    "--framework-fall-scale": k5Geometry.value.scale,
   };
 });
 
@@ -225,6 +254,7 @@ let k2ExpandTimer: number | undefined;
 let k3StartTimer: number | undefined;
 let k3Frame: number | undefined;
 let k4Frame: number | undefined;
+let k5Frame: number | undefined;
 let scrollFrame: number | undefined;
 let touchStartY: number | null = null;
 let pendingK2 = false;
@@ -239,7 +269,8 @@ const K2_LINE_EXPAND_DURATION = 1100;
 const K2_LINE_STAGGER = 65;
 const K3_GEOMETRY_DURATION = 1500;
 const K4_GEOMETRY_DURATION = 1250;
-const K3_CURSOR_HOLD_CYCLES = 2;
+const K3_CURSOR_HOLD_CYCLES = 1;
+const K5_FALL_DURATION = 1250;
 
 function easeInOutCubic(value: number): number {
   return value < 0.5
@@ -249,6 +280,10 @@ function easeInOutCubic(value: number): number {
 
 function easeOutCubic(value: number): number {
   return 1 - Math.pow(1 - value, 3);
+}
+
+function easeInCubic(value: number): number {
+  return value * value * value;
 }
 
 function animateDocumentScroll(
@@ -293,6 +328,29 @@ function scrollImmediatelyToFramework() {
   lastScrollY = window.scrollY;
 }
 
+function beginK5() {
+  if (k5Started.value || prefersReducedMotion) return;
+
+  k5DividerCopyTransform.value =
+    k2LineTransforms.value[lineDefinitions[1].id] ?? "";
+  k5Started.value = true;
+
+  const startTime = performance.now();
+  const frame = (now: number) => {
+    const progress = Math.min(1, (now - startTime) / K5_FALL_DURATION);
+    k5Progress.value = easeInCubic(progress);
+
+    if (progress < 1) {
+      k5Frame = window.requestAnimationFrame(frame);
+    } else {
+      k5Frame = undefined;
+      k5Progress.value = 1;
+    }
+  };
+
+  k5Frame = window.requestAnimationFrame(frame);
+}
+
 function beginK4() {
   if (k4Started.value) return;
   k4Started.value = true;
@@ -312,6 +370,7 @@ function beginK4() {
     } else {
       k4Frame = undefined;
       k4Progress.value = 1;
+      beginK5();
     }
   };
 
@@ -528,6 +587,7 @@ onBeforeUnmount(() => {
   if (k3StartTimer !== undefined) window.clearTimeout(k3StartTimer);
   if (k3Frame !== undefined) window.cancelAnimationFrame(k3Frame);
   if (k4Frame !== undefined) window.cancelAnimationFrame(k4Frame);
+  if (k5Frame !== undefined) window.cancelAnimationFrame(k5Frame);
   if (scrollFrame !== undefined) window.cancelAnimationFrame(scrollFrame);
   document.documentElement.classList.remove("k3-content-theme");
 
@@ -638,6 +698,8 @@ onBeforeUnmount(() => {
       :k2-line-transforms="k2LineTransforms"
       :k2-line-delays="k2LineDelays"
       :k3-started="k3Started"
+      :k5-started="k5Started"
+      :k5-divider-copy-transform="k5DividerCopyTransform"
     />
     <div
       v-if="k2Phase === 'titles'"
@@ -656,7 +718,7 @@ onBeforeUnmount(() => {
     <div
       v-if="k2Phase === 'titles'"
       class="framework-titles"
-      :class="{ 'is-k3': k3Started }"
+      :class="{ 'is-k3': k3Started, 'is-k5': k5Started }"
       :style="frameworkTitlesStyle"
       aria-hidden="true"
     >
@@ -923,6 +985,12 @@ onBeforeUnmount(() => {
 .framework-title:first-child {
   align-self: start;
   margin-block-start: var(--framework-first-title-offset, 0px);
+}
+
+.framework-titles.is-k5 .framework-title:not(:first-child) {
+  transform:
+    translateY(var(--framework-fall-offset, 0px))
+    scale(calc(var(--framework-title-scale, 1) * var(--framework-fall-scale, 1)));
 }
 
 .framework-title__text {
