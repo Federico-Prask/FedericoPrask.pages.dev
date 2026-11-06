@@ -589,7 +589,7 @@ At the end of K3:
 
 ## 8. Part.01 expansion: K4
 
-K4 begins automatically when the shared K3 framework geometry reaches its final state. It opens Part.01 before any K5 falling motion begins.
+K4 and K5 begin together automatically when the shared K3 framework geometry reaches its final state. They are two coordinated effects in one continuous animation timeline, not sequential movements.
 
 ### 8.1 Expand Part.01
 
@@ -597,9 +597,9 @@ Part.01 opens downward into a content canvas.
 
 The first implementation targets a Part.01 row height of **60% of the measured viewport height**. The current compact row height is preserved as the header zone; the extra height is added below it. This is an initial implementation value and remains subject to browser calibration.
 
-The expansion lasts **1250ms** and uses **Out Cubic** easing. One shared progress value drives the first row height, the movement of the lower rules and titles, and the framework scroll-stage height.
+The expansion is part of the same **1250ms In Cubic** timeline as the Part.02–04 fall. A single eased progress value drives Part.01's row height, the lower Parts' downward movement and scale reduction, the lower horizontal rules, and the framework scroll-stage height. There is no preliminary downward displacement followed by a second fall.
 
-The uppermost horizontal rule remains fixed. The four lower horizontal rules move down by the same incremental distance as the Part.01 row expands. The first title stays in its original position within the compact header zone; the following three titles move with their rows.
+The uppermost horizontal rule remains fixed. The four lower horizontal rules move down with the expanding first row and continue through the same uninterrupted fall. The Part.01 title stays anchored in its original compact header zone; Parts 02–04 shrink while moving down from the very first frame.
 
 The document flow grows by the same amount as the expansion. Do not rely on an overflowing transform that leaves the next Parts in their old document positions.
 
@@ -613,15 +613,13 @@ During K4:
 - Part.03 remains compact.
 - Part.04 remains compact.
 
-Their row heights and order remain unchanged; they are simply displaced downward by the expansion above them.
-
-Do not start their falling animation during K4. That belongs to K5.
+Their compact row heights and order remain unchanged. Their titles begin shrinking and falling at the same instant that Part.01 opens; the two effects share one continuous progress value.
 
 ### 8.3 K4 end state
 
 Part.01 has a 60%-of-viewport-height empty content area, but its actual content has not yet started revealing.
 
-The other three Parts remain in their compact framework state below Part.01. K5 may begin only after this expansion has completed.
+The other three Parts have already moved through the first part of their continuous fall. There is no second downward animation stage after the expansion.
 
 For reduced-motion users, skip the interpolation and enter this final K4 geometry directly. Do not run the K5 falling motion for reduced-motion users; keep Parts 02–04 available in their compact positions.
 ---
@@ -634,11 +632,11 @@ K5 moves from framework construction into the presentation of actual content.
 
 Part.02, Part.03 and Part.04 move downward to make room for Part.01's content.
 
-The fall begins immediately after K4 has completed; there is no separate idle phase. Use one shared **1250ms In Cubic** progress value for downward movement and scale reduction. Do not shrink the titles first and then start the fall: their scale-down and downward movement must happen simultaneously on every frame, driven by the same progress value.
+The fall begins on the same frame as K4 expansion; it does not wait for K4 to complete. K4 and K5 share one **1250ms In Cubic** animation driver and one progress value for downward movement and scale reduction. Do not split the movement into an expansion displacement followed by a second fall, and do not shrink the titles first: scale reduction and downward movement happen together from the first frame.
 
 The fall distance is greater than one viewport height (the current source target is viewport height + the expanded framework height + 48px). The In Cubic curve must provide unmistakable acceleration, carrying Parts 02–04 and their moving horizontal rules completely beyond the viewport rather than allowing them to settle inside it.
 
-The four lower horizontal rules move with the falling Parts. The rule directly above Part.02 (`guide-mono-h-04`) is duplicated at the K4 end position: the original moves down with the falling framework, while the copy remains fixed as the bottom boundary of Part.01. The retained copy uses the original rule's exact K4 transform and stays in place throughout K5.
+The rule directly above Part.02 (`guide-mono-h-04`) is shared by Part.01 and Part.02. Before the combined animation starts, duplicate it at its exact pre-expansion position, close to the Part.01 title. Keep this copy fixed as Part.01's boundary. The original shared rule moves down with Part.02–04 and the other lower rules. Do not place the retained copy at the expanded 60vh boundary or move it during the fall.
 
 The fall is a one-time transform, not ordinary layout reflow. For reduced-motion users, skip the fall and leave Parts 02–04 visible in their compact positions.
 
@@ -733,9 +731,8 @@ The names may change in code, but the ordering and state boundaries must remain 
 - K2 can be entered only once.
 - Scrolling upward never reverses the state.
 - K3 does not begin before the K2 guide expansion and title reveal have reached their intended completion point.
-- K4 does not begin before the K3 framework and theme transition are complete.
-- K5 begins immediately after Part.01 has finished expanding.
-- During K5, Parts 02–04 shrink and fall at the same time; no shrink-then-fall sequence is allowed.
+- K4 and K5 begin together after the K3 framework and theme transition is complete.
+- Part.01 expansion and the Part.02–04 scale-and-fall share one continuous 1250ms In Cubic timeline; no intermediate downward hold or second fall is allowed.
 - The original Part.02 top rule falls with the lower framework, while an exact-position copy remains at the bottom of Part.01.
 - The falling titles and lower rules travel beyond the viewport; reduced-motion users retain the compact Parts without the fall.
 - Once the content state is complete, ordinary scrolling and reading behave like a normal page.
@@ -753,8 +750,7 @@ Values recorded for implemented stages are first-pass source parameters, not vis
 - K3 title scale ratio.
 - K3 color interpolation curve.
 - Cursor starting blink frequency and deceleration curve.
-- K4 first-row target height (initially 60% of viewport height) and 1250ms Out Cubic duration.
-- K5 simultaneous scale-and-fall distance, In Cubic acceleration and 1250ms duration.
+- K4/K5 shared first-row target height (initially 60% of viewport height), fall distance and 1250ms In Cubic duration.
 - Text reveal phrase size, delay and opacity duration.
 - Large-component reveal duration.
 
