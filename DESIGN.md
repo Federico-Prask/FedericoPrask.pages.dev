@@ -505,6 +505,8 @@ The left and right vertical boundaries begin at the browser's viewport edges and
 
 Both vertical guides finish at the measured Hero-name inset and its mirrored right-side position. The left final position is measured from the actual left edge of “Federico Prask”; it is not an independently guessed percentage.
 
+At the end of K3, the top horizontal rule's distance from the top viewport edge must equal the left vertical guide's distance from the left viewport edge. Both use the same final measured inset. During K3, the horizontal top inset interpolates from its initial vertical spacing to that same final inset on the shared progress value; it must not be positioned using an unrelated padding value.
+
 The vertical guides are continuous page-height lines, not the short sides of a rectangular card. At the start of K3, the left guide coincides with the viewport's left browser edge and the right guide coincides with its right browser edge. They move horizontally inward by the measured Hero-name inset. They do not grow vertically.
 
 The geometry must be driven by one shared progress value, not by separate CSS transitions that merely happen to have the same duration. Let p run from 0 to 1 using one 1500ms Out Cubic curve. The vertical-guide positions, title size and row-group height, and the vertical spacing between all five full-width horizontal rules must all be calculated from this same p. This guarantees that their relative positions remain mathematically coordinated throughout the motion.
@@ -570,7 +572,7 @@ Its behavior:
 
 Do not remove the cursor at the end of K3.
 
-The current sequence allows the synchronized cursors to complete two 900ms blink cycles after the longest title finishes before K3 begins. K3 then eases the blinking down over approximately 3.2 seconds. Both timings remain subject to browser review.
+The current sequence allows the synchronized cursors to complete one 900ms blink cycle after the longest title finishes before K3 begins. Do not add a second idle cycle. K3 then eases the blinking down over approximately 3.2 seconds. Both timings remain subject to browser review.
 
 ### 7.7 K3 end state
 
@@ -621,7 +623,7 @@ Part.01 has a 60%-of-viewport-height empty content area, but its actual content 
 
 The other three Parts remain in their compact framework state below Part.01. K5 may begin only after this expansion has completed.
 
-For reduced-motion users, skip the interpolation and enter this final K4 geometry directly.
+For reduced-motion users, skip the interpolation and enter this final K4 geometry directly. Do not run the K5 falling motion for reduced-motion users; keep Parts 02–04 available in their compact positions.
 ---
 
 ## 9. Part fall and content reveal: K5
@@ -632,18 +634,13 @@ K5 moves from framework construction into the presentation of actual content.
 
 Part.02, Part.03 and Part.04 move downward to make room for Part.01's content.
 
-Use an ease-in curve, preferably in the In Cubic family.
+The fall begins immediately after K4 has completed; there is no separate idle phase. Use one shared **1250ms In Cubic** progress value for downward movement and scale reduction. Do not shrink the titles first and then start the fall: their scale-down and downward movement must happen simultaneously on every frame.
 
-The motion should have an unmistakable falling quality:
+The fall distance is greater than one viewport height (the current source target is viewport height + the expanded framework height + 48px). The acceleration must be strong enough that Parts 02–04 and their moving horizontal rules clearly leave the viewport rather than settling within it.
 
-- It accelerates into the downward movement.
-- It should not read as a simple gentle push.
-- It should not be reduced to ordinary layout reflow.
-- Its timing and acceleration should be tuned through visual testing.
+The four lower horizontal rules move with the falling Parts. The rule directly above Part.02 (`guide-mono-h-04`) is duplicated at the K4 end position: the original moves down with the falling framework, while the copy remains fixed as the bottom boundary of Part.01. Do not move, fade or remove this retained copy during K5.
 
-The exact distance, overlap behavior and final resting positions remain open.
-
-The final layout must remain stable after the animation. Do not leave the Parts dependent on a temporary transform that causes later content to overlap or jump when the animation ends.
+The fall is a one-time transform, not ordinary layout reflow. For reduced-motion users, skip the fall and leave Parts 02–04 visible in their compact positions.
 
 ### 9.2 Part.01 content reading order
 
@@ -737,7 +734,10 @@ The names may change in code, but the ordering and state boundaries must remain 
 - Scrolling upward never reverses the state.
 - K3 does not begin before the K2 guide expansion and title reveal have reached their intended completion point.
 - K4 does not begin before the K3 framework and theme transition are complete.
-- K5 does not begin before Part.01 has finished expanding.
+- K5 begins immediately after Part.01 has finished expanding.
+- During K5, Parts 02–04 shrink and fall at the same time; no shrink-then-fall sequence is allowed.
+- The original Part.02 top rule falls with the lower framework, while an exact-position copy remains at the bottom of Part.01.
+- The falling titles and lower rules travel beyond the viewport; reduced-motion users retain the compact Parts without the fall.
 - Once the content state is complete, ordinary scrolling and reading behave like a normal page.
 
 ### 10.3 Timing
@@ -754,7 +754,7 @@ Values recorded for implemented stages are first-pass source parameters, not vis
 - K3 color interpolation curve.
 - Cursor starting blink frequency and deceleration curve.
 - K4 first-row target height (initially 60% of viewport height) and 1250ms Out Cubic duration.
-- K5 falling distance, acceleration and duration.
+- K5 simultaneous scale-and-fall distance, In Cubic acceleration and 1250ms duration.
 - Text reveal phrase size, delay and opacity duration.
 - Large-component reveal duration.
 
