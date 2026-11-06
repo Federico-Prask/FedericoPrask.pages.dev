@@ -752,7 +752,7 @@ The names may change in code, but the ordering and state boundaries must remain 
 - Scrolling upward never reverses the state.
 - K3 does not begin before the K2 guide expansion and title reveal have reached their intended completion point.
 - K4 and K5 begin together after the K3 framework and theme transition is complete.
-- Part.01 expansion and the Part.02–04 scale-and-fall share one continuous 1250ms In Cubic timeline; no intermediate downward hold or second fall is allowed.
+- Part.01 expansion and the Part.02–04 position-only fall share one continuous 1250ms In Cubic timeline; preserve title font sizes and scales, with no intermediate downward hold or second fall.
 - The original Part.02 top rule falls with the lower framework, while an exact-position copy remains at the bottom of Part.01.
 - The falling titles and lower rules travel beyond the viewport; reduced-motion users retain the compact Parts without the fall.
 - Once the content state is complete, ordinary scrolling and reading behave like a normal page.
@@ -1099,7 +1099,7 @@ No new animation library is mandated by this document. First evaluate whether th
 
 **Acceptance criteria**
 
-- Part.01 expands toward 60% of the viewport height while Parts 02–04 begin shrinking and falling on the same frame, driven by one shared 1250ms In Cubic progress value.
+- Part.01 expands toward 60% of the viewport height while Parts 02–04 begin falling on the same frame, driven by one shared 1250ms In Cubic progress value; their title font sizes and scales do not change.
 - The uppermost rule and Part.01 title remain anchored; the lower rules move with their associated Parts.
 - The Part.01/Part.02 shared divider is duplicated at its pre-expansion position and retained close to the Part.01 title.
 - The document flow grows to fit both the expanded Part.01 region and its complete Introduction copy.
