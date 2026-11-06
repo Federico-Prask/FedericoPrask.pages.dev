@@ -594,9 +594,9 @@ Part.01 opens downward into a content canvas.
 
 The first implementation targets a Part.01 row height of **60% of the measured viewport height**. The current compact row height is preserved as the header zone; the extra height is added below it. This is an initial implementation value and remains subject to browser calibration.
 
-The expansion is part of the same **1250ms In Cubic** timeline as the Part.02–04 fall. A single eased progress value drives Part.01's row height, the lower Parts' downward movement and scale reduction, the lower horizontal rules, and the framework scroll-stage height. There is no preliminary downward displacement followed by a second fall.
+The expansion is part of the same **1250ms In Cubic** timeline as the Part.02–04 fall. A single eased progress value drives Part.01's row height, the lower Parts' downward movement, the lower horizontal rules, and the framework scroll-stage height. Part titles retain their K3 font size and scale throughout the fall. There is no preliminary downward displacement followed by a second fall.
 
-The uppermost horizontal rule remains fixed. The four lower horizontal rules move down with the expanding first row and continue through the same uninterrupted fall. The Part.01 title stays anchored in its original compact header zone; Parts 02–04 shrink while moving down from the very first frame.
+The uppermost horizontal rule remains fixed. The four lower horizontal rules move down with the expanding first row and continue through the same uninterrupted fall. The Part.01 title stays anchored in its original compact header zone; Parts 02–04 move down from the very first frame without shrinking their title text.
 
 The document flow grows by the same amount as the expansion. Do not rely on an overflowing transform that leaves the next Parts in their old document positions.
 
@@ -610,7 +610,7 @@ During K4:
 - Part.03 remains compact.
 - Part.04 remains compact.
 
-Their compact row heights and order remain unchanged. Their titles begin shrinking and falling at the same instant that Part.01 opens; the two effects share one continuous progress value.
+Their compact row heights and order remain unchanged. Their titles begin falling at the same instant that Part.01 opens, but retain their original K3 font size and scale. The fall changes position only.
 
 ### 8.3 K4 end state
 
@@ -629,7 +629,7 @@ K5 moves from framework construction into the presentation of actual content.
 
 Part.02, Part.03 and Part.04 move downward to make room for Part.01's content.
 
-The fall begins on the same frame as K4 expansion; it does not wait for K4 to complete. K4 and K5 share one **1250ms In Cubic** animation driver and one progress value for downward movement and scale reduction. Do not split the movement into an expansion displacement followed by a second fall, and do not shrink the titles first: scale reduction and downward movement happen together from the first frame.
+The fall begins on the same frame as K4 expansion; it does not wait for K4 to complete. K4 and K5 share one **1250ms In Cubic** animation driver and one progress value for downward movement. This is a position-only translation: Part.02–04 title font sizes and scales remain unchanged throughout. Do not split the movement into an expansion displacement followed by a second fall.
 
 The fall distance is greater than one viewport height (the current source target is viewport height + the expanded framework height + 48px). The In Cubic curve must provide unmistakable acceleration, carrying Parts 02–04 and their moving horizontal rules completely beyond the viewport rather than allowing them to settle inside it.
 
@@ -696,7 +696,22 @@ The Introduction begins below the retained Part.01/Part.02 divider copy, within 
 
 The opening sentence reads “你好，我是丰朴 FedericoPrask，这是我的个人网站” in Chinese. Only the name uses **LXGW WenKai Lite**, as a handwritten signature-like accent. The name is emphasized with a translucent, angled highlighter mark derived from the site's blue identity color. The surrounding greeting, paragraphs and controls retain the existing sans-serif typography. Do not apply the handwritten face to the whole Introduction.
 
-The Chinese copy is the supplied first-person text and must not be rewritten into invented claims. The English locale provides a faithful translation so the existing language switch continues to work. The closing phrase “Explore. Experiment. Create.” remains a display-style sign-off.
+The Chinese copy is the supplied first-person text and must not be rewritten into invented claims. The English locale provides a faithful translation so the existing language switch continues to work. The closing phrase “Explore. Experiment. Create.” remains a display-style sign-off, but should be visually subordinate to the main Introduction: use a smaller display size rather than a large hero-like heading.
+
+
+### 9.8 Part.02 — Works: pull-out entrance
+
+Part.02 begins only after the complete Part.01 Introduction content. It must appear immediately below the actual end of Part.01 in normal document flow; do not position it against the viewport bottom or the old compact framework coordinates.
+
+Treat the Part.02 content as a structured, table-like section: clear rows and columns, aligned labels and values, and consistent horizontal divisions. It should read as an organized information surface rather than a loose collection of unrelated cards. The precise columns and content hierarchy belong to the Works design phase.
+
+The entrance should feel as if the Part.02 section is being pulled out from beneath the end of Part.01. Begin with the section concealed below its final position and translate it upward into place. Use an **In-Out Cubic** easing curve for this upward movement: the entrance accelerates from rest, passes through the middle, and decelerates smoothly into its final position. The movement should reveal the section as one coherent surface, not as separately falling or rising rows.
+
+Do not scale the Part.02 title or content during this entrance. Keep typography at its designed final size; the animation is positional. The final position must follow the end of Part.01 with a deliberate section gap, and the page must reserve normal-flow space for the full Part.02 section so later content does not overlap it.
+
+Part.03 and Part.04 remain later sections in document order. This specification defines the Part.02 entrance only; do not assume that Parts 03 and 04 share the same pull-out animation or timing until their own entrance behavior is designed.
+
+The entrance should be one-shot and should not reverse when the visitor scrolls upward. Reduced-motion mode should place Part.02 directly in its final position with all content available.
 
 ---
 
@@ -709,7 +724,7 @@ The Chinese copy is the supplied first-person text and must not be rewritten int
 | K2 | First Scroll | First downward scroll removes temporary annotations; original guide lines move and expand; Part titles appear | One-time trigger; not scroll-progress-driven |
 | K3 | Part Framework & Theme Transition | Side boundaries move inward; titles/rules shrink; all colors transition | Layout and theme transition are synchronized |
 | K4 | Part.01 Expansion | Part.01 expands vertically | Other Parts remain compact |
-| K5 | Part Fall & Content Reveal | Parts 02–04 fall; Part.01 content flows into view | Text and large components use different reveal granularity |
+| K5 | Part Fall & Content Reveal | Parts 02–04 translate downward without title scaling; Part.01 content flows into view | Text and large components use different reveal granularity |
 
 ### 10.1 High-level state model
 
@@ -1384,9 +1399,9 @@ This is source-level geometry with a successful Cloudflare Pages build/deploy fo
 
 ### 19.12 K4/K5 source implementation — one continuous opening and fall
 
-K4 and K5 start together after K3 completes. One 1250ms In Cubic animation driver writes the same eased progress to Part.01 expansion and the Parts 02–04 fall/scale reduction. The first row expands toward 60% of the measured viewport height while the lower Parts begin moving downward and shrinking on the very same frame. There is no K4 displacement followed by a second K5 fall, and no shrink-then-fall ordering.
+K4 and K5 start together after K3 completes. One 1250ms In Cubic animation driver writes the same eased progress to Part.01 expansion and the Parts 02–04 downward translation. The first row expands toward 60% of the measured viewport height while the lower Parts begin moving down on the very same frame. Part titles keep their K3 font size and scale: there is no title shrink. There is no K4 displacement followed by a second K5 fall.
 
-The top horizontal rule stays anchored. The lower four horizontal rules receive their K4 row-expansion offset and continue moving down with the same shared progress; Parts 02–04 titles are displaced by the expanding first row and translated farther by the same fall progress. Their scale decreases from its K3 value to 42% of that value. The combined displacement target is one viewport height plus the expanded framework height plus 48px, taking all three Parts and their associated moving rules out of the viewport.
+The top horizontal rule stays anchored. The lower four horizontal rules receive their K4 row-expansion offset and continue moving down with the same shared progress; Parts 02–04 titles are displaced by the expanding first row and translated farther by the same fall progress. Their font size and scale remain at their K3 values throughout. The combined displacement target is one viewport height plus the expanded framework height plus 48px, taking all three Parts and their associated moving rules out of the viewport.
 
 Before the shared animation begins, the current transform of `guide-mono-h-04`—the line shared by Part.01 and Part.02—is copied into a separate SVG path. This copy is kept at the exact pre-expansion position, close to the Part.01 title. The original line moves with Part.02–04; the copy remains fixed as Part.01's divider. It must not be captured after the Part.01 expansion offset has already been applied.
 
