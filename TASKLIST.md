@@ -32,7 +32,7 @@ The active application is a deliberately small Vue page. The old page compositio
 - K5's falling choreography is implemented at source level: after K4, Parts 02–04 and the lower four rules fall together over 1250ms In Cubic. The three titles shrink during the same movement, the displacement exceeds one viewport height, and a copy of the Part.02 top rule stays at the bottom of Part.01. Reduced-motion users keep Parts 02–04 visible. Actual Part.01 content and its reveal sequence are not implemented; local build and browser review remain pending.
 - A local production build and browser visual review have not been completed.
 
-**Next implementation target:** pull dev, run a local production build, then verify K0–K4 in the browser. Check the compact K0 Hero dimensions at desktop/mobile sizes, SF Pro Display Heavy loading, the complete K0–K2 choreography, the K3 synchronized geometry and both palettes, cursor deceleration, and K4's 60%-viewport expansion, fixed upper boundary, displaced lower Parts, document height and reduced-motion state.
+**Next implementation target:** pull dev, run a local production build, then verify K0–K5 in the browser. Check the compact K0 Hero dimensions at desktop/mobile sizes, SF Pro Display Heavy loading, the complete K0–K2 choreography, K3's equal top/left page-edge insets and shortened wait, both palettes, K4's 60%-viewport expansion, and K5's simultaneous scale-and-fall, acceleration, off-screen exit and retained Part.01 bottom rule.
 
 ## 2. Foundation and repository cleanup
 
@@ -141,7 +141,7 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Start both vertical rules exactly at the viewport/browser edges and move them inward by the measured Hero-name inset.
 - [x] Drive vertical guides, title position/scale/row height and horizontal-rule spacing from one shared 1500ms Out Cubic progress value; do not use independent geometry transitions.
 - [x] Calculate the horizontal guide-to-title clear space from the same row geometry as the vertical title-to-horizontal-rule clear space, keeping the two distances equal throughout K3.
-- [x] Keep all five horizontal rules full viewport width throughout K2 and K3 while compressing their vertical spacing around the group center.
+- [x] Keep all five horizontal rules full viewport width; anchor the top rule to the same interpolated top inset as the left vertical guide's final inset, and compress the four row gaps below it.
 - [x] Give horizontal and vertical rules the same 0.35px solid stroke and shared theme colors.
 - [x] Align the Part-title container with the vertical guides and scale titles/row spacing to the final 0.72 ratio.
 - [x] Remove the four Part background rectangles and the extra title extension line; retain only the original underline cursor.
