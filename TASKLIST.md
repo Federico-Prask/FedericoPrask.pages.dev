@@ -250,6 +250,7 @@ The active application is a deliberately small Vue page. The old page compositio
 3. Review and calibrate revised K0/K1 in a local browser, including the full waiting state, reduced-motion behavior and responsive sizes.
 4. Browser-test the revised K2 sequence: full-width Stage A rules, the lower-rule viewport anchor, bottom-to-top upward unfolding with matched Out Cubic scroll, and simultaneous character-by-character Part title reveals.
 5. Browser-test K3–K5: verify equal top/left page-edge insets, the shorter pre-K3 wait, and that Part.01 expansion plus Parts 02–04 scale-and-fall form one continuous motion with no two-stage drop; verify the retained shared rule stays close to the Part.01 title.
-6. Implement the actual Introduction content and its ordered reveal.
-7. Update this file and `DESIGN.md` after each completed implementation slice.
-6. Do not mark visual verification tasks complete until they have been checked in a browser.
+6. Browser-review Introduction: check the start position below the retained divider, paragraph spacing and full-page scroll range; verify the LXGW WenKai Lite name mark in both themes and at mobile widths.
+7. Verify Chinese/English switching, reduced-motion behavior and on-demand font loading.
+8. Update this file and `DESIGN.md` after each completed implementation slice.
+9. Do not mark visual verification tasks complete until they have been checked in a browser.
