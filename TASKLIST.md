@@ -28,7 +28,7 @@ The active application is a deliberately small Vue page. The old page compositio
 - K2 has been rewritten at source level. The five original paths become full viewport-width rules during the first movement, while the document scrolls 22% of the Hero height with In-Out Cubic. After a short hold, the lowest line becomes the visual anchor; the remaining document scroll and the four upper lines move with matching Out Cubic timing, unfolding upward from the anchor. The annotation SVG is not stretched. Four Part titles then reveal together, character by character. Source files are fetched and checked; local build, animation rendering and input behavior remain unverified.
 - Part titles use the original local SF Pro variable TTF at public/fonts/SF-Pro.ttf. Its wght axis (1–1000) and opsz axis (17–28) are confirmed; titles request weight 800 (Heavy), and the TTF is preloaded. Browser rendering still requires verification.
 - K3 is implemented at source level with one shared 1500ms Out Cubic progress driver. Full-height vertical rules start at the viewport/browser edges and move inward; title position, title scale, title-row height and full-width horizontal-rule spacing are computed from that same progress. At the end of K3, the top horizontal rule and left vertical rule have matching distances from their respective viewport edges, using the same measured inset. The synchronized cursors now wait one 900ms blink cycle rather than two before K3 begins. Local build and browser review remain pending.
-- K4/K5 are implemented as one continuous source-level transition: after K3, Part.01 expands toward 60% of the viewport while Parts 02–04 shrink and fall from the same first frame. One 1250ms In Cubic progress value drives both effects; the lower four rules and titles travel together, beyond the viewport. A copy of the Part.01/Part.02 shared rule is captured before the expansion and remains close to the Part.01 title, while the original moves away with Parts 02–04. Reduced-motion users get the expanded Part.01 with Parts 02–04 still visible. The actual Part.01 content and reveal sequence are not implemented; current revision needs a fresh build and browser review.
+- K4/K5 are implemented as one continuous source-level transition: after K3, Part.01 expands toward 60% of the viewport while Parts 02–04 fall from the same first frame. One 1250ms In Cubic progress value drives both effects; the lower four rules and titles travel together, beyond the viewport. Part.02–04 title font sizes and scales remain unchanged during the fall. A copy of the Part.01/Part.02 shared rule is captured before the expansion and remains close to the Part.01 title, while the original moves away with Parts 02–04. Reduced-motion users get the expanded Part.01 with Parts 02–04 still visible. The actual Part.01 content and reveal sequence are not implemented; current revision needs a fresh build and browser review.
 - A local production build and browser visual review have not been completed.
 
 **Next implementation target:** pull dev, run a local production build, then verify K0–K5 in the browser. Check the compact K0 Hero dimensions at desktop/mobile sizes, SF Pro Display Heavy loading, the complete K0–K2 choreography, K3's equal top/left page-edge insets and shortened wait, both palettes, K4's 60%-viewport expansion, and K5's simultaneous scale-and-fall, acceleration, off-screen exit and retained Part.01 bottom rule.
@@ -163,7 +163,7 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Expand Part.01 to a first-row height of 60% of the measured viewport height.
 - [x] Combine K4 expansion and K5 falling motion on one shared 1250ms In Cubic progress value; do not run them sequentially.
 - [x] Keep the uppermost horizontal rule fixed; move the four lower rules as part of the single shared K4/K5 trajectory.
-- [x] Keep the Part.01 title anchored in its original compact header zone; start Parts 02–04 shrinking and falling at the same time as the expansion.
+- [x] Keep the Part.01 title anchored in its original compact header zone; start Parts 02–04 falling at the same time as the expansion without shrinking their title text.
 - [x] Increase the framework scroll-stage height by the same amount so document flow matches the expanded layout.
 - [x] Skip interpolation and enter the final K4 geometry for reduced-motion users.
 - [ ] Verify the expansion timing, title anchor, rule alignment, lower-Part spacing and page scroll range in the browser.
@@ -171,11 +171,11 @@ The active application is a deliberately small Vue page. The old page compositio
 ### 5.2 K5 — Part fall and content reveal
 
 - [x] Start Part.01 expansion and the Parts 02–04 fall together after K3; there is only one 1250ms In Cubic timeline.
-- [x] Drive the fall and scale reduction from the same progress value starting at the first frame.
+- [x] Drive the position-only fall from the same progress value starting at the first frame; preserve Part.02–04 title font sizes and scales.
 - [x] Move the four lower horizontal rules with the falling Parts, far enough that the titles and rules leave the viewport.
 - [x] Duplicate the shared Part.01/Part.02 rule at its exact pre-expansion position, close to the Part.01 title; keep that copy fixed while the original rule falls away.
 - [x] Skip the falling motion for reduced-motion users and retain Parts 02–04 in their compact positions.
-- [ ] Verify the acceleration, simultaneous scale/fall, final off-screen displacement and duplicate rule position in the browser.
+- [ ] Verify the acceleration, unchanged title scale, final off-screen displacement and duplicate rule position in the browser.
 - [x] Reveal Part.01 content from top to bottom and left to right.
 - [x] Reveal ordinary text in short, fast phrase groups, independently of the K4/K5 geometry timeline.
 - [x] Keep the Introduction in normal document flow so the page grows to fit the complete copy.
@@ -189,12 +189,18 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Preserve the supplied Chinese copy.
 - [x] Provide an English translation for the existing language selector.
 - [x] Highlight only “丰朴 FedericoPrask” in the opening sentence with the uploaded LXGW WenKai Lite face and a blue-toned highlighter treatment.
-- [ ] Review the English translation and verify the handwritten font/highlighter treatment in the browser.
+- [ ] Review the English translation and verify the handwritten font/highlighter treatment and smaller closing tagline in the browser.
 
 ## 6. Phase 4 — Remaining content Parts
 
 ### 6.1 Part.02 — Works
 
+- [x] Specify Part.02 as a structured, table-like information section in `DESIGN.md`.
+- [x] Specify a one-piece upward pull-out entrance using In-Out Cubic easing, beginning below the final Part.01 content.
+- [x] Keep Part.02 typography at its designed final size during the entrance; do not scale its title or content.
+- [ ] Design the exact Works rows, columns and content hierarchy.
+- [ ] Implement and browser-test the Part.02 pull-out entrance.
+- [ ] Define separate entrance behavior for Parts 03 and 04; do not assume they share Part.02's motion.
 - [ ] Curate Development projects.
 - [ ] Curate Graphic Design works.
 - [ ] Establish a distinctive editorial composition for the portfolio.
