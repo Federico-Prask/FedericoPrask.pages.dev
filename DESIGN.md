@@ -256,42 +256,39 @@ Blue should be a meaningful part of the visual composition, not merely a tiny ac
 
 Use the blue family to establish the content-stage identity through an intentional combination of:
 
-- Page and section surfaces.
 - Important typographic emphasis.
 - Selected diagram or annotation elements.
 - Rules and structural boundaries.
 - Selected work presentation or visual blocks.
 
-Do not paint every element blue. The strength comes from the relationship between blue surfaces, neutral areas, text and fine structural lines.
+Keep the overall page background identical to the Hero background in both Light and Dark modes. Do not introduce a separate blue-tinted page surface during K3. Do not paint every element blue; the identity should come from the relationship between the consistent neutral background, text and fine blue structural lines.
 
 A deep blue such as `#263D58` may be evaluated as an additional supporting color, but it is not a mandatory token until its use is visually confirmed.
 
 ### 4.4 Hero-to-content color transition
 
-The Hero's opening treatment is monochrome. The content destination is blue-based.
+The Hero's opening treatment is monochrome. The content framework adds blue-based typography and structural accents, but the overall page background remains unchanged.
 
 During K3, interpolate these properties as one coordinated transition:
 
-- Page background.
-- Part backgrounds.
 - Part title text.
 - Horizontal rules.
-- Left and right dashed boundaries.
+- Left and right boundaries.
 - Other structural borders.
 - Cursor color.
 
-The final Part background must blend into the same color as the page background at the bottom of the page. The structure should remain legible through its boundaries and spacing, rather than through a visually separate card fill.
+Do not interpolate the page background or switch it to a blue-tinted content surface. The page background must remain exactly the active Hero background in both Light and Dark modes. Part backgrounds remain transparent; the structure is communicated through boundaries and spacing rather than separate card fills.
 
 ### 4.5 Light and Dark modes
 
 **Confirmed: keep both Light and Dark modes.**
 
-The two modes are not merely filters over the same composition. Each mode needs a coherent version of the blue-based content palette with sufficient contrast.
+The two modes are not merely filters over the same composition. Each mode needs a coherent version of the blue-based typography and structural accents with sufficient contrast, while preserving the Hero background.
 
 The K3 transition must work in both modes:
 
-- Light mode: transition from the Hero's monochrome state into the light blue / light neutral content palette.
-- Dark mode: transition from the Hero's monochrome state into the dark blue / dark neutral content palette.
+- Light mode: retain the Hero's warm light background and transition text and structural accents into their light content colors.
+- Dark mode: retain the Hero's near-black background and transition text and structural accents into their dark content colors.
 
 The user's selected mode and the animation stage are separate concepts. The transition changes the page from its Hero visual state to its content visual state; it must not accidentally toggle the user's Light / Dark preference.
 
@@ -1374,7 +1371,7 @@ The horizontal and vertical clear spaces are derived from one calculation. For a
 
 All five horizontal rules remain full viewport width. The top rule follows the interpolated shared top inset and ends at the same page-edge distance as the left vertical guide; the four lower gaps compress below it to 72%. The existing short underline cursor remains attached to each title. No additional extension line or Part background rectangles are created.
 
-A single k3-content-theme class activates the Light/Dark blue-neutral palettes. The page background, Part titles, horizontal rules, vertical rules and cursors transition together. Cursor blinking slows through a 3.2-second sequence and ends with the underline visible. Reduced-motion mode skips the transition and presents the final framework immediately.
+A single k3-content-theme class activates the Light/Dark content colors. The page background remains bound to --site-hero-background and does not change during K3; Part titles, horizontal rules, vertical rules and cursors transition together. Cursor blinking slows through a 3.2-second sequence and ends with the underline visible. Reduced-motion mode skips the transition and presents the final framework immediately.
 
 This is source-level geometry with a successful Cloudflare Pages build/deploy for the current `dev` head; local build and browser visual verification remain pending. Verify boundary alignment against the actual Hero name, the equal final top/left page-edge inset, synchronized vertical-line travel, top-anchored horizontal-rule compression, simultaneous title scaling, both palettes, the shortened cursor wait, theme switching during/after K3, mobile fit and reduced-motion behavior.
 
