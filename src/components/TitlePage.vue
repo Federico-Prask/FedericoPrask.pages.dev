@@ -1102,9 +1102,8 @@ onBeforeUnmount(() => {
   display: inline-block;
   max-width: 100%;
   opacity: 0;
-  transform: translateY(0.42em) scale(0.94);
-  transform-origin: center bottom;
-  animation: introduction-chunk-pop 420ms cubic-bezier(0.333333, 1, 0.666667, 1) both;
+  transform: translateY(0.42em);
+  animation: introduction-chunk-reveal 420ms cubic-bezier(0.333333, 1, 0.666667, 1) both;
   animation-delay: var(--intro-delay, 0ms);
 }
 
@@ -1119,15 +1118,15 @@ onBeforeUnmount(() => {
   line-height: 1.15;
 }
 
-@keyframes introduction-chunk-pop {
+@keyframes introduction-chunk-reveal {
   from {
     opacity: 0;
-    transform: translateY(0.42em) scale(0.94);
+    transform: translateY(0.42em);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
   }
 }
 
