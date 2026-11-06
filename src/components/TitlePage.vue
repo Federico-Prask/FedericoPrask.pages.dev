@@ -1109,7 +1109,7 @@ onBeforeUnmount(() => {
   margin-block-start: clamp(2rem, 4vw, 3.25rem) !important;
   color: var(--site-text-primary);
   font-family: "SF Pro Display", var(--font-heading);
-  font-size: clamp(1.55rem, 3vw, 2.5rem);
+  font-size: clamp(1.25rem, 2.2vw, 1.85rem);
   font-weight: 800;
   letter-spacing: -0.045em;
   line-height: 1.15;
@@ -1329,7 +1329,7 @@ onBeforeUnmount(() => {
   }
 
   .introduction-content__tagline {
-    font-size: 1.7rem;
+    font-size: 1.4rem;
   }
 }
 
