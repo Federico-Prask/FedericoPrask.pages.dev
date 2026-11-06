@@ -27,9 +27,9 @@ The active application is a deliberately small Vue page. The old page compositio
 - K1 has a source-derived construction view of the complete FP Logo: solid plate/monogram outlines, nineteen dashed guides, coordinate labels and Force handles. K0/K1 are not yet visually approved.
 - K2 has been rewritten at source level. The five original paths become full viewport-width rules during the first movement, while the document scrolls 22% of the Hero height with In-Out Cubic. After a short hold, the lowest line becomes the visual anchor; the remaining document scroll and the four upper lines move with matching Out Cubic timing, unfolding upward from the anchor. The annotation SVG is not stretched. Four Part titles then reveal together, character by character. Source files are fetched and checked; local build, animation rendering and input behavior remain unverified.
 - Part titles use the original local SF Pro variable TTF at public/fonts/SF-Pro.ttf. Its wght axis (1–1000) and opsz axis (17–28) are confirmed; titles request weight 800 (Heavy), and the TTF is preloaded. Browser rendering still requires verification.
-- K3 is implemented at source level with one shared 1500ms Out Cubic progress driver. Full-height vertical rules start exactly at the viewport/browser edges and move inward; title position, title scale, title-row height and full-width horizontal-rule spacing are computed from that same progress. The horizontal clear space from each vertical guide to the title edge is calculated to equal the vertical clear space from the title line box to its adjacent horizontal rule. No Part background blocks or extra extension lines are used; Light/Dark palettes transition together, and the cursor slows to a visible stop. Local build and browser review remain pending.
+- K3 is implemented at source level with one shared 1500ms Out Cubic progress driver. Full-height vertical rules start at the viewport/browser edges and move inward; title position, title scale, title-row height and full-width horizontal-rule spacing are computed from that same progress. At the end of K3, the top horizontal rule and left vertical rule have matching distances from their respective viewport edges, using the same measured inset. The synchronized cursors now wait one 900ms blink cycle rather than two before K3 begins. Local build and browser review remain pending.
 - K4 is implemented at source level: Part.01 expands to 60% of the measured viewport height over 1250ms Out Cubic; its upper boundary and title stay anchored while the four lower rules and Parts 02–04 move down together. Document flow grows with the expansion, and reduced-motion users enter the final geometry directly. Browser verification remains pending.
-- K5 and the actual content of all four Parts are not implemented.
+- K5's falling choreography is implemented at source level: after K4, Parts 02–04 and the lower four rules fall together over 1250ms In Cubic. The three titles shrink during the same movement, the displacement exceeds one viewport height, and a copy of the Part.02 top rule stays at the bottom of Part.01. Reduced-motion users keep Parts 02–04 visible. Actual Part.01 content and its reveal sequence are not implemented; local build and browser review remain pending.
 - A local production build and browser visual review have not been completed.
 
 **Next implementation target:** pull dev, run a local production build, then verify K0–K4 in the browser. Check the compact K0 Hero dimensions at desktop/mobile sizes, SF Pro Display Heavy loading, the complete K0–K2 choreography, the K3 synchronized geometry and both palettes, cursor deceleration, and K4's 60%-viewport expansion, fixed upper boundary, displaced lower Parts, document height and reduced-motion state.
@@ -148,10 +148,13 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Transition the page, titles, rules and cursor through one K3 content-theme state, with a darker, lower-saturation Dark palette.
 - [x] Decelerate cursor blinking and leave the underline visible.
 - [x] Keep the Hero at its compact K0 base size; do not add a second K3 Hero scale-down.
-- [ ] Verify in the browser that the horizontal distance from each vertical guide to the title edge exactly matches the vertical distance from the title line box to its adjacent horizontal rule throughout the 1500ms K3 motion.
+- [x] Drive the K3 top horizontal-rule inset from the same shared progress as the side boundaries, ending with equal top/left distances from the viewport edges.
+- [x] Reduce the pre-K3 cursor hold from two 900ms cycles to one.
+- [ ] Verify in the browser that the horizontal distance from each vertical guide to the title edge exactly matches the vertical clear space from the title line box to its adjacent horizontal rule throughout the 1500ms K3 motion.
+- [ ] Verify the top horizontal rule and left vertical boundary finish at equal page-edge distances.
 - [ ] Verify the single shared Out Cubic progress keeps both guides, titles and all five horizontal rules synchronized, with no premature fast entry.
 - [ ] Verify the complete transition in both Light and Dark modes, including a theme change during/after K3.
-- [ ] Verify cursor timing, mobile fit and reduced-motion final state.
+- [ ] Verify the shortened pre-K3 wait, cursor timing, mobile fit and reduced-motion final state.
 
 ## 5. Phase 3 — Part.01 introduction reveal
 
@@ -168,7 +171,13 @@ The active application is a deliberately small Vue page. The old page compositio
 
 ### 5.2 K5 — Part fall and content reveal
 
-- [ ] Animate Parts 02–04 downward with a perceptible ease-in / falling character.
+- [x] Start K5 immediately after K4 completes; do not add a separate idle hold.
+- [x] Drive Parts 02–04 downward with one shared 1250ms In Cubic progress value.
+- [x] Reduce the scale of Parts 02–04 simultaneously with their downward movement; do not shrink them in a preceding stage.
+- [x] Move the four lower horizontal rules with the falling Parts, far enough that the titles and rules leave the viewport.
+- [x] Duplicate the rule above Part.02 at its K4 position; keep the copy fixed as the lower boundary of Part.01 while the original rule falls.
+- [x] Skip the falling motion for reduced-motion users and retain Parts 02–04 in their compact positions.
+- [ ] Verify the acceleration, simultaneous scale/fall, final off-screen displacement and duplicate rule position in the browser.
 - [ ] Reveal Part.01 content from top to bottom and left to right.
 - [ ] Reveal ordinary text in short, fast phrase/token groups.
 - [ ] Reveal small UI elements with tight sequential staggering.
@@ -239,6 +248,7 @@ The active application is a deliberately small Vue page. The old page compositio
 2. Check Logo sizing at several viewport widths; tune the minimum, preferred and maximum sizes if the Logo still feels too sensitive to window width.
 3. Review and calibrate revised K0/K1 in a local browser, including the full waiting state, reduced-motion behavior and responsive sizes.
 4. Browser-test the revised K2 sequence: full-width Stage A rules, the lower-rule viewport anchor, bottom-to-top upward unfolding with matched Out Cubic scroll, and simultaneous character-by-character Part title reveals.
-5. Browser-test K4: verify the 60%-viewport-height Part.01 canvas, fixed first boundary/title, synchronized lower-rule and title displacement, compact Part.02–04 rows, document flow and reduced-motion state.
-6. Update this file and `DESIGN.md` after each completed implementation slice.
+5. Browser-test K3–K5: verify equal top/left page-edge insets, the shorter pre-K3 wait, K4 expansion, and K5's simultaneous In Cubic scale-and-fall, off-screen exit and retained Part.01 bottom rule.
+6. Implement the actual Introduction content and its ordered reveal.
+7. Update this file and `DESIGN.md` after each completed implementation slice.
 6. Do not mark visual verification tasks complete until they have been checked in a browser.
