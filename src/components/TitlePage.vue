@@ -1099,9 +1099,12 @@ onBeforeUnmount(() => {
 }
 
 .introduction-content__chunk {
+  display: inline-block;
+  max-width: 100%;
   opacity: 0;
-  filter: blur(3px);
-  animation: introduction-copy-reveal 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform: translateY(0.42em) scale(0.94);
+  transform-origin: center bottom;
+  animation: introduction-chunk-pop 420ms cubic-bezier(0.333333, 1, 0.666667, 1) both;
   animation-delay: var(--intro-delay, 0ms);
 }
 
@@ -1115,15 +1118,15 @@ onBeforeUnmount(() => {
   line-height: 1.15;
 }
 
-@keyframes introduction-copy-reveal {
+@keyframes introduction-chunk-pop {
   from {
     opacity: 0;
-    filter: blur(3px);
+    transform: translateY(0.42em) scale(0.94);
   }
 
   to {
     opacity: 1;
-    filter: blur(0);
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -1359,7 +1362,7 @@ onBeforeUnmount(() => {
 
   .introduction-content__chunk {
     opacity: 1;
-    filter: none;
+    transform: none;
     animation: none;
   }
 
