@@ -698,6 +698,8 @@ The opening sentence reads “你好，我是丰朴 FedericoPrask，这是我的
 
 The Chinese copy is the supplied first-person text and must not be rewritten into invented claims. The English locale provides a faithful translation so the existing language switch continues to work. The closing phrase “Explore. Experiment. Create.” remains a display-style sign-off, but should be visually subordinate to the main Introduction: use a smaller display size rather than a large hero-like heading.
 
+**Text reveal motion:** Reveal the Introduction in its existing short text chunks, not character by character and not as one whole paragraph. The greeting, handwritten name, website suffix, each prepared phrase in the paragraphs, and the closing tagline are separate motion units. Keep their original reading order and use a restrained stagger between units. Each complete chunk should rise into place with the same title-like pop used in the Part titles: begin at `translateY(0.42em)` and `scale(0.94)`, then settle at the final position and scale while opacity rises to 1. Use a 420ms Out Cubic transition and a 58ms stagger. Do not split the text into individual glyphs. The chunks remain readable as normal flowing copy once settled; preserve the paragraph structure and all supplied wording. Under reduced motion, show every chunk immediately with no offset or scaling.
+
 
 ### 9.8 Part.02 — Works: pull-out entrance
 
