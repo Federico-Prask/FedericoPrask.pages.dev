@@ -177,7 +177,8 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Skip the falling motion for reduced-motion users and retain Parts 02–04 in their compact positions.
 - [ ] Verify the acceleration, unchanged title scale, final off-screen displacement and duplicate rule position in the browser.
 - [x] Reveal Part.01 content from top to bottom and left to right.
-- [x] Reveal ordinary text in short, fast phrase groups, independently of the K4/K5 geometry timeline.
+- [x] Reveal ordinary text in short phrase groups, with each complete group as one unit rather than character-by-character.
+- [x] Use the Part-title-style upward pop on each group (0.42em rise, 0.94 to 1 scale, 420ms Out Cubic) with a 58ms stagger.
 - [x] Keep the Introduction in normal document flow so the page grows to fit the complete copy.
 - [x] Provide a reduced-motion presentation with all copy immediately readable.
 - [ ] Verify the complete reveal sequence and reading order in the browser.
