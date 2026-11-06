@@ -690,6 +690,14 @@ At minimum, separate:
 
 They may overlap in time when the design specifies synchronization, but they should not be forced into one monolithic animation rule.
 
+### 9.7 Introduction identity and copy
+
+The Introduction begins below the retained Part.01/Part.02 divider copy, within the expanded Part.01 reading area. Its content stays in normal document flow so the page can grow naturally as the full introduction extends beyond the initial viewport.
+
+The opening sentence reads “你好，我是丰朴 FedericoPrask，这是我的个人网站” in Chinese. Only the name uses **LXGW WenKai Lite**, as a handwritten signature-like accent. The name is emphasized with a translucent, angled highlighter mark derived from the site's blue identity color. The surrounding greeting, paragraphs and controls retain the existing sans-serif typography. Do not apply the handwritten face to the whole Introduction.
+
+The Chinese copy is the supplied first-person text and must not be rewritten into invented claims. The English locale provides a faithful translation so the existing language switch continues to work. The closing phrase “Explore. Experiment. Create.” remains a display-style sign-off.
+
 ---
 
 ## 10. Complete animation sequence
@@ -1076,14 +1084,13 @@ No new animation library is mandated by this document. First evaluate whether th
 
 **Acceptance criteria**
 
-- Part.01 expands to the 60%-of-viewport-height first-row target using one shared 1250ms Out Cubic progress value.
-- The uppermost rule and Part.01 title remain anchored while the four lower rules and Parts 02–04 move down together.
-- The document flow grows by the same amount as Part.01; no lower Part overlaps or jumps after the animation.
-- Other Parts remain compact throughout K4.
-- Part.02–04 do not fall until K5.
-- Their motion has a perceptible ease-in / falling quality.
+- Part.01 expands toward 60% of the viewport height while Parts 02–04 begin shrinking and falling on the same frame, driven by one shared 1250ms In Cubic progress value.
+- The uppermost rule and Part.01 title remain anchored; the lower rules move with their associated Parts.
+- The Part.01/Part.02 shared divider is duplicated at its pre-expansion position and retained close to the Part.01 title.
+- The document flow grows to fit both the expanded Part.01 region and its complete Introduction copy.
+- Parts 02–04 fall beyond the viewport; do not create a second downward animation stage.
 - Part.01 content reveals top-to-bottom and left-to-right.
-- Text appears in short groups at a brisk pace.
+- Ordinary text appears in short groups at a brisk pace.
 - Large visual components appear whole.
 
 ### Phase 6 — Parts 02–04
@@ -1383,6 +1390,15 @@ The top horizontal rule stays anchored. The lower four horizontal rules receive 
 
 Before the shared animation begins, the current transform of `guide-mono-h-04`—the line shared by Part.01 and Part.02—is copied into a separate SVG path. This copy is kept at the exact pre-expansion position, close to the Part.01 title. The original line moves with Part.02–04; the copy remains fixed as Part.01's divider. It must not be captured after the Part.01 expansion offset has already been applied.
 
-Reduced-motion users receive the expanded K4 geometry without the fall; Parts 02–04 remain visible. The actual Introduction content reveal remains unimplemented.
+Reduced-motion users receive the expanded K4 geometry without the fall; Parts 02–04 remain visible. The retained divider copy stays in place and the complete Introduction copy is readable without reveal animation.
 
-Cloudflare Pages completed a production build/deploy for an earlier animation revision. The current combined-motion revision still needs a fresh build check and browser review.
+Cloudflare Pages completed a production build/deploy for an earlier animation revision. The current Introduction implementation still needs a fresh build check and browser review.
+
+### 19.13 Introduction content and typography implementation
+
+The Introduction is rendered inside the framework scroll stage in normal document flow. Its top padding is derived from the final K3 stage inset and the compact Part.01 row height, placing the opening copy immediately below the retained pre-expansion divider copy. Horizontal padding uses the same final title inset as the Part titles. The document therefore grows to fit the copy instead of clipping it to the initial viewport.
+
+The user-supplied Chinese Introduction is preserved as five paragraphs. A matching English translation is provided for the existing language selector. Each paragraph is divided into short inline text groups; the groups reveal in reading order with a 58ms stagger and a short opacity/blur transition. The text reveal is separate from the shared K4/K5 geometry driver.
+
+Only “丰朴 FedericoPrask” in the opening sentence uses the uploaded `LXGWWenKaiLite-Regular.ttf` face, registered as `LXGW WenKai Lite`. Light and Medium faces are also registered for future use. The handwritten face is not preloaded, so it is requested only when the Introduction is rendered. The name receives an angled translucent highlight based on `--site-brand`; all other copy retains the regular site typography. Reduced-motion mode displays the complete text without its reveal animation and retains the Part.01/Part.02 divider copy.
+
