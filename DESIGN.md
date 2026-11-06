@@ -1069,7 +1069,7 @@ No new animation library is mandated by this document. First evaluate whether th
 
 - Both side boundaries visibly move inward.
 - Title scale and boundary movement remain synchronized.
-- Background, text, lines, borders, surfaces and cursor all participate.
+- The page background remains identical to the Hero; Part titles, rules, boundaries and cursor transition to the K3 content palette.
 - The final Part surface blends with the page background.
 - The cursor remains visible and stops blinking.
 
