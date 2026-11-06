@@ -257,7 +257,6 @@ let k2ExpandTimer: number | undefined;
 let k3StartTimer: number | undefined;
 let k3Frame: number | undefined;
 let k4Frame: number | undefined;
-let k5Frame: number | undefined;
 let scrollFrame: number | undefined;
 let touchStartY: number | null = null;
 let pendingK2 = false;
@@ -273,7 +272,7 @@ const K2_LINE_STAGGER = 65;
 const K3_GEOMETRY_DURATION = 1500;
 const K4_GEOMETRY_DURATION = 1250;
 const K3_CURSOR_HOLD_CYCLES = 1;
-const K5_FALL_DURATION = 1250;
+const K4_K5_TRANSITION_DURATION = 1250;
 
 function easeInOutCubic(value: number): number {
   return value < 0.5
@@ -331,29 +330,6 @@ function scrollImmediatelyToFramework() {
   lastScrollY = window.scrollY;
 }
 
-function beginK5() {
-  if (k5Started.value || prefersReducedMotion) return;
-
-  k5DividerCopyTransform.value =
-    k2LineTransforms.value[lineDefinitions[1].id] ?? "";
-  k5Started.value = true;
-
-  const startTime = performance.now();
-  const frame = (now: number) => {
-    const progress = Math.min(1, (now - startTime) / K5_FALL_DURATION);
-    k5Progress.value = easeInCubic(progress);
-
-    if (progress < 1) {
-      k5Frame = window.requestAnimationFrame(frame);
-    } else {
-      k5Frame = undefined;
-      k5Progress.value = 1;
-    }
-  };
-
-  k5Frame = window.requestAnimationFrame(frame);
-}
-
 function beginK4() {
   if (k4Started.value) return;
   k4Started.value = true;
@@ -363,17 +339,27 @@ function beginK4() {
     return;
   }
 
+  // Capture the shared Part.01 / Part.02 divider before either side moves.
+  // Its copy stays beside the Part.01 title while the original travels away.
+  k5DividerCopyTransform.value =
+    k2LineTransforms.value[lineDefinitions[1].id] ?? "";
+  k5Started.value = true;
+
   const startTime = performance.now();
   const frame = (now: number) => {
-    const progress = Math.min(1, (now - startTime) / K4_GEOMETRY_DURATION);
-    k4Progress.value = easeOutCubic(progress);
+    const progress = Math.min(1, (now - startTime) / K4_K5_TRANSITION_DURATION);
+    const eased = easeInCubic(progress);
+
+    // Part.01 opens while Parts 02–04 shrink and fall on this same timeline.
+    k4Progress.value = eased;
+    k5Progress.value = eased;
 
     if (progress < 1) {
       k4Frame = window.requestAnimationFrame(frame);
     } else {
       k4Frame = undefined;
       k4Progress.value = 1;
-      beginK5();
+      k5Progress.value = 1;
     }
   };
 
@@ -590,7 +576,6 @@ onBeforeUnmount(() => {
   if (k3StartTimer !== undefined) window.clearTimeout(k3StartTimer);
   if (k3Frame !== undefined) window.cancelAnimationFrame(k3Frame);
   if (k4Frame !== undefined) window.cancelAnimationFrame(k4Frame);
-  if (k5Frame !== undefined) window.cancelAnimationFrame(k5Frame);
   if (scrollFrame !== undefined) window.cancelAnimationFrame(scrollFrame);
   document.documentElement.classList.remove("k3-content-theme");
 
