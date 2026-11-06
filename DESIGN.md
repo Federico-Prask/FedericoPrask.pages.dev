@@ -1378,14 +1378,14 @@ A single k3-content-theme class activates the Light/Dark blue-neutral palettes. 
 
 This is source-level geometry with a successful Cloudflare Pages build/deploy for the current `dev` head; local build and browser visual verification remain pending. Verify boundary alignment against the actual Hero name, the equal final top/left page-edge inset, synchronized vertical-line travel, top-anchored horizontal-rule compression, simultaneous title scaling, both palettes, the shortened cursor wait, theme switching during/after K3, mobile fit and reduced-motion behavior.
 
-### 19.12 K4/K5 source implementation — introduction opening and Part fall
+### 19.12 K4/K5 source implementation — one continuous opening and fall
 
-K4 begins automatically after K3 completes. The first row expands to 60% of the measured viewport height over 1250ms Out Cubic. Its upper rule remains fixed; the four lower rules and Parts 02–04 titles move down by the same expansion offset. The framework scroll-stage document height increases by that same amount, so the expanded layout participates in normal document flow.
+K4 and K5 start together after K3 completes. One 1250ms In Cubic animation driver writes the same eased progress to Part.01 expansion and the Parts 02–04 fall/scale reduction. The first row expands toward 60% of the measured viewport height while the lower Parts begin moving downward and shrinking on the very same frame. There is no K4 displacement followed by a second K5 fall, and no shrink-then-fall ordering.
 
-K5 starts immediately after K4 completes. One 1250ms In Cubic progress value drives both downward movement and scale reduction for Parts 02–04; there is no separate shrink-then-fall stage. The three title transforms combine their existing K3 scale with a further 1.0-to-0.42 scale factor, while the lower four horizontal rules receive the same downward offset. The target offset is one viewport height plus the expanded framework height plus 48px, ensuring the falling titles and lines leave the viewport.
+The top horizontal rule stays anchored. The lower four horizontal rules receive their K4 row-expansion offset and continue moving down with the same shared progress; Parts 02–04 titles are displaced by the expanding first row and translated farther by the same fall progress. Their scale decreases from its K3 value to 42% of that value. The combined displacement target is one viewport height plus the expanded framework height plus 48px, taking all three Parts and their associated moving rules out of the viewport.
 
-At K5 start, the current transform of `guide-mono-h-04`—the rule above Part.02 and the lower boundary of Part.01—is copied into a separate SVG path. The original guide falls with the lower framework; the copied path remains at the exact K4 position as Part.01's bottom boundary.
+Before the shared animation begins, the current transform of `guide-mono-h-04`—the line shared by Part.01 and Part.02—is copied into a separate SVG path. This copy is kept at the exact pre-expansion position, close to the Part.01 title. The original line moves with Part.02–04; the copy remains fixed as Part.01's divider. It must not be captured after the Part.01 expansion offset has already been applied.
 
-Reduced-motion users receive the expanded K4 geometry without the K5 fall; Parts 02–04 remain visible. The K5 actual Introduction content reveal remains unimplemented.
+Reduced-motion users receive the expanded K4 geometry without the fall; Parts 02–04 remain visible. The actual Introduction content reveal remains unimplemented.
 
-Cloudflare Pages completed the production build and preview deployment for the current `dev` head. Local `vp build` and browser review of K3–K5 still need to be performed.
+Cloudflare Pages completed a production build/deploy for an earlier animation revision. The current combined-motion revision still needs a fresh build check and browser review.
