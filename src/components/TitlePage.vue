@@ -184,10 +184,12 @@ const k2LineTransforms = computed<Record<string, string>>(() => {
 
       // Keep every horizontal guide full-width. K3 compresses only the
       // vertical distance between the five lines around their shared center.
-      const lineCenter =
-        finalBottomY - ((lineDefinitions.length - 1) * finalRowGap) / 2;
+      // Keep the first rule attached to the shared top/left page inset.
+      // The four row gaps compress below that fixed upper boundary.
       const compressedY =
-        lineCenter + (targetY - lineCenter) * k3Geometry.value.compression;
+        heroHeight.value +
+        stageInset +
+        index * finalRowGap * k3Geometry.value.compression;
       const k4Offset = index === 0 ? 0 : k4Geometry.value.extraHeight;
       const k5Offset = index === 0 ? 0 : k5Geometry.value.dropOffset;
       return [
@@ -216,10 +218,7 @@ const frameworkTitlesStyle = computed(() => {
   const stageTop = heroHeight.value + geometry.stageInset - bounds.top;
   return {
     left: geometry.titleInset - bounds.left + "px",
-    top:
-      stageTop +
-      (geometry.stageHeight - geometry.titleAreaHeight) / 2 +
-      "px",
+    top: stageTop + "px",
     width: width - geometry.titleInset * 2 + "px",
     height: k4Geometry.value.totalHeight + "px",
     "--framework-title-size": geometry.titleFontSize + "px",
