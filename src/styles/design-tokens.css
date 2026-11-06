@@ -71,7 +71,7 @@
 
 /* K3 content palette: cool blue-neutral surfaces with the existing brand blues. */
 :root.k3-content-theme {
-  --site-page-background: #eaf0f7;
+  --site-page-background: var(--site-hero-background);
   --site-page-background-soft: #dfe8f2;
   --site-panel-background: #f5f8fc;
   --site-text-primary: #1b2b3d;
@@ -111,7 +111,7 @@
 }
 
 :root.dark.k3-content-theme {
-  --site-page-background: #080d14;
+  --site-page-background: var(--site-hero-background);
   --site-page-background-soft: #0b121b;
   --site-panel-background: #101923;
   --site-text-primary: #d8dee7;
