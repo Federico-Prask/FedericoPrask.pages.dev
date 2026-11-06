@@ -130,12 +130,16 @@ const k4Geometry = computed(() => {
   };
 });
 
-const k5Geometry = computed(() => ({
-  dropDistance: viewport.value.height + k4Geometry.value.totalHeight + 48,
-  dropOffset:
-    (viewport.value.height + k4Geometry.value.totalHeight + 48) * k5Progress.value,
-  scale: 1 - 0.58 * k5Progress.value,
-}));
+const k5Geometry = computed(() => {
+  const dropDistance =
+    viewport.value.height + k4Geometry.value.totalHeight + 48;
+
+  return {
+    dropDistance,
+    dropOffset: dropDistance * k5Progress.value,
+    scale: 1 - 0.58 * k5Progress.value,
+  };
+});
 
 const compactLineGap = computed(() => {
   const { height } = viewport.value;
