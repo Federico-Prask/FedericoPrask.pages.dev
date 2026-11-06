@@ -10,6 +10,8 @@ const props = withDefaults(
     k2LineTransforms?: Record<string, string>;
     k2LineDelays?: Record<string, string>;
     k3Started?: boolean;
+    k5Started?: boolean;
+    k5DividerCopyTransform?: string;
   }>(),
   {
     k2Started: false,
@@ -17,6 +19,8 @@ const props = withDefaults(
     k2LineTransforms: () => ({}),
     k2LineDelays: () => ({}),
     k3Started: false,
+    k5Started: false,
+    k5DividerCopyTransform: "",
   },
 );
 
@@ -66,6 +70,14 @@ function k2PathStyle(id: string) {
       <path id="guide-mono-v-07" data-source="monogram" data-axis="v" data-start="86,131" d="M 86 0 L 86 256" />
       <path id="guide-mono-h-07" data-source="monogram" data-axis="h" data-start="86,199" d="M 0 199 L 256 199" data-k2-persistent="true" data-guide-y="199" :style="k2PathStyle('guide-mono-h-07')" />
       <path id="guide-mono-v-08" data-source="monogram" data-axis="v" data-start="52,199" d="M 52 0 L 52 256" />
+      <path
+        v-if="props.k5Started && props.k5DividerCopyTransform"
+        id="guide-k5-part01-bottom-copy"
+        class="framework-rule-copy"
+        data-k2-persistent="true"
+        d="M 0 72 L 256 72"
+        :style="{ transform: props.k5DividerCopyTransform }"
+      />
     </g>
 
     <g id="annotation-original-logo" data-k2-disposition="remove">
