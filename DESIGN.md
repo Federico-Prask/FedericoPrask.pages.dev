@@ -1313,7 +1313,7 @@ Legacy page components, their UI primitives, the old content-data model, unused 
 
 Source files have been fetched again from the target branch after the changes, and the import relationship and application entry were inspected.
 
-**A local Vite production build and browser visual review have not yet been run.** Do not report the current implementation as build-verified or visually approved.
+Cloudflare Pages completed the production build and preview deployment successfully for the current `dev` head. A local `vp build` and browser visual review have not yet been run. Deployment success is not visual approval.
 
 ### 19.5 Current K0 source implementation
 
@@ -1380,4 +1380,16 @@ All five horizontal rules remain full viewport width. The top rule follows the i
 
 A single k3-content-theme class activates the Light/Dark blue-neutral palettes. The page background, Part titles, horizontal rules, vertical rules and cursors transition together. Cursor blinking slows through a 3.2-second sequence and ends with the underline visible. Reduced-motion mode skips the transition and presents the final framework immediately.
 
-This is source-level implementation only. **No local production build or browser verification has been run.** Verify boundary alignment against the actual Hero name, synchronized vertical-line travel, simultaneous title scaling and horizontal-rule spacing compression, both palettes, cursor deceleration, theme switching during/after K3, mobile fit and reduced-motion behavior.
+This is source-level geometry with a successful Cloudflare Pages build/deploy for the current `dev` head; local build and browser visual verification remain pending. Verify boundary alignment against the actual Hero name, the equal final top/left page-edge inset, synchronized vertical-line travel, top-anchored horizontal-rule compression, simultaneous title scaling, both palettes, the shortened cursor wait, theme switching during/after K3, mobile fit and reduced-motion behavior.
+
+### 19.12 K4/K5 source implementation — introduction opening and Part fall
+
+K4 begins automatically after K3 completes. The first row expands to 60% of the measured viewport height over 1250ms Out Cubic. Its upper rule remains fixed; the four lower rules and Parts 02–04 titles move down by the same expansion offset. The framework scroll-stage document height increases by that same amount, so the expanded layout participates in normal document flow.
+
+K5 starts immediately after K4 completes. One 1250ms In Cubic progress value drives both downward movement and scale reduction for Parts 02–04; there is no separate shrink-then-fall stage. The three title transforms combine their existing K3 scale with a further 1.0-to-0.42 scale factor, while the lower four horizontal rules receive the same downward offset. The target offset is one viewport height plus the expanded framework height plus 48px, ensuring the falling titles and lines leave the viewport.
+
+At K5 start, the current transform of `guide-mono-h-04`—the rule above Part.02 and the lower boundary of Part.01—is copied into a separate SVG path. The original guide falls with the lower framework; the copied path remains at the exact K4 position as Part.01's bottom boundary.
+
+Reduced-motion users receive the expanded K4 geometry without the K5 fall; Parts 02–04 remain visible. The K5 actual Introduction content reveal remains unimplemented.
+
+Cloudflare Pages completed the production build and preview deployment for the current `dev` head. Local `vp build` and browser review of K3–K5 still need to be performed.
