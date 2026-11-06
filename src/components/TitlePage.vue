@@ -27,6 +27,7 @@ const k4Started = ref(false);
 const k4Progress = ref(0);
 const k5Started = ref(false);
 const k5Progress = ref(0);
+const introductionStarted = ref(false);
 const k5DividerCopyTransform = ref("");
 const heroNameInset = ref(0);
 
@@ -56,6 +57,130 @@ const frameworkTitleRevealDuration =
   Math.max(...frameworkParts.map((part) => part.length - 1)) * 36 + 420;
 const frameworkCursorDelay = frameworkTitleRevealDuration + "ms";
 
+type IntroductionCopy = {
+  greeting: string;
+  name: string;
+  website: string;
+  paragraphs: string[][];
+  tagline: string;
+};
+
+const zhIntroductionCopy: IntroductionCopy = {
+  "greeting": "你好，我是",
+  "name": "丰朴 FedericoPrask",
+  "website": "，这是我的个人网站",
+  "paragraphs": [
+    [
+      "我对计算机技术、数字创作以及各种形式的表达怀有浓厚兴趣。",
+      "我喜欢探索不同领域的工具与技术，也享受从理解原理、构思想法到亲手实践，",
+      "将抽象概念逐步转化为具体作品的过程。"
+    ],
+    [
+      "在计算机领域，我长期关注算法、数据结构与软件开发。",
+      "从竞赛编程中的问题分析与算法推导，到独立软件项目的架构设计与实现，",
+      "我喜欢探究技术背后的逻辑，也乐于尝试不同的技术方案。",
+      "我掌握的语言与技术栈包括 C++（Console）、C++ Qt、Java，",
+      "以及前端技术 Vue.js 与 TypeScript，并能够基于 Electron 结合 Vue.js 和 TypeScript 进行桌面应用开发。"
+    ],
+    [
+      "同时，我对视觉设计与数字媒体创作也充满兴趣。",
+      "我会留意界面设计中的排版、字体、色彩与交互细节，",
+      "使用 InDesign 与 Figma 进行视觉设计，也会使用 Photoshop 和 Procreate 进行数字绘画，",
+      "用 DaVinci Resolve 探索视频剪辑与后期制作，通过 After Effects 尝试动画创意，",
+      "并通过 FL Studio 与 MuseScore 尝试音乐制作与乐谱编配。",
+      "不同媒介为表达想法提供了不同可能，也让我能够从更多角度理解创作本身。"
+    ],
+    [
+      "我也喜欢研究各类工具与工作流程，探索它们的能力与边界，",
+      "并尝试把不同领域的知识联系起来。",
+      "我习惯把工具看作可以拆解、组合和不断调整的系统，",
+      "关注它们的输入输出、抽象层级、自动化方式以及协作流程，",
+      "也比较不同工具在表达力、效率、学习成本与适用场景上的取舍。",
+      "在具体实践中，我会尝试搭建从构思、原型、实现到迭代的完整工作流，",
+      "让编程、设计、音视频制作中的方法相互迁移：",
+      "用工程化的思路组织创作流程，也用创作的视角重新理解技术方案。",
+      "对我而言，探索边界并不是单纯追求“会用”，",
+      "而是理解工具为何存在、适合解决什么问题，以及何时应当换一种方式。",
+      "技术不仅是解决问题的手段，也是创造与表达的工具。"
+    ],
+    [
+      "这个网站是这些兴趣与探索的集合。",
+      "在这里，你可以看到我的个人项目、技术研究、学习记录、设计实验，",
+      "以及各种仍在进行中的尝试。",
+      "它会随着我的学习与创作不断变化，记录那些值得分享的作品、想法与过程。"
+    ]
+  ],
+  "tagline": "Explore. Experiment. Create."
+};
+const enIntroductionCopy: IntroductionCopy = {
+  "greeting": "Hello, I am",
+  "name": "丰朴 FedericoPrask",
+  "website": ", and this is my personal website.",
+  "paragraphs": [
+    [
+      "I have a strong interest in computing, digital creation, and many forms of expression.",
+      "I enjoy exploring tools and technologies across different fields, and turning abstract ideas into concrete work —",
+      "from understanding the principles and shaping an idea to putting it into practice."
+    ],
+    [
+      "In computing, I have a long-standing interest in algorithms, data structures, and software development.",
+      "From problem analysis and algorithm design in competitive programming to architecture and implementation in independent software projects,",
+      "I enjoy exploring the logic behind technology and trying different technical approaches.",
+      "My languages and technologies include C++ (Console), C++ with Qt, Java, Vue.js, and TypeScript.",
+      "I can also build desktop applications with Electron, Vue.js, and TypeScript."
+    ],
+    [
+      "I am equally interested in visual design and digital media.",
+      "I pay close attention to typography, typefaces, color, and interaction details in interface design.",
+      "I use InDesign and Figma for visual design, and Photoshop and Procreate for digital illustration;",
+      "I explore video editing and post-production with DaVinci Resolve, and animation with After Effects.",
+      "I also experiment with music production and score arrangement using FL Studio and MuseScore.",
+      "Different media offer different ways to express an idea and help me understand the creative process from multiple perspectives."
+    ],
+    [
+      "I also enjoy studying tools and workflows, exploring their capabilities and limits,",
+      "and finding connections between different fields.",
+      "I see tools as systems that can be taken apart, combined, and refined.",
+      "I pay attention to their inputs and outputs, levels of abstraction, automation, and collaboration workflows,",
+      "and compare their expressive power, efficiency, learning curves, and suitable use cases.",
+      "In practice, I build workflows that span ideation, prototyping, implementation, and iteration.",
+      "I look for ways to transfer methods between programming, design, and audio-visual creation:",
+      "using engineering principles to organize creative work, and a creator perspective to reconsider technical solutions.",
+      "For me, exploring boundaries is not simply about learning how to use a tool;",
+      "it is about understanding why it exists, what problems it is suited to solve, and when another approach would be better.",
+      "Technology is not only a means of solving problems, but also a tool for creation and expression."
+    ],
+    [
+      "This website brings these interests and explorations together.",
+      "Here, you can find my personal projects, technical research, learning notes, design experiments,",
+      "and various attempts that are still in progress.",
+      "The site will continue to evolve as I learn and create, documenting work, ideas, and processes worth sharing."
+    ]
+  ],
+  "tagline": "Explore. Experiment. Create."
+};
+
+const introductionCopy = computed(() => locale.value === "zh" ? zhIntroductionCopy : enIntroductionCopy);
+
+const introductionView = computed(() => {
+  const copy = introductionCopy.value;
+  let revealStep = 0;
+  const nextDelay = () => `${revealStep++ * 58}ms`;
+  const greetingDelay = nextDelay();
+  const nameDelay = nextDelay();
+  const websiteDelay = nextDelay();
+  const paragraphs = copy.paragraphs.map((paragraph) =>
+    paragraph.map((text) => ({ text, delay: nextDelay() })),
+  );
+  return {
+    ...copy,
+    greetingDelay,
+    nameDelay,
+    websiteDelay,
+    paragraphs,
+    taglineDelay: nextDelay(),
+  };
+});
 const annotationStyle = computed(() => ({
   left: annotationBounds.value.left + "px",
   top: annotationBounds.value.top + "px",
@@ -240,6 +365,12 @@ const frameworkScrollStageStyle = computed(() => ({
   minHeight: `calc(100svh + ${k4Geometry.value.extraHeight}px)`,
 }));
 
+const introductionStageStyle = computed(() => ({
+  paddingBlockStart: `${k3Geometry.value.stageInset + k4Geometry.value.compactRowHeight + 24}px`,
+  paddingInlineStart: `${k3Geometry.value.titleInset}px`,
+  paddingInlineEnd: `${k3Geometry.value.titleInset}px`,
+}));
+
 const frameworkVerticalLeftStyle = computed(() => ({
   left: k3Geometry.value.boundaryInset + "px",
 }));
@@ -333,16 +464,19 @@ function beginK4() {
   if (k4Started.value) return;
   k4Started.value = true;
 
-  if (prefersReducedMotion) {
-    k4Progress.value = 1;
-    return;
-  }
-
   // Capture the shared Part.01 / Part.02 divider before either side moves.
   // Its copy stays beside the Part.01 title while the original travels away.
   k5DividerCopyTransform.value =
     k2LineTransforms.value[lineDefinitions[1].id] ?? "";
   k5Started.value = true;
+
+  if (prefersReducedMotion) {
+    k4Progress.value = 1;
+    introductionStarted.value = true;
+    return;
+  }
+
+  introductionStarted.value = true;
 
   const startTime = performance.now();
   const frame = (now: number) => {
@@ -668,9 +802,43 @@ onBeforeUnmount(() => {
   <div
     class="title-page__framework-scroll-stage"
     :class="{ 'is-k3': k3Started }"
-    :style="frameworkScrollStageStyle"
-    aria-hidden="true"
-  ></div>
+    :style="[frameworkScrollStageStyle, introductionStarted ? introductionStageStyle : undefined]"
+  >
+    <article
+      v-if="introductionStarted"
+      class="introduction-content"
+      aria-labelledby="introduction-greeting"
+    >
+      <h2 id="introduction-greeting" class="introduction-content__greeting">
+        <span
+          class="introduction-content__chunk"
+          :style="{ '--intro-delay': introductionView.greetingDelay }"
+        >{{ introductionView.greeting }}</span>
+        <span
+          class="introduction-content__chunk"
+          :style="{ '--intro-delay': introductionView.nameDelay }"
+        ><span class="introduction-content__name-mark">{{ introductionView.name }}</span></span>
+        <span
+          class="introduction-content__chunk"
+          :style="{ '--intro-delay': introductionView.websiteDelay }"
+        >{{ introductionView.website }}</span>
+      </h2>
+
+      <p v-for="(paragraph, paragraphIndex) in introductionView.paragraphs" :key="paragraphIndex">
+        <span
+          v-for="chunk in paragraph"
+          :key="chunk.delay"
+          class="introduction-content__chunk"
+          :style="{ '--intro-delay': chunk.delay }"
+        >{{ chunk.text }}</span>
+      </p>
+
+      <p
+        class="introduction-content__tagline introduction-content__chunk"
+        :style="{ '--intro-delay': introductionView.taglineDelay }"
+      >{{ introductionView.tagline }}</p>
+    </article>
+  </div>
 
   <div
     v-if="annotationBounds.width"
@@ -878,9 +1046,85 @@ onBeforeUnmount(() => {
 }
 
 .title-page__framework-scroll-stage {
+  position: relative;
+  display: flow-root;
   min-height: 100svh;
   background: var(--site-hero-background);
   transition: background-color 1500ms cubic-bezier(0.333333, 1, 0.666667, 1);
+}
+
+.introduction-content {
+  width: min(100%, 76rem);
+  padding-block-end: clamp(4rem, 8vw, 7rem);
+  color: var(--site-text-secondary);
+  font-family: var(--font-body);
+  font-size: clamp(0.94rem, 1vw, 1.075rem);
+  font-weight: 400;
+  line-height: 1.95;
+  text-wrap: pretty;
+}
+
+.introduction-content__greeting {
+  margin: 0 0 clamp(1.25rem, 2.7vw, 2.1rem);
+  color: var(--site-text-primary);
+  font-family: var(--font-heading);
+  font-size: clamp(1.2rem, 2vw, 1.65rem);
+  font-weight: 500;
+  line-height: 1.55;
+  letter-spacing: -0.025em;
+}
+
+.introduction-content__name-mark {
+  color: var(--site-text-primary);
+  font-family: "LXGW WenKai Lite", cursive;
+  font-size: 1.22em;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: 0;
+  background-image: linear-gradient(
+    177deg,
+    transparent 0 54%,
+    color-mix(in srgb, var(--site-brand) 76%, transparent) 54% 90%,
+    transparent 90%
+  );
+  background-repeat: no-repeat;
+  background-position: 0 0.08em;
+  background-size: 100% 100%;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.introduction-content p {
+  margin: 0 0 1.15em;
+}
+
+.introduction-content__chunk {
+  opacity: 0;
+  filter: blur(3px);
+  animation: introduction-copy-reveal 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--intro-delay, 0ms);
+}
+
+.introduction-content__tagline {
+  margin-block-start: clamp(2rem, 4vw, 3.25rem) !important;
+  color: var(--site-text-primary);
+  font-family: "SF Pro Display", var(--font-heading);
+  font-size: clamp(1.55rem, 3vw, 2.5rem);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 1.15;
+}
+
+@keyframes introduction-copy-reveal {
+  from {
+    opacity: 0;
+    filter: blur(3px);
+  }
+
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
 }
 
 .title-page__framework-scroll-stage.is-k3 {
@@ -1074,6 +1318,19 @@ onBeforeUnmount(() => {
   .framework-title {
     letter-spacing: -0.025em;
   }
+
+  .introduction-content {
+    font-size: 0.94rem;
+    line-height: 1.85;
+  }
+
+  .introduction-content__greeting {
+    font-size: 1.18rem;
+  }
+
+  .introduction-content__tagline {
+    font-size: 1.7rem;
+  }
 }
 
 @media (max-width: 360px) {
@@ -1097,6 +1354,12 @@ onBeforeUnmount(() => {
   .framework-title__character {
     opacity: 1;
     transform: none;
+    animation: none;
+  }
+
+  .introduction-content__chunk {
+    opacity: 1;
+    filter: none;
     animation: none;
   }
 
