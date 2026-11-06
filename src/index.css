@@ -17,6 +17,30 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: "LXGW WenKai Lite";
+  src: url("/fonts/LXGWWenKaiLite-Light.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "LXGW WenKai Lite";
+  src: url("/fonts/LXGWWenKaiLite-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "LXGW WenKai Lite";
+  src: url("/fonts/LXGWWenKaiLite-Medium.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
 /* Dark mode is explicitly controlled by the theme preference. */
 @custom-variant dark (&:where(.dark, .dark *));
 
