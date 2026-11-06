@@ -144,7 +144,7 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Give horizontal and vertical rules the same 0.35px solid stroke and shared theme colors.
 - [x] Align the Part-title container with the vertical guides and scale titles/row spacing to the final 0.72 ratio.
 - [x] Remove the four Part background rectangles and the extra title extension line; retain only the original underline cursor.
-- [x] Transition the page, titles, rules and cursor through one K3 content-theme state, with a darker, lower-saturation Dark palette.
+- [x] Keep the page background identical to the Hero background in Light and Dark modes; transition only titles, rules, boundaries and cursor through K3 content colors.
 - [x] Decelerate cursor blinking and leave the underline visible.
 - [x] Keep the Hero at its compact K0 base size; do not add a second K3 Hero scale-down.
 - [x] Drive the K3 top horizontal-rule inset from the same shared progress as the side boundaries, ending with equal top/left distances from the viewport edges.
