@@ -182,14 +182,14 @@ const k2LineTransforms = computed<Record<string, string>>(() => {
         ? finalBottomY - (lineDefinitions.length - 1 - index) * finalRowGap
         : compactTopY + index * compactLineGap.value;
 
-      // Keep every horizontal guide full-width. K3 compresses only the
-      // vertical distance between the five lines around their shared center.
-      // Keep the first rule attached to the shared top/left page inset.
-      // The four row gaps compress below that fixed upper boundary.
-      const compressedY =
-        heroHeight.value +
-        stageInset +
-        index * finalRowGap * k3Geometry.value.compression;
+      // During K2, preserve the compact regrouping. Once the full framework
+      // opens, keep its first rule on the shared top/left page inset and
+      // compress the four row gaps below that fixed upper boundary.
+      const compressedY = isExpanding
+        ? heroHeight.value +
+          stageInset +
+          index * finalRowGap * k3Geometry.value.compression
+        : targetY;
       const k4Offset = index === 0 ? 0 : k4Geometry.value.extraHeight;
       const k5Offset = index === 0 ? 0 : k5Geometry.value.dropOffset;
       return [
