@@ -176,17 +176,20 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Duplicate the shared Part.01/Part.02 rule at its exact pre-expansion position, close to the Part.01 title; keep that copy fixed while the original rule falls away.
 - [x] Skip the falling motion for reduced-motion users and retain Parts 02–04 in their compact positions.
 - [ ] Verify the acceleration, simultaneous scale/fall, final off-screen displacement and duplicate rule position in the browser.
-- [ ] Reveal Part.01 content from top to bottom and left to right.
-- [ ] Reveal ordinary text in short, fast phrase/token groups.
-- [ ] Reveal small UI elements with tight sequential staggering.
-- [ ] Reveal large visual components as complete objects rather than fragmented pieces.
+- [x] Reveal Part.01 content from top to bottom and left to right.
+- [x] Reveal ordinary text in short, fast phrase groups, independently of the K4/K5 geometry timeline.
+- [x] Keep the Introduction in normal document flow so the page grows to fit the complete copy.
+- [x] Provide a reduced-motion presentation with all copy immediately readable.
+- [ ] Verify the complete reveal sequence and reading order in the browser.
+- [ ] Verify the content start position against the retained Part.01/Part.02 divider at desktop and mobile widths.
 
 ### 5.3 Introduction content
 
-- [ ] Curate real biographical and technical information.
-- [ ] Select the facts and experiences that should appear in the introduction.
-- [ ] Write and review Chinese and English copy.
-- [ ] Do not invent personal history, awards or project details.
+- [x] Use the supplied biographical and technical information without inventing personal history, awards or project details.
+- [x] Preserve the supplied Chinese copy.
+- [x] Provide an English translation for the existing language selector.
+- [x] Highlight only “丰朴 FedericoPrask” in the opening sentence with the uploaded LXGW WenKai Lite face and a blue-toned highlighter treatment.
+- [ ] Review the English translation and verify the handwritten font/highlighter treatment in the browser.
 
 ## 6. Phase 4 — Remaining content Parts
 
