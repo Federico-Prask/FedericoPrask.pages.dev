@@ -1109,6 +1109,7 @@ onBeforeUnmount(() => {
 }
 
 .introduction-content__tagline {
+  display: block;
   margin-block-start: clamp(2rem, 4vw, 3.25rem) !important;
   color: var(--site-text-primary);
   font-family: "SF Pro Display", var(--font-heading);
