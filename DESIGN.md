@@ -3,7 +3,7 @@
 > **Document status:** Active design specification  
 > **Target branch:** `dev`  
 > **Project:** Federico Prask — Personal Website  
-> **Last updated:** 2026-11-04  
+> **Last updated:** 2026-11-06  
 >
 > This document is the source of truth for the redesign. Implementation decisions should follow it. If a later discussion changes a confirmed requirement, update this document before or together with the corresponding code change.
 
