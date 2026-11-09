@@ -193,7 +193,7 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Keep the Introduction in normal document flow so the page grows to fit the complete copy.
 - [x] Provide a reduced-motion presentation with all copy immediately readable.
 - [ ] Verify the complete reveal sequence and reading order in the browser.
-- [x] Measure the Introduction end and align the Part.02 lower rule 32px after it; reserve the same gap before the Works boundary.
+- [x] Measure the Introduction end and position the Part.02 title row 24px after it; reserve the title row's full compact height plus 24px in normal flow.
 - [ ] Verify the tagline-to-rule gap, Works boundary and absence of title overlap at desktop and mobile widths.
 
 ### 5.3 Introduction content
@@ -209,12 +209,12 @@ The active application is a deliberately small Vue page. The old page compositio
 ### 6.1 Part.02 — Works
 
 - [x] Specify Part.02 as alternating editorial collage-and-copy rows in `DESIGN.md`.
-- [x] Specify a two-step Part.02 dock: the title row's lower rule rests at the viewport bottom, then a separate downward gesture scrolls the full document upward.
-- [x] Keep Part.02 typography at its designed final size during the entrance; do not scale its title or content.
+- [x] Reuse the Part.02 title from the shared four-Part framework; do not create a separate heading strip.
+- [x] Keep Part.02 title typography, scale, row alignment and horizontal rules identical to Part.01.
 - [x] Design four alternating editorial rows: media-left/copy-right, then copy-left/media-right.
 - [x] Add bilingual category-level copy for Development, Visual Design, Music Production, and Video & Motion.
-- [x] Implement the 1150ms In-Out Cubic whole-document entrance from the dock to the Works start, with reverse playback to the dock and no typography scaling.
-- [x] Integrate two-step docking and entrance with wheel, single-touch, keyboard, native-scroll and scrollbar input; preserve free Part.01 reading and reduced-motion native flow.
+- [x] Align the Part.02 row's lower rule after the measured Introduction using its compact framework row height plus a 24px gap.
+- [x] Let native document scrolling push Part.01 out of the viewport and bring Part.02 into view; remove the dock, fixed cover and custom Works scroll interception.
 - [ ] Define separate entrance behavior for Parts 03 and 04; do not assume they share Part.02's motion.
 - [ ] Curate Development projects.
 - [ ] Curate Graphic Design works.
@@ -282,11 +282,10 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Put the page under one page-level Scene owned by `TitlePage.vue`.
 - [x] Inline Works data, layout and content in that Scene; remove the separate Works section component.
 - [x] Keep Works, Milestones and Beyond in the same normal document flow after Introduction.
-- [x] Temporarily fix the Part.02 Scene only during dock, cover and reverse states; return the same element to normal flow after the cover.
-- [x] Reserve its normal-flow position with a temporary viewport-height slot during the fixed transition.
-- [x] Keep normal Works reading on native `window` scrolling; remove the nested scroll container and manual wheel/touch `scrollTop` updates.
-- [x] Intercept input only at the Part.02 dock and reverse boundaries; require a separate gesture after the current gesture reaches a boundary.
+- [x] Keep Part.02, Milestones and Beyond in normal document flow inside the single page Scene.
+- [x] Remove the fixed Part.02 layer, temporary viewport slot, dock and cover/reverse states.
+- [x] Keep all reading on native `window` scrolling; do not add a nested scroll container or manually adjust wheel/touch deltas.
 - [x] Keep the page-edge vertical rails attached to the shared Scene.
 - [ ] Run `vp build` locally.
-- [ ] Browser-test the first-gesture dock, second-gesture cover, native trackpad momentum, touch/keyboard scrolling, reverse at Works top, responsive resize and reduced-motion mode.
-- [ ] Verify the Introduction tagline and Part.02 heading have no overlap at desktop and mobile widths.
+- [ ] Browser-test native wheel/trackpad momentum, touch/keyboard/scrollbar reading, responsive resize and reduced-motion mode.
+- [ ] Verify the Part.02 shared title row begins 24px after the tagline, matches Part.01 typography exactly, and does not overlap Works content.
