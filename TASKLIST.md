@@ -212,11 +212,12 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Reuse the Part.02 title from the shared four-Part framework; do not create a separate heading strip.
 - [x] Keep Part.02 title typography, scale, row alignment and horizontal rules identical to Part.01.
 - [x] Return the Part.01 title and uppermost horizontal rule to the compact framework group before expanding Part.02.
+- [x] Keep the document stationary while the four titles and five rules reassemble; begin document movement only with Part.02 expansion.
 - [x] Design four alternating editorial rows: media-left/copy-right, then copy-left/media-right.
 - [x] Add bilingual category-level copy for Development, Visual Design, Music Production, and Video & Motion.
 - [x] Measure the Part.02 row from the actual Introduction end and preserve its original document coordinate.
 - [x] Reuse the Part.01 60vh expansion geometry and expand the Part.02 row.
-- [x] Scroll the document during framework reassembly so Part.01 leaves the viewport while Part.02 stays in its normal document position.
+- [x] Scroll the document together with Part.02 expansion so Part.01 leaves the viewport while Part.02 stays in its normal document position.
 - [x] Reverse the two-stage transition at the Part.02 top boundary after a separate upward gesture.
 - [ ] Define separate entrance behavior for Parts 03 and 04; do not assume they share Part.02's motion.
 - [ ] Curate Development projects.
