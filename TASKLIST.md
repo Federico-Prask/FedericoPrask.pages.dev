@@ -211,7 +211,7 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Specify Part.02 as alternating editorial collage-and-copy rows in `DESIGN.md`.
 - [x] Reuse the Part.02 title from the shared four-Part framework; do not create a separate heading strip.
 - [x] Keep Part.02 title typography, scale, row alignment and horizontal rules identical to Part.01.
-- [x] Reassemble all four Part titles and five original rules before the Part.02 pull-out.
+- [x] Return the Part.01 title and uppermost horizontal rule to the compact framework group before expanding Part.02.
 - [x] Design four alternating editorial rows: media-left/copy-right, then copy-left/media-right.
 - [x] Add bilingual category-level copy for Development, Visual Design, Music Production, and Video & Motion.
 - [x] Measure the Part.02 row from the actual Introduction end and preserve its original document coordinate.
