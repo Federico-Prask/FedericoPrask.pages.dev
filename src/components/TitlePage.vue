@@ -1330,6 +1330,7 @@ function handleTouchStart(event: TouchEvent) {
   if (event.touches.length !== 1) {
     touchStartY = null;
     touchLastY = null;
+    touchStartedAtPart02Top = false;
     touchBlockedUntilEnd =
       transitionPlayback.value === "forward" ||
       transitionPlayback.value === "reverse" ||
@@ -1503,9 +1504,16 @@ function handleDocumentScroll() {
     movedUp &&
     currentY < part02RowTop.value - 1
   ) {
+    const crossedFromInside = lastScrollY > part02RowTop.value + 1;
     scrollToImmediately(part02RowTop.value);
     lastScrollY = window.scrollY;
-    armPart02ReverseGestureGate();
+
+    if (crossedFromInside || part02NeedsFreshReverseGesture) {
+      armPart02ReverseGestureGate();
+      return;
+    }
+
+    beginPart02Reverse();
     return;
   }
 
@@ -1664,6 +1672,7 @@ function updateAnnotationBounds() {
 
 async function handleResize() {
   const previousHeroHeight = heroHeight.value;
+  const previousPart02RowTop = part02RowTop.value;
   const currentScrollY = window.scrollY;
   const hasActiveTransition =
     transitionPlayback.value === "forward" ||
@@ -1702,6 +1711,13 @@ async function handleResize() {
     part02Playback.value === "reverse-expand" ||
     part02Playback.value === "reverse-recompose"
   ) {
+    lastScrollY = window.scrollY;
+    return;
+  }
+
+  if (part02Playback.value === "complete") {
+    const part02Offset = Math.max(0, currentScrollY - previousPart02RowTop);
+    scrollToImmediately(part02RowTop.value + part02Offset);
     lastScrollY = window.scrollY;
     return;
   }
@@ -2624,7 +2640,8 @@ onBeforeUnmount(() => {
   visibility: hidden;
 }
 
-.framework-titles.is-part02-transition .framework-title {
+.framework-titles.is-part02-transition .framework-title,
+.framework-titles.is-part02-transition .framework-title:nth-child(n + 3) {
   visibility: visible;
 }
 
