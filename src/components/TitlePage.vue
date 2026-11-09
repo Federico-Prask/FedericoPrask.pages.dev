@@ -2541,7 +2541,7 @@ onBeforeUnmount(() => {
 @media (max-width: 760px) {
   .works-section {
     width: calc(100% - 2.5rem);
-    padding-block: 4.5rem 6rem;
+    padding-block: 0 6rem;
   }
 
   .works-section__header {
