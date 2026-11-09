@@ -585,7 +585,8 @@ function deactivateWorksOverlay() {
 function beginWorksReverse() {
   if (worksPlayback.value !== "complete") return;
   const overlay = worksOverlayRef.value;
-  if (!overlay || overlay.scrollTop > 1) return;
+  const scroller = overlay?.querySelector<HTMLElement>(".works-overlay__scroll");
+  if (!overlay || !scroller || scroller.scrollTop > 1) return;
 
   worksPlayback.value = "reverse";
   blockCurrentInputGestures();
@@ -1053,11 +1054,9 @@ function handleWheel(event: WheelEvent) {
   if (
     worksPlayback.value === "complete" &&
     event.deltaY < 0 &&
-    worksOverlayRef.value?.scrollTop === 0
+    worksOverlayRef.value?.querySelector<HTMLElement>(".works-overlay__scroll")?.scrollTop === 0
   ) {
     event.preventDefault();
-    scrollToImmediately(worksBoundary);
-    lastScrollY = window.scrollY;
     beginWorksReverse();
     return;
   }
@@ -1175,12 +1174,10 @@ function handleTouchMove(event: TouchEvent) {
 
   if (
     worksPlayback.value === "complete" &&
-    worksOverlayRef.value?.scrollTop === 0 &&
+    worksOverlayRef.value?.querySelector<HTMLElement>(".works-overlay__scroll")?.scrollTop === 0 &&
     stepDelta < -8
   ) {
     event.preventDefault();
-    scrollToImmediately(worksBoundary);
-    lastScrollY = window.scrollY;
     beginWorksReverse();
     touchBlockedUntilEnd = true;
     return;
