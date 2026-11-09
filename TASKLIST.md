@@ -309,3 +309,13 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Reverse the overlay at its scroll origin and reveal Part.01 again.
 - [x] Keep Part.03 and Part.04 inside the overlay after Works and Milestones respectively.
 - [ ] Browser-test dock alignment, cover/reverse motion, nested scrolling, keyboard, touch, and responsive resizing.
+
+
+- [x] Keep the Part.01 framework title visible after the Part.02–04 titles finish falling.
+- [x] Align the dock to the actual lower rule of the Part.02 row (expanded Part.01 row plus two compact rows).
+- [x] Prevent the Part.02 dock from activating before K5 and the Part.01/Part.02 framework geometry have completed.
+- [x] Add left and right page-edge rules to the fixed Part.02 overlay.
+- [x] Lock both document root and body while the overlay is active.
+- [x] Route wheel, touch, and keyboard scrolling into the overlay's own content scroller; reverse only at its top boundary.
+- [x] Keep Works/Milestones/Beyond in normal flow for reduced-motion users.
+- [ ] Browser-test the four interaction states and desktop/mobile boundary alignment.
