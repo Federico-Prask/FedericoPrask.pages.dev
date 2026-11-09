@@ -19,6 +19,13 @@ type K2Phase =
   | "reverse-expand"
   | "reverse-recompose";
 type TransitionPlayback = "idle" | "forward" | "complete" | "reverse";
+type Part02Playback =
+  | "idle"
+  | "recompose"
+  | "expand"
+  | "complete"
+  | "reverse-expand"
+  | "reverse-recompose";
 type ScrollEasing = "in-out-cubic" | "out-cubic" | "reverse-out-cubic";
 type ActiveScrollAnimation = {
   progress: number;
@@ -47,6 +54,10 @@ const k5Progress = ref(0);
 const introductionStarted = ref(false);
 const introductionContentRef = ref<HTMLElement | null>(null);
 const worksFrameworkDropDistance = ref(0);
+const part02RowTop = ref(0);
+const part02Playback = ref<Part02Playback>("idle");
+const part02RecomposeProgress = ref(0);
+const part02ExpansionProgress = ref(0);
 const transitionPlayback = ref<TransitionPlayback>("idle");
 const k3Reversing = ref(false);
 const heroNameInset = ref(0);
@@ -362,8 +373,26 @@ const k4Geometry = computed(() => {
 });
 
 const PART_TITLE_CONTENT_GAP = 24;
+const PART02_RECOMPOSE_DURATION = 760;
+const PART02_EXPANSION_DURATION = K4_K5_TRANSITION_DURATION;
+const PART02_TRIGGER_VIEWPORT_RATIO = 0.36;
+const part02ExpansionExtra = computed(() =>
+  Math.max(
+    0,
+    viewport.value.height * K4_PART01_HEIGHT_RATIO - k4Geometry.value.compactRowHeight,
+  ) * part02ExpansionProgress.value,
+);
+const part02RowHeight = computed(
+  () => k4Geometry.value.compactRowHeight + part02ExpansionExtra.value,
+);
 const part02HeadingSpacerHeight = computed(
-  () => k4Geometry.value.compactRowHeight + PART_TITLE_CONTENT_GAP,
+  () => part02RowHeight.value + PART_TITLE_CONTENT_GAP,
+);
+const part02TriggerY = computed(() =>
+  Math.max(
+    heroHeight.value,
+    part02RowTop.value - viewport.value.height * PART02_TRIGGER_VIEWPORT_RATIO,
+  ),
 );
 
 const k5Geometry = computed(() => {
@@ -425,6 +454,40 @@ const k2LineTransforms = computed<Record<string, string>>(() => {
     k2Phase.value === "titles" ||
     k2Phase.value === "reverse-titles";
 
+  const part02TransitionActive = part02Playback.value !== "idle";
+  const part02RecomposeOffset =
+    k4Geometry.value.extraHeight + k5Geometry.value.dropOffset;
+
+  if (part02TransitionActive) {
+    const compactRowHeight = k4Geometry.value.compactRowHeight;
+    const recompose = part02Playback.value === "recompose" ||
+      part02Playback.value === "reverse-recompose";
+    const progress = recompose ? part02RecomposeProgress.value : 1;
+    const groupTop = part02RowTop.value - compactRowHeight;
+    const firstRuleY = heroHeight.value + stageInset +
+      part02RecomposeOffset * progress;
+    const rowHeights = [
+      compactRowHeight,
+      part02RowHeight.value,
+      compactRowHeight,
+      compactRowHeight,
+    ];
+    const targets = [
+      firstRuleY,
+      groupTop + compactRowHeight,
+      groupTop + compactRowHeight + rowHeights[1],
+      groupTop + compactRowHeight + rowHeights[1] + compactRowHeight,
+      groupTop + compactRowHeight + rowHeights[1] + compactRowHeight * 2,
+    ];
+
+    return Object.fromEntries(
+      lineDefinitions.map((line, index) => [
+        line.id,
+        makeLineMatrix(line.y, 0, targets[index], width),
+      ]),
+    );
+  }
+
   // Keep the expanded geometry while reverse-title exit runs. As soon as
   // reverse-expand begins, the targets become the compact five-line group;
   // LogoAnnotation supplies the inverse In Cubic transition for that move.
@@ -469,6 +532,7 @@ const k2LineDelays = computed<Record<string, string>>(() =>
 );
 
 const k5DividerCopyTransform = computed(() => {
+  if (part02Playback.value !== "idle") return "";
   const bounds = annotationBounds.value;
   const { width, height } = viewport.value;
   if (!bounds.width || !width || !height) return "";
@@ -488,24 +552,52 @@ const frameworkTitlesStyle = computed(() => {
   const bounds = annotationBounds.value;
   const { width } = viewport.value;
   const geometry = k3Geometry.value;
-  const stageTop = heroHeight.value + geometry.stageInset - bounds.top;
+  const compactRowHeight = k4Geometry.value.compactRowHeight;
+  const part02TransitionActive = part02Playback.value !== "idle";
+  const recompose = part02Playback.value === "recompose" ||
+    part02Playback.value === "reverse-recompose";
+  const progress = recompose ? part02RecomposeProgress.value : 1;
+  const originalTop = heroHeight.value + geometry.stageInset;
+  const recomposeOffset =
+    k4Geometry.value.extraHeight + k5Geometry.value.dropOffset;
+  const groupTop = part02RowTop.value - compactRowHeight;
+  const titleTop = part02TransitionActive
+    ? originalTop + (groupTop - originalTop) * progress
+    : originalTop;
+  const firstRowHeight = part02TransitionActive
+    ? k4Geometry.value.firstRowHeight +
+      (compactRowHeight - k4Geometry.value.firstRowHeight) * progress
+    : k4Geometry.value.firstRowHeight;
+  const secondRowHeight = part02TransitionActive
+    ? part02RowHeight.value
+    : compactRowHeight;
+  const fallOffset = part02TransitionActive
+    ? k5Geometry.value.dropOffset * (1 - progress)
+    : k5Geometry.value.dropOffset;
+
   return {
     left: geometry.titleInset - bounds.left + "px",
-    top: stageTop + "px",
+    top: titleTop - bounds.top + "px",
     width: width - geometry.titleInset * 2 + "px",
-    height: k4Geometry.value.totalHeight + "px",
+    height: part02TransitionActive
+      ? firstRowHeight + secondRowHeight + compactRowHeight * 2 + "px"
+      : k4Geometry.value.totalHeight + "px",
     "--framework-title-size": geometry.titleFontSize + "px",
     "--framework-title-scale": geometry.compression,
-    "--framework-first-row-height": k4Geometry.value.firstRowHeight + "px",
-    "--framework-compact-row-height": k4Geometry.value.compactRowHeight + "px",
+    "--framework-first-row-height": firstRowHeight + "px",
+    "--framework-part02-row-height": secondRowHeight + "px",
+    "--framework-compact-row-height": compactRowHeight + "px",
     "--framework-first-title-offset":
-      (k4Geometry.value.compactRowHeight - geometry.titleFontSize) / 2 + "px",
-    "--framework-fall-offset": k5Geometry.value.dropOffset + "px",
+      (compactRowHeight - geometry.titleFontSize) / 2 + "px",
+    "--framework-second-title-offset":
+      (compactRowHeight - geometry.titleFontSize) / 2 + "px",
+    "--framework-recompose-offset": recomposeOffset * progress + "px",
+    "--framework-fall-offset": fallOffset + "px",
   };
 });
 
 const frameworkScrollStageStyle = computed(() => ({
-  minHeight: `calc(100svh + ${k4Geometry.value.extraHeight}px)`,
+  minHeight: `calc(100svh + ${k4Geometry.value.extraHeight + part02ExpansionExtra.value}px)`,
 }));
 
 const introductionStageStyle = computed(() => ({
@@ -586,7 +678,9 @@ async function updatePart02FrameworkPosition() {
   if (!article) return;
 
   const articleBottom = article.getBoundingClientRect().bottom + window.scrollY;
-  const targetPart02Bottom = articleBottom + part02HeadingSpacerHeight.value;
+  part02RowTop.value = articleBottom + PART_TITLE_CONTENT_GAP;
+  const targetPart02Bottom =
+    part02RowTop.value + k4Geometry.value.compactRowHeight;
   worksFrameworkDropDistance.value =
     targetPart02Bottom - getFinalPart02RowBottomY();
   await nextTick();
