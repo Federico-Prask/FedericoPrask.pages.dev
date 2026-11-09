@@ -635,11 +635,11 @@ Part.02, Part.03 and Part.04 move downward to make room for Part.01's content.
 
 The fall begins on the same frame as K4 expansion; it does not wait for K4 to complete. K4 and K5 share one **1250ms In Cubic** animation driver and one progress value for downward movement. This is a position-only translation: Part.02–04 title font sizes and scales remain unchanged throughout. Do not split the movement into an expansion displacement followed by a second fall.
 
-The fall distance is greater than one viewport height (the current source target is viewport height + the expanded framework height + 48px). The In Cubic curve must provide unmistakable acceleration, carrying Parts 02–04 and their moving horizontal rules completely beyond the viewport rather than allowing them to settle inside it.
+The final fall distance is calculated from the Introduction's measured rendered end, not from a fixed viewport-sized constant. At the end of the shared In Cubic timeline, the lower rule of the Part.02 row sits 32px after the Introduction; Parts 03 and 04 continue below it in their original compact order. This keeps the framework titles and rules attached to the content structure instead of letting their absolute-positioned overlay drift into the Works text.
 
 The rule directly above Part.02 (`guide-mono-h-04`) is shared by Part.01 and Part.02. Before the combined animation starts, duplicate it at its exact pre-expansion position, close to the Part.01 title. Keep this copy fixed as Part.01's boundary. The original shared rule moves down with Part.02–04 and the other lower rules. Do not place the retained copy at the expanded 60vh boundary or move it during the fall.
 
-The fall is a one-time transform, not ordinary layout reflow. For reduced-motion users, skip the fall and leave Parts 02–04 visible in their compact positions.
+The fall is a one-time transform, not ordinary layout reflow. For reduced-motion users, skip the interpolation and place Parts 02–04 directly at their measured final positions after the Introduction, preserving their compact row heights.
 
 ### 9.2 Part.01 content reading order
 
@@ -709,7 +709,7 @@ The Chinese copy is the supplied first-person text and must not be rewritten int
 
 After the reader reaches the end of the Part.01 Introduction, the Part.02 framework title row must be visible as a narrow strip at the bottom of the viewport. Its lower horizontal rule aligns with the viewport bottom; the Part.03 and Part.04 title rows remain below the viewport. The final Part.01 tagline, “Explore. Experiment. Create.”, remains visible immediately above this Part.02 strip.
 
-The first downward scroll from the Introduction is ordinary reading navigation and only docks the page at this position. A separate, subsequent downward scroll starts the Part.02 entrance. Do not start the entrance on the same gesture that reaches the dock. The dock is derived from the bottom edge of the Part.02 framework row, not from the end of an arbitrary transformed element. A normal-flow spacer keeps the Works content start aligned with that row boundary.
+The first downward scroll from the Introduction is ordinary reading navigation and only docks the page at this position. A separate, subsequent downward scroll starts the Part.02 entrance. Do not start the entrance on the same gesture that reaches the dock. The dock is derived from the bottom edge of the Part.02 framework row, not from the end of an arbitrary transformed element. Measure the actual Introduction end after it is mounted, position the Part.02 lower rule 32px after it, and reserve that same 32px in normal flow so the Works start aligns with the rule. Never use a fixed viewport-sized K5 offset: the Part.02–04 titles and rules must not overlap Works copy.
 
 Treat Part.02 as an editorial portfolio composed of alternating collage-and-copy rows, not as a table or a grid of uniform project cards. The first row places its collage on the left and copy on the right; the second reverses those sides; subsequent rows continue the alternation. Each collage uses overlapping, differently sized media surfaces with intentional offsets and varied aspect ratios. On narrow screens, stack the collage above its copy while preserving the row sequence. The four initial editorial groups are Development, Visual Design, Music Production, and Video & Motion. The current colored surfaces are format placeholders, not claimed portfolio artifacts; replace them with the user's actual selected media when supplied.
 
