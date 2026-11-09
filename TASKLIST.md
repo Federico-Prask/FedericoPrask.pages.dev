@@ -277,52 +277,16 @@ The active application is a deliberately small Vue page. The old page compositio
 9. Do not mark visual verification tasks complete until they have been checked in a browser.
 
 
-### Part.02 first layout pass
+### Part.02 unified page Scene
 
-- [x] Add the Works section after the Introduction in normal document flow.
-- [x] Add four alternating media/copy rows with responsive stacking.
-- [x] Add colored collage placeholders to establish the intended media proportions and overlap.
-- [ ] Replace placeholders with the user's actual curated work images after they are uploaded/selected.
-- [x] Implement the two-step Part.02 dock and whole-document entrance/reverse interaction; browser verification remains pending.
-
-
-### Part.02 transition implementation
-
-- [x] Align a normal-flow Works boundary marker with the Part.02 framework row's lower rule using a measured spacer.
-- [x] Dock on the first downward gesture; start the whole-document In-Out Cubic scroll on the next downward gesture.
-- [x] Reverse the whole-document scroll from the Works start boundary back to the dock.
-- [x] Lock directional input during the document-scroll transition and preserve its progress on viewport resize.
-- [ ] Browser-test the first-gesture dock, second-gesture whole-document entrance, reverse playback, boundary alignment, scrollbar/touch/keyboard input and responsive resizing.
-- [ ] Verify reduced-motion native scrolling and the Part.02 dock alignment in a browser.
-
-
-- [x] Keep the Part.02 entrance strip attached to the Introduction/Works boundary and preserve the whole-document upward cover transition.
-- [x] Hide Part.03 and Part.04 in the absolute opening overlay after K5 completes.
-- [x] Render Part.03 after Works and Part.04 after the Milestones section in normal document flow.
-- [ ] Add curated Milestones and Beyond content; their current sections are structural anchors only.
-- [ ] Browser-verify Part.02 cover motion and the Part.03/04 boundaries at desktop and mobile widths.
-
-
-- [x] Replace the Part.02 document-scroll animation with a fixed overlay that physically covers the stationary Part.01 layer.
-- [x] Animate the overlay itself with 1150ms In-Out Cubic easing; keep the document scroll position stationary during the cover.
-- [x] Lock body scrolling after entry and move subsequent reading into the overlay's own scroll container.
-- [x] Reverse the overlay at its scroll origin and reveal Part.01 again.
-- [x] Keep Part.03 and Part.04 inside the overlay after Works and Milestones respectively.
-- [ ] Browser-test dock alignment, cover/reverse motion, nested scrolling, keyboard, touch, and responsive resizing.
-
-
-- [x] Keep the Part.01 framework title visible after the Part.02–04 titles finish falling.
-- [x] Align the dock to the actual lower rule of the Part.02 row (expanded Part.01 row plus two compact rows).
-- [x] Prevent the Part.02 dock from activating before K5 and the Part.01/Part.02 framework geometry have completed.
-- [x] Add left and right page-edge rules to the fixed Part.02 overlay.
-- [x] Lock both document root and body while the overlay is active.
-- [x] Route wheel, touch, and keyboard scrolling into the overlay's own content scroller; reverse only at its top boundary.
-- [x] Keep Works/Milestones/Beyond in normal flow for reduced-motion users.
-- [ ] Browser-test the four interaction states and desktop/mobile boundary alignment.
-
-- [x] Require a fresh wheel gesture after the docking gesture; continuous wheel bursts cannot immediately trigger the cover.
-
-- [x] Correct Part.02 dock geometry to the lower rule after the expanded Part.01 row and one compact Part.02 row.
-- [x] Keep the Part.01 title visible after the K5 fall; hide only the duplicate fallen Part.02–04 titles.
-- [x] Show the Part.02 dock only after K5 has completed and the measured Introduction boundary is reached.
-- [x] Separate the docking gesture from the next wheel gesture with an idle interval; touch and keyboard use their own gesture/key boundaries.
+- [x] Put the page under one page-level Scene owned by `TitlePage.vue`.
+- [x] Inline Works data, layout and content in that Scene; remove the separate Works section component.
+- [x] Keep Works, Milestones and Beyond in the same normal document flow after Introduction.
+- [x] Temporarily fix the Part.02 Scene only during dock, cover and reverse states; return the same element to normal flow after the cover.
+- [x] Reserve its normal-flow position with a temporary viewport-height slot during the fixed transition.
+- [x] Keep normal Works reading on native `window` scrolling; remove the nested scroll container and manual wheel/touch `scrollTop` updates.
+- [x] Intercept input only at the Part.02 dock and reverse boundaries; require a separate gesture after the current gesture reaches a boundary.
+- [x] Keep the page-edge vertical rails attached to the shared Scene.
+- [ ] Run `vp build` locally.
+- [ ] Browser-test the first-gesture dock, second-gesture cover, native trackpad momentum, touch/keyboard scrolling, reverse at Works top, responsive resize and reduced-motion mode.
+- [ ] Verify the Introduction tagline and Part.02 heading have no overlap at desktop and mobile widths.
