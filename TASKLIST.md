@@ -301,3 +301,11 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Render Part.03 after Works and Part.04 after the Milestones section in normal document flow.
 - [ ] Add curated Milestones and Beyond content; their current sections are structural anchors only.
 - [ ] Browser-verify Part.02 cover motion and the Part.03/04 boundaries at desktop and mobile widths.
+
+
+- [x] Replace the Part.02 document-scroll animation with a fixed overlay that physically covers the stationary Part.01 layer.
+- [x] Animate the overlay itself with 1150ms In-Out Cubic easing; keep the document scroll position stationary during the cover.
+- [x] Lock body scrolling after entry and move subsequent reading into the overlay's own scroll container.
+- [x] Reverse the overlay at its scroll origin and reveal Part.01 again.
+- [x] Keep Part.03 and Part.04 inside the overlay after Works and Milestones respectively.
+- [ ] Browser-test dock alignment, cover/reverse motion, nested scrolling, keyboard, touch, and responsive resizing.
