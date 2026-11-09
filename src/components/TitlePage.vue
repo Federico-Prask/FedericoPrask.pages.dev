@@ -654,18 +654,20 @@ function beginWorksEntrance() {
     { duration: WORKS_TRANSITION_DURATION, easing: "cubic-bezier(0.645, 0.045, 0.355, 1)", fill: "forwards" },
   );
   worksSceneAnimation.onfinish = () => {
+    const finishedAnimation = worksSceneAnimation;
     worksSceneAnimation = null;
-    finishWorksEntrance();
+    finishWorksEntrance(finishedAnimation ?? undefined);
   };
 }
 
-function finishWorksEntrance() {
+function finishWorksEntrance(finishedAnimation?: Animation) {
   const scene = worksSceneRef.value;
   if (!scene) return;
   const boundary = getWorksBoundaryY();
   if (boundary !== null) scrollToImmediately(boundary);
   scene.style.transform = "none";
   worksPlayback.value = "complete";
+  finishedAnimation?.cancel();
   lastScrollY = window.scrollY;
 }
 
@@ -681,11 +683,13 @@ function beginWorksReverse() {
   scene.style.transform = "translate3d(0, 0, 0)";
 
   const finishReverse = () => {
+    const finishedAnimation = worksSceneAnimation;
     worksSceneAnimation = null;
     const dockY = getWorksDockScrollY();
     if (dockY !== null) scrollToImmediately(dockY);
     scene.style.transform = "";
     worksPlayback.value = "docked";
+    finishedAnimation?.cancel();
     clearFreshWorksWheelGesture();
     lastScrollY = window.scrollY;
   };
