@@ -1464,19 +1464,17 @@ The section is placed after the Introduction in normal document flow. Its dedica
 
 ### 6.7 Part.02 entrance and reverse interaction
 
-The Works section remains in normal document flow; it is never translated independently of the page. A spacer after the Introduction aligns the Works start with the lower boundary of the Part.02 framework title row. The initial dock position is one viewport height above that boundary, so the Part.02 strip's lower rule rests at the bottom of the viewport while Parts 03 and 04 remain below it.
+Part.02 is a dedicated fixed overlay, not a Works section moved by document scrolling. Its dock point is aligned to the lower horizontal rule of the Part.02 framework row, which is placed 32px after the measured end of the Introduction. The first downward gesture that reaches the dock only snaps the document to that point and reveals the bottom title strip. A separate downward gesture starts the 1150ms In-Out Cubic overlay entrance.
 
-The first downward gesture that reaches the dock only snaps to that position. A second, distinct downward gesture starts a 1150ms In-Out Cubic document-scroll animation from the dock to the Works start. The complete page moves together, including the framework title strip, horizontal rule, background, Part.01 and Works content. The scroll distance is one viewport height. During the animation, wheel, touch, keyboard, native document-scroll and scrollbar input are locked; Ctrl+wheel zoom and multi-touch remain untouched.
+The overlay itself moves from the bottom of the viewport to cover the stationary Part.01 layer. The document `scrollY` does not animate during this transition. Once the cover finishes, the document root and body are locked and the overlay's own scroll container takes over. Reverse animation is available only after the overlay content has been scrolled all the way to its top; the gesture that merely returns content to the top does not also reverse the cover.
 
-At the Works start boundary, upward input returns the document to the dock along the same In-Out Cubic trajectory. From the dock, upward input resumes ordinary Part.01 reading navigation. Reduced-motion users do not dock or animate; they use native document scrolling with the Works section in normal flow.
+Touch input uses the end of the current touch gesture as the dock/entrance boundary. Keyboard input uses key release. A continuous wheel burst is not treated as two gestures: after docking, a 240ms wheel-idle interval is required before the next downward wheel gesture can start the cover. Reduced-motion users skip the dock and cover and read Works, Milestones and Beyond in normal document flow.
 
+### 6.8 Part heading ownership and content boundaries
 
-### 6.8 Part heading ownership and document-flow boundaries
+The opening framework introduces all four Part titles during K2–K5. After K5, the Part.01 title remains visible; the fallen Part.02–04 title instances in the opening framework are hidden to prevent duplicates. A separate Part.02 heading belongs to the fixed overlay and appears only at the dock.
 
-The K2–K5 opening framework still introduces all four Part titles together. After K5 completes, Part.03 and Part.04 are hidden in the absolute opening overlay so they cannot float over Works content. Part.02 remains attached to the Introduction/Works boundary and participates in the whole-document upward cover transition.
-
-Part.03 is rendered in normal document flow immediately after the complete Works section. Part.04 is rendered in normal document flow after the Milestones section. Their positions are determined by the actual preceding section heights, not by a shared fixed offset or the opening framework grid. Milestones and Beyond are currently structural anchors only; no placeholder copy or fabricated milestones are added.
-
+In normal-motion mode, Part.03 is rendered after the complete Works section inside the Part.02 overlay. Part.04 follows the Milestones section inside that same overlay. Their positions therefore follow the actual preceding content heights. They are not floating rows in the middle of Works. In reduced-motion mode, all three content sections are placed in normal document flow.
 
 ### 6.9 Part.02 is a fixed overlay, not document scrolling
 
