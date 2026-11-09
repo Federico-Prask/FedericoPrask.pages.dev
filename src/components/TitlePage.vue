@@ -4,7 +4,6 @@ import { useI18n } from "../composables/useI18n";
 import { useTheme } from "../composables/useTheme";
 import LogoMark from "./LogoMark.vue";
 import LogoAnnotation from "./LogoAnnotation.vue";
-import WorksSection from "./WorksSection.vue";
 
 const { locale, setLocale } = useI18n();
 const { pref, resolved, cycle } = useTheme();
@@ -52,12 +51,10 @@ const introductionContentRef = ref<HTMLElement | null>(null);
 const worksSpacerHeight = ref(0);
 const worksFrameworkDropDistance = ref(0);
 const worksBoundaryRef = ref<HTMLElement | null>(null);
-const worksOverlayRef = ref<HTMLElement | null>(null);
-let worksOverlayAnimation: Animation | null = null;
-let documentOverflowBeforeWorks: { root: string; body: string } | null = null;
+const worksSceneRef = ref<HTMLElement | null>(null);
+let worksSceneAnimation: Animation | null = null;
 let worksWheelReleaseTimer: number | undefined;
 let worksNeedsFreshWheelGesture = false;
-let lockedDocumentScrollY = 0;
 const transitionPlayback = ref<TransitionPlayback>("idle");
 const k3Reversing = ref(false);
 const heroNameInset = ref(0);
@@ -215,6 +212,96 @@ const introductionView = computed(() => {
     taglineDelay: nextDelay(),
   };
 });
+const isZh = computed(() => locale.value === "zh");
+
+const works = computed(() => isZh.value ? [
+  {
+    number: "01",
+    category: "DEVELOPMENT",
+    title: "把想法变成可以运行的东西。",
+    description: "从算法与数据结构，到软件架构、交互界面和 Web 应用。我关注问题本身，也在意实现过程中的结构、细节与体验。",
+    note: "SOFTWARE · WEB · EXPERIMENTS",
+    layout: "development",
+    mediaLabel: "开发作品预览占位区域",
+  },
+  {
+    number: "02",
+    category: "VISUAL DESIGN",
+    title: "让信息拥有清晰的视觉秩序。",
+    description: "通过版式、字体、色彩与图形组织内容，在界面设计和视觉实验中寻找功能与表达之间的平衡。",
+    note: "LAYOUT · TYPOGRAPHY · GRAPHICS",
+    layout: "design",
+    mediaLabel: "视觉设计作品预览占位区域",
+  },
+  {
+    number: "03",
+    category: "MUSIC PRODUCTION",
+    title: "用声音构建另一种表达。",
+    description: "在 FL Studio 中尝试编曲、音色设计与音乐制作，探索节奏、层次和音色之间的关系。",
+    note: "FL STUDIO · ARRANGEMENT · SOUND",
+    layout: "music",
+    mediaLabel: "音乐制作作品预览占位区域",
+  },
+  {
+    number: "04",
+    category: "VIDEO & MOTION",
+    title: "让画面在时间中发生变化。",
+    description: "从视频剪辑与后期处理，到动态视觉和封面设计，尝试把静态构图延伸为连续的视觉叙事。",
+    note: "EDITING · MOTION · VISUAL STORY",
+    layout: "motion",
+    mediaLabel: "视频与动态设计作品预览占位区域",
+  },
+] : [
+  {
+    number: "01",
+    category: "DEVELOPMENT",
+    title: "Turning ideas into things that work.",
+    description: "From algorithms and data structures to software architecture, interfaces, and web applications. I care about the problem itself, as well as the structure, details, and experience of its implementation.",
+    note: "SOFTWARE · WEB · EXPERIMENTS",
+    layout: "development",
+    mediaLabel: "Development work preview placeholder",
+  },
+  {
+    number: "02",
+    category: "VISUAL DESIGN",
+    title: "Giving information a visual order.",
+    description: "Using layout, typography, color, and graphics to organize content, while exploring the balance between function and expression in interface design and visual experiments.",
+    note: "LAYOUT · TYPOGRAPHY · GRAPHICS",
+    layout: "design",
+    mediaLabel: "Visual design work preview placeholder",
+  },
+  {
+    number: "03",
+    category: "MUSIC PRODUCTION",
+    title: "Finding another way to express ideas through sound.",
+    description: "Experimenting with arrangement, sound design, and music production in FL Studio, exploring the relationships between rhythm, layers, and timbre.",
+    note: "FL STUDIO · ARRANGEMENT · SOUND",
+    layout: "music",
+    mediaLabel: "Music production preview placeholder",
+  },
+  {
+    number: "04",
+    category: "VIDEO & MOTION",
+    title: "Letting images unfold through time.",
+    description: "From video editing and post-production to motion graphics and cover design, extending static compositions into continuous visual narratives.",
+    note: "EDITING · MOTION · VISUAL STORY",
+    layout: "motion",
+    mediaLabel: "Video and motion design preview placeholder",
+  },
+]);
+
+const sectionLabel = computed(() => isZh.value ? "精选作品与创作实践" : "Selected work & creative practice");
+const sectionIntro = computed(() => isZh.value
+  ? "从软件开发到视觉与音视频创作。不同媒介，不同方法，都是探索与表达的一部分。"
+  : "From software development to visual and audio-visual creation. Different media and methods, all part of the same process of exploration and expression.");
+
+const worksSceneSlotHeight = computed(() =>
+  !prefersReducedMotion &&
+  (worksPlayback.value === "docked" || worksPlayback.value === "forward" || worksPlayback.value === "reverse")
+    ? viewport.value.height
+    : 0,
+);
+
 const annotationStyle = computed(() => ({
   left: annotationBounds.value.left + "px",
   top: annotationBounds.value.top + "px",
@@ -460,6 +547,7 @@ let touchStartY: number | null = null;
 let touchLastY: number | null = null;
 let touchGestureActive = false;
 let touchBlockedUntilEnd = false;
+let touchStartedAtWorksTop = false;
 const pressedScrollKeys = new Set<string>();
 const blockedScrollKeys = new Set<string>();
 let pendingK2 = false;
@@ -542,51 +630,85 @@ function getWorksDockScrollY(): number | null {
 }
 
 function beginWorksEntrance() {
-  if (
-    !introductionStarted.value ||
-    transitionPlayback.value !== "complete" ||
-    worksPlayback.value !== "docked"
-  ) return;
-
-  const overlay = worksOverlayRef.value;
-  if (!overlay) return;
+  if (!introductionStarted.value || transitionPlayback.value !== "complete" || worksPlayback.value !== "docked") return;
+  const scene = worksSceneRef.value;
+  if (!scene) return;
 
   clearFreshWorksWheelGesture();
   worksPlayback.value = "forward";
   blockCurrentInputGestures();
-  overlay.scrollTop = 0;
+  lastScrollY = window.scrollY;
+  scene.style.transform = "translate3d(0, calc(100% - var(--part02-peek)), 0)";
 
   if (prefersReducedMotion) {
-    activateWorksOverlay();
-    worksPlayback.value = "complete";
+    finishWorksEntrance();
     return;
   }
 
-  worksOverlayAnimation?.cancel();
-  worksOverlayAnimation = overlay.animate(
+  worksSceneAnimation?.cancel();
+  worksSceneAnimation = scene.animate(
     [
-      { transform: "translate3d(0, calc(100% - var(--works-overlay-peek)), 0)" },
+      { transform: "translate3d(0, calc(100% - var(--part02-peek)), 0)" },
       { transform: "translate3d(0, 0, 0)" },
     ],
     { duration: WORKS_TRANSITION_DURATION, easing: "cubic-bezier(0.645, 0.045, 0.355, 1)", fill: "forwards" },
   );
-  worksOverlayAnimation.onfinish = () => {
-    worksOverlayAnimation = null;
-    overlay.style.transform = "translate3d(0, 0, 0)";
-    activateWorksOverlay();
-    worksPlayback.value = "complete";
+  worksSceneAnimation.onfinish = () => {
+    worksSceneAnimation = null;
+    finishWorksEntrance();
   };
 }
 
-function getWorksScrollContainer(): HTMLElement | null {
-  return worksOverlayRef.value?.querySelector<HTMLElement>(".works-overlay__scroll") ?? null;
+function finishWorksEntrance() {
+  const scene = worksSceneRef.value;
+  if (!scene) return;
+  const boundary = getWorksBoundaryY();
+  if (boundary !== null) scrollToImmediately(boundary);
+  scene.style.transform = "none";
+  worksPlayback.value = "complete";
+  lastScrollY = window.scrollY;
+}
+
+function beginWorksReverse() {
+  if (worksPlayback.value !== "complete") return;
+  const scene = worksSceneRef.value;
+  const boundary = getWorksBoundaryY();
+  if (!scene || boundary === null || window.scrollY > boundary + 1) return;
+
+  worksPlayback.value = "reverse";
+  blockCurrentInputGestures();
+  lastScrollY = window.scrollY;
+  scene.style.transform = "translate3d(0, 0, 0)";
+
+  const finishReverse = () => {
+    worksSceneAnimation = null;
+    const dockY = getWorksDockScrollY();
+    if (dockY !== null) scrollToImmediately(dockY);
+    scene.style.transform = "";
+    worksPlayback.value = "docked";
+    clearFreshWorksWheelGesture();
+    lastScrollY = window.scrollY;
+  };
+
+  if (prefersReducedMotion) {
+    finishReverse();
+    return;
+  }
+
+  worksSceneAnimation?.cancel();
+  worksSceneAnimation = scene.animate(
+    [
+      { transform: "translate3d(0, 0, 0)" },
+      { transform: "translate3d(0, calc(100% - var(--part02-peek)), 0)" },
+    ],
+    { duration: WORKS_TRANSITION_DURATION, easing: "cubic-bezier(0.645, 0.045, 0.355, 1)", fill: "forwards" },
+  );
+  worksSceneAnimation.onfinish = finishReverse;
 }
 
 function armFreshWorksWheelGesture() {
   worksNeedsFreshWheelGesture = true;
-  if (worksWheelReleaseTimer !== undefined) {
-    window.clearTimeout(worksWheelReleaseTimer);
-  }
+  if (worksWheelReleaseTimer !== undefined) window.clearTimeout(worksWheelReleaseTimer);
   worksWheelReleaseTimer = window.setTimeout(() => {
     worksNeedsFreshWheelGesture = false;
     worksWheelReleaseTimer = undefined;
@@ -600,69 +722,6 @@ function clearFreshWorksWheelGesture() {
     worksWheelReleaseTimer = undefined;
   }
 }
-
-function activateWorksOverlay() {
-  const overlay = worksOverlayRef.value;
-  if (!overlay) return;
-
-  documentOverflowBeforeWorks = {
-    root: document.documentElement.style.overflow,
-    body: document.body.style.overflow,
-  };
-  lockedDocumentScrollY = window.scrollY;
-  document.documentElement.style.overflow = "hidden";
-  document.body.style.overflow = "hidden";
-  overlay.classList.add("is-active");
-  const scroller = getWorksScrollContainer();
-  if (scroller) scroller.scrollTop = 0;
-}
-
-function deactivateWorksOverlay() {
-  const overlay = worksOverlayRef.value;
-  overlay?.classList.remove("is-active");
-  if (documentOverflowBeforeWorks) {
-    document.documentElement.style.overflow = documentOverflowBeforeWorks.root;
-    document.body.style.overflow = documentOverflowBeforeWorks.body;
-  }
-  documentOverflowBeforeWorks = null;
-}
-
-function beginWorksReverse() {
-  if (worksPlayback.value !== "complete") return;
-  const overlay = worksOverlayRef.value;
-  const scroller = getWorksScrollContainer();
-  if (!overlay || !scroller || scroller.scrollTop > 1) return;
-
-  worksPlayback.value = "reverse";
-  blockCurrentInputGestures();
-
-  const finishReverse = () => {
-    deactivateWorksOverlay();
-    overlay.style.transform = "";
-    worksPlayback.value = "docked";
-    clearFreshWorksWheelGesture();
-    lastScrollY = window.scrollY;
-  };
-
-  if (prefersReducedMotion) {
-    finishReverse();
-    return;
-  }
-
-  worksOverlayAnimation?.cancel();
-  worksOverlayAnimation = overlay.animate(
-    [
-      { transform: "translate3d(0, 0, 0)" },
-      { transform: "translate3d(0, calc(100% - var(--works-overlay-peek)), 0)" },
-    ],
-    { duration: WORKS_TRANSITION_DURATION, easing: "cubic-bezier(0.645, 0.045, 0.355, 1)", fill: "forwards" },
-  );
-  worksOverlayAnimation.onfinish = () => {
-    worksOverlayAnimation = null;
-    finishReverse();
-  };
-}
-
 
 function resolveScrollEasing(
   easing: ScrollEasing,
@@ -1077,38 +1136,34 @@ function reverseK2StageA() {
 
 function handleWheel(event: WheelEvent) {
   if (event.ctrlKey) return;
-
   if (worksPlayback.value === "forward" || worksPlayback.value === "reverse") {
     event.preventDefault();
     return;
   }
 
-  if (worksPlayback.value === "complete") {
-    const scroller = getWorksScrollContainer();
-    if (!scroller || event.deltaY === 0) return;
-
-    event.preventDefault();
-    const wheelDelta = event.deltaMode === WheelEvent.DOM_DELTA_LINE
-      ? event.deltaY * 16
-      : event.deltaMode === WheelEvent.DOM_DELTA_PAGE
-        ? event.deltaY * scroller.clientHeight
-        : event.deltaY;
-    const maxScroll = Math.max(0, scroller.scrollHeight - scroller.clientHeight);
-    const nextScroll = Math.max(0, Math.min(maxScroll, scroller.scrollTop + wheelDelta));
-
-    // A gesture that merely reaches the top finishes scrolling the Works
-    // content. A subsequent upward gesture at the top reverses the cover.
-    if (event.deltaY < 0 && scroller.scrollTop <= 1) {
+  const worksBoundary = getWorksBoundaryY();
+  if (worksPlayback.value === "complete" && worksBoundary !== null && event.deltaY < 0) {
+    if (window.scrollY <= worksBoundary + 1) {
+      event.preventDefault();
+      if (worksNeedsFreshWheelGesture) {
+        armFreshWorksWheelGesture();
+        return;
+      }
+      clearFreshWorksWheelGesture();
       beginWorksReverse();
       return;
     }
-
-    scroller.scrollTop = nextScroll;
+    if (window.scrollY + event.deltaY <= worksBoundary) {
+      event.preventDefault();
+      scrollToImmediately(worksBoundary);
+      armFreshWorksWheelGesture();
+      lastScrollY = window.scrollY;
+    }
+    // All ordinary wheel input is left to the browser's native scroll pipeline.
     return;
   }
 
   const worksDockY = getWorksDockScrollY();
-
   if (worksPlayback.value === "docked") {
     if (event.deltaY > 0) {
       event.preventDefault();
@@ -1131,8 +1186,7 @@ function handleWheel(event: WheelEvent) {
     transitionPlayback.value === "complete" &&
     worksDockY !== null &&
     event.deltaY > 0 &&
-    (window.scrollY >= worksDockY - 1 ||
-      window.scrollY + event.deltaY >= worksDockY)
+    (window.scrollY >= worksDockY - 1 || window.scrollY + event.deltaY >= worksDockY)
   ) {
     event.preventDefault();
     scrollToImmediately(worksDockY);
@@ -1149,8 +1203,7 @@ function handleWheel(event: WheelEvent) {
   if (
     transitionPlayback.value === "complete" &&
     event.deltaY < 0 &&
-    (window.scrollY <= heroHeight.value + 1 ||
-      window.scrollY + event.deltaY <= heroHeight.value)
+    (window.scrollY <= heroHeight.value + 1 || window.scrollY + event.deltaY <= heroHeight.value)
   ) {
     event.preventDefault();
     scrollToImmediately(heroHeight.value);
@@ -1183,6 +1236,11 @@ function handleTouchStart(event: TouchEvent) {
   }
   touchStartY = event.touches[0].clientY;
   touchLastY = touchStartY;
+  const initialWorksBoundary = getWorksBoundaryY();
+  touchStartedAtWorksTop =
+    worksPlayback.value === "complete" &&
+    initialWorksBoundary !== null &&
+    window.scrollY <= initialWorksBoundary + 1;
   touchBlockedUntilEnd =
     transitionPlayback.value === "forward" ||
     transitionPlayback.value === "reverse" ||
@@ -1236,24 +1294,22 @@ function handleTouchMove(event: TouchEvent) {
   }
 
   if (worksPlayback.value === "complete") {
-    const scroller = getWorksScrollContainer();
-    if (!scroller) return;
+    const worksBoundary = getWorksBoundaryY();
+    if (worksBoundary === null) return;
 
-    event.preventDefault();
-    if (stepDelta < -8 && scroller.scrollTop <= 1) {
+    if (touchStartedAtWorksTop && stepDelta < -8) {
+      event.preventDefault();
       beginWorksReverse();
       touchBlockedUntilEnd = true;
       return;
     }
-
-    const maxScroll = Math.max(0, scroller.scrollHeight - scroller.clientHeight);
-    const previousTop = scroller.scrollTop;
-    scroller.scrollTop = Math.max(0, Math.min(maxScroll, previousTop + stepDelta));
-
-    // Do not turn the same swipe that reaches scrollTop=0 into a page reversal.
-    if (stepDelta < -8 && previousTop > 1 && scroller.scrollTop <= 1) {
+    if (!touchStartedAtWorksTop && window.scrollY > worksBoundary + 1 && window.scrollY + stepDelta <= worksBoundary) {
+      event.preventDefault();
+      scrollToImmediately(worksBoundary);
+      lastScrollY = window.scrollY;
       touchBlockedUntilEnd = true;
     }
+    // No preventDefault while reading: native touch momentum remains intact.
     return;
   }
 
@@ -1304,6 +1360,7 @@ function handleTouchEnd(event: TouchEvent) {
   touchGestureActive = event.touches.length > 0;
   touchStartY = null;
   touchLastY = null;
+  touchStartedAtWorksTop = false;
 
   if (event.touches.length > 0) {
     if (
@@ -1342,31 +1399,33 @@ function handleDocumentScroll() {
       const dockY = getWorksDockScrollY();
       if (dockY !== null) scrollToImmediately(dockY);
       lastScrollY = window.scrollY;
-      beginWorksEntrance();
       return;
     }
-    if (movedUp) worksPlayback.value = "idle";
+    if (movedUp) {
+      clearFreshWorksWheelGesture();
+      worksPlayback.value = "idle";
+    }
   }
 
   if (worksPlayback.value === "complete") {
-    if (Math.abs(currentY - lockedDocumentScrollY) > 1) {
-      scrollToImmediately(lockedDocumentScrollY);
+    const boundary = getWorksBoundaryY();
+    if (boundary !== null && currentY < boundary - 1) {
+      scrollToImmediately(boundary);
+      lastScrollY = window.scrollY;
+      armFreshWorksWheelGesture();
+      return;
     }
-    lastScrollY = lockedDocumentScrollY;
+    lastScrollY = currentY;
     return;
   }
 
-  if (
-    !prefersReducedMotion &&
-    worksPlayback.value === "idle" &&
-    transitionPlayback.value === "complete" &&
-    movedDown &&
-    worksDockY !== null &&
-    currentY >= worksDockY - 1
-  ) {
+  if (!prefersReducedMotion && worksPlayback.value === "idle" &&
+      transitionPlayback.value === "complete" && movedDown &&
+      worksDockY !== null && currentY >= worksDockY - 1) {
     scrollToImmediately(worksDockY);
     worksPlayback.value = "docked";
     lastScrollY = window.scrollY;
+    armFreshWorksWheelGesture();
     return;
   }
 
@@ -1383,7 +1442,6 @@ function handleDocumentScroll() {
     beginK2();
   }
 }
-
 
 function isInteractiveTarget(target: EventTarget | null): boolean {
   if (!(target instanceof Element)) return false;
@@ -1437,22 +1495,23 @@ function handleKeydown(event: KeyboardEvent) {
   }
 
   if (worksPlayback.value === "complete") {
-    const scroller = getWorksScrollContainer();
-    if (scrollUp && scroller?.scrollTop === 0) {
-      event.preventDefault();
-      beginWorksReverse();
-      blockedScrollKeys.add(key);
-      return;
-    }
-    if (scroller) {
-      event.preventDefault();
-      const amount =
-        event.key === "Home" ? -scroller.scrollTop :
-        event.key === "End" ? scroller.scrollHeight :
-        event.key === "PageDown" || event.key === "PageUp" || event.key === " " ?
-          Math.sign(scrollDown ? 1 : -1) * scroller.clientHeight * 0.85 :
-          Math.sign(scrollDown ? 1 : -1) * 64;
-      scroller.scrollBy({ top: amount, behavior: "auto" });
+    const boundary = getWorksBoundaryY();
+    if (scrollUp && boundary !== null) {
+      if (window.scrollY <= boundary + 1) {
+        event.preventDefault();
+        beginWorksReverse();
+        blockedScrollKeys.add(key);
+        return;
+      }
+      const estimatedDelta =
+        event.key === "Home" ? Number.POSITIVE_INFINITY :
+        event.key === "PageUp" || event.key === " " ? viewport.value.height : 64;
+      if (window.scrollY - estimatedDelta <= boundary) {
+        event.preventDefault();
+        scrollToImmediately(boundary);
+        lastScrollY = window.scrollY;
+        blockedScrollKeys.add(key);
+      }
     }
     return;
   }
@@ -1529,6 +1588,7 @@ async function handleResize() {
 
   if (worksPlayback.value === "complete") {
     updateAnnotationBounds();
+    lastScrollY = window.scrollY;
     return;
   }
 
@@ -1642,8 +1702,8 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   isUnmounting = true;
-  worksOverlayAnimation?.cancel();
-  worksOverlayAnimation = null;
+  worksSceneAnimation?.cancel();
+  worksSceneAnimation = null;
   clearFreshWorksWheelGesture();
   reverseIntroductionAnimations.forEach((animation) => animation.cancel());
   if (k2RecomposeTimer !== undefined) window.clearTimeout(k2RecomposeTimer);
@@ -1658,7 +1718,6 @@ onBeforeUnmount(() => {
   }
   activeScrollAnimation = null;
   restoreDocumentScrollBehavior();
-  deactivateWorksOverlay();
   document.documentElement.classList.remove("k3-content-theme");
   document.documentElement.classList.remove("k3-content-theme-reversing");
 
@@ -1676,6 +1735,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
+  <main class="page-scene">
   <section
     id="title-page"
     ref="titlePageRef"
@@ -1804,50 +1864,76 @@ onBeforeUnmount(() => {
       aria-hidden="true"
     ></div>
 
-    <div
-      v-if="prefersReducedMotion && introductionStarted"
-      class="works-section-stage"
-    >
-      <WorksSection />
-      <section id="milestones-section" class="document-part-section" aria-labelledby="milestones-heading">
-        <h2 id="milestones-heading" class="document-part-heading">Part.03 Milestones</h2>
-      </section>
-      <section id="beyond-section" class="document-part-section" aria-labelledby="beyond-heading">
-        <h2 id="beyond-heading" class="document-part-heading">Part.04 Beyond</h2>
-      </section>
-    </div>
-  </div>
+    <div v-if="introductionStarted" class="works-scene-slot" :style="{ height: worksSceneSlotHeight + 'px' }" aria-hidden="true"></div>
 
-  <div
-    v-if="introductionStarted && !prefersReducedMotion"
-    ref="worksOverlayRef"
-    class="works-overlay"
-    :class="{ 'is-docked': worksPlayback === 'docked' || worksPlayback === 'forward' || worksPlayback === 'reverse', 'is-active': worksPlayback === 'complete' }"
-    :aria-hidden="worksPlayback !== 'complete' && worksPlayback !== 'docked' && worksPlayback !== 'forward' && worksPlayback !== 'reverse'"
-  >
-    <span
-      class="works-overlay__vertical-rule works-overlay__vertical-rule--left"
-      :style="frameworkVerticalLeftStyle"
-      aria-hidden="true"
-    ></span>
-    <span
-      class="works-overlay__vertical-rule works-overlay__vertical-rule--right"
-      :style="{ right: k3Geometry.boundaryInset + 'px' }"
-      aria-hidden="true"
-    ></span>
-    <header class="works-overlay__heading">
-      <span>Part.02 Works</span>
-      <span class="works-overlay__rule" aria-hidden="true"></span>
-    </header>
-    <div class="works-overlay__scroll">
-      <WorksSection />
-      <section id="milestones-section" class="document-part-section" aria-labelledby="milestones-heading">
-        <h2 id="milestones-heading" class="document-part-heading">Part.03 Milestones</h2>
+    <section
+      v-if="introductionStarted"
+      ref="worksSceneRef"
+      class="works-scene"
+      :class="{
+        'is-fixed': worksPlayback === 'docked' || worksPlayback === 'forward' || worksPlayback === 'reverse',
+        'is-docked': worksPlayback === 'docked',
+        'is-transitioning': worksPlayback === 'forward' || worksPlayback === 'reverse',
+        'is-flow': worksPlayback === 'complete' || prefersReducedMotion,
+        'is-reduced-motion': prefersReducedMotion,
+      }"
+      :aria-hidden="worksPlayback === 'idle' && !prefersReducedMotion"
+    >
+      <span class="works-scene__vertical-rail works-scene__vertical-rail--left" :style="frameworkVerticalLeftStyle" aria-hidden="true"></span>
+      <span class="works-scene__vertical-rail works-scene__vertical-rail--right" :style="{ right: k3Geometry.boundaryInset + 'px' }" aria-hidden="true"></span>
+      <header class="works-scene__heading">
+        <span>Part.02 Works</span>
+        <span class="works-scene__rule" aria-hidden="true"></span>
+      </header>
+      <div class="works-scene__content">
+<section class="works-section" aria-labelledby="works-heading">
+        <header class="works-section__header">
+          <div class="works-section__eyebrow">
+            <span>02</span>
+            <span aria-hidden="true">/</span>
+            <span>WORKS</span>
+          </div>
+          <div class="works-section__heading-group">
+            <h2 id="works-heading">{{ sectionLabel }}</h2>
+            <p>{{ sectionIntro }}</p>
+          </div>
+        </header>
+
+        <div class="works-section__list">
+          <article
+            v-for="work in works"
+            :key="work.number"
+            class="works-row"
+            :class="`works-row--${work.layout}`"
+          >
+            <div class="works-row__media" role="img" :aria-label="work.mediaLabel">
+              <div class="works-collage" :class="`works-collage--${work.layout}`" aria-hidden="true">
+                <span class="works-collage__tile works-collage__tile--one"></span>
+                <span class="works-collage__tile works-collage__tile--two"></span>
+                <span class="works-collage__tile works-collage__tile--three"></span>
+              </div>
+            </div>
+
+            <div class="works-row__copy">
+              <div class="works-row__meta">
+                <span>{{ work.number }}</span>
+                <span>{{ work.category }}</span>
+              </div>
+              <h3>{{ work.title }}</h3>
+              <p>{{ work.description }}</p>
+              <span class="works-row__note">{{ work.note }}</span>
+            </div>
+          </article>
+        </div>
       </section>
-      <section id="beyond-section" class="document-part-section" aria-labelledby="beyond-heading">
-        <h2 id="beyond-heading" class="document-part-heading">Part.04 Beyond</h2>
-      </section>
-    </div>
+        <section id="milestones-section" class="document-part-section" aria-labelledby="milestones-heading">
+          <h2 id="milestones-heading" class="document-part-heading">Part.03 Milestones</h2>
+        </section>
+        <section id="beyond-section" class="document-part-section" aria-labelledby="beyond-heading">
+          <h2 id="beyond-heading" class="document-part-heading">Part.04 Beyond</h2>
+        </section>
+      </div>
+    </section>
   </div>
 
   <div
@@ -1922,6 +2008,7 @@ onBeforeUnmount(() => {
       </div>
     </div>
   </div>
+  </main>
 </template>
 
 <style scoped>
@@ -2096,37 +2183,67 @@ onBeforeUnmount(() => {
   width: 100%;
 }
 
-.works-overlay {
-  --works-overlay-peek: clamp(4.5rem, 9vw, 8rem);
+.page-scene {
+  position: relative;
+  width: 100%;
+  min-height: 100svh;
+}
+
+.works-scene-slot {
+  display: block;
+  width: 100%;
+  pointer-events: none;
+}
+
+.works-scene {
+  --part02-peek: clamp(4.5rem, 9vw, 8rem);
   position: fixed;
   z-index: 30;
   inset: 0;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  height: 100svh;
   overflow: hidden;
   background: var(--site-page-background);
   color: var(--site-text-primary);
-  transform: translate3d(0, calc(100% - var(--works-overlay-peek)), 0);
   visibility: hidden;
   pointer-events: none;
+  transform: translate3d(0, 100%, 0);
   will-change: transform;
 }
 
-.works-overlay.is-docked {
-  visibility: visible;
-  pointer-events: auto;
+.works-scene.is-fixed { visibility: visible; }
+
+.works-scene.is-docked {
+  transform: translate3d(0, calc(100% - var(--part02-peek)), 0);
 }
 
-.works-overlay.is-active {
+.works-scene.is-transitioning { visibility: visible; }
+
+.works-scene.is-flow {
+  position: relative;
+  inset: auto;
+  z-index: auto;
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  overflow: visible;
   visibility: visible;
   pointer-events: auto;
+  transform: none;
+  will-change: auto;
 }
 
-.works-overlay__heading {
+.works-scene__heading {
+  position: relative;
+  z-index: 2;
   display: flex;
-  flex: 0 0 var(--works-overlay-peek);
+  flex: 0 0 var(--part02-peek);
   align-items: center;
   gap: 1.5rem;
+  min-height: var(--part02-peek);
   padding-inline: clamp(1.5rem, 4.2vw, 4.5rem);
   border-block: 0.35px solid var(--site-framework-rule);
   color: var(--site-text-primary);
@@ -2137,14 +2254,17 @@ onBeforeUnmount(() => {
   line-height: 1;
 }
 
-.works-overlay__rule {
-  flex: 1;
-  height: 0.35px;
-  background: var(--site-framework-rule);
+.works-scene__rule { flex: 1; height: 0.35px; background: var(--site-framework-rule); }
+
+.works-scene__content {
+  position: relative;
+  min-height: 0;
+  overflow: visible;
+  overscroll-behavior: auto;
 }
 
-.works-overlay__vertical-rule {
-  position: absolute;
+.works-scene__vertical-rail {
+  position: fixed;
   z-index: 4;
   inset-block: 0;
   width: 0;
@@ -2152,18 +2272,262 @@ onBeforeUnmount(() => {
   pointer-events: none;
 }
 
-.works-overlay__scroll {
-  flex: 1 1 auto;
+.works-scene.is-reduced-motion {
+  position: relative;
+  inset: auto;
+  display: block;
+  height: auto;
   min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  scrollbar-gutter: stable;
+  overflow: visible;
+  visibility: visible;
+  pointer-events: auto;
+  transform: none;
+  will-change: auto;
 }
 
-.works-overlay.is-docked .works-overlay__scroll,
-.works-overlay.is-docked .works-overlay__heading {
-  pointer-events: none;
+.works-section {
+  width: min(100% - clamp(2.5rem, 8vw, 8rem), 76rem);
+  margin-inline: auto;
+  padding-block: clamp(5.5rem, 11vw, 10rem) clamp(6rem, 12vw, 11rem);
+  color: var(--site-text-primary);
 }
+
+.works-section__header {
+  display: grid;
+  grid-template-columns: minmax(8rem, 0.38fr) minmax(0, 1fr);
+  gap: clamp(1.5rem, 5vw, 5rem);
+  align-items: start;
+  margin-block-end: clamp(4rem, 8vw, 7.5rem);
+}
+
+.works-section__eyebrow,
+.works-row__meta,
+.works-row__note {
+  font-family: var(--font-technical);
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  line-height: 1.5;
+}
+
+.works-section__eyebrow {
+  display: flex;
+  gap: 0.65rem;
+  padding-block-start: 0.65rem;
+  color: var(--site-text-secondary);
+}
+
+.works-section__heading-group h2 {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: clamp(1.8rem, 3.2vw, 3rem);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 1.12;
+}
+
+.works-section__heading-group p {
+  max-width: 42rem;
+  margin: 1.15rem 0 0;
+  color: var(--site-text-secondary);
+  font-size: clamp(0.9rem, 1vw, 1.025rem);
+  line-height: 1.85;
+  text-wrap: pretty;
+}
+
+.works-section__list {
+  display: grid;
+  gap: clamp(4.5rem, 9vw, 8.5rem);
+}
+
+.works-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(16rem, 0.82fr);
+  gap: clamp(2rem, 6vw, 6.5rem);
+  align-items: center;
+}
+
+.works-row:nth-child(even) {
+  grid-template-columns: minmax(16rem, 0.82fr) minmax(0, 1.08fr);
+}
+
+.works-row:nth-child(even) .works-row__media {
+  order: 2;
+}
+
+.works-row__media {
+  position: relative;
+  min-width: 0;
+  aspect-ratio: 1.28;
+  isolation: isolate;
+}
+
+.works-collage {
+  position: absolute;
+  inset: 0;
+}
+
+.works-collage__tile {
+  position: absolute;
+  display: block;
+  border: 1px solid color-mix(in srgb, var(--site-text-primary) 9%, transparent);
+  box-shadow: 0 16px 42px color-mix(in srgb, #14243a 9%, transparent);
+}
+
+.works-collage__tile--one {
+  inset: 4% 22% 18% 2%;
+  background: linear-gradient(135deg, #a9bdd1, #d5dce2);
+}
+
+.works-collage__tile--two {
+  inset: 18% 2% 4% 40%;
+  background: linear-gradient(145deg, #c3cbd4, #879fb7);
+}
+
+.works-collage__tile--three {
+  inset: 0 5% 48% 56%;
+  background: linear-gradient(145deg, #d8d0c5, #b5a99d);
+}
+
+.works-collage--design .works-collage__tile--one {
+  inset: 2% 28% 22% 0;
+  background: linear-gradient(145deg, #d9c9c0, #b99c94);
+}
+
+.works-collage--design .works-collage__tile--two {
+  inset: 27% 0 0 43%;
+  background: linear-gradient(135deg, #c8c2d1, #918aa8);
+}
+
+.works-collage--design .works-collage__tile--three {
+  inset: 0 4% 55% 58%;
+  background: linear-gradient(135deg, #e3d9c8, #b9a88c);
+}
+
+.works-collage--music .works-collage__tile--one {
+  inset: 8% 20% 10% 0;
+  background: linear-gradient(135deg, #9eb5bb, #5f7f89);
+}
+
+.works-collage--music .works-collage__tile--two {
+  inset: 20% 0 0 42%;
+  background: linear-gradient(145deg, #b9c4cb, #748c9d);
+}
+
+.works-collage--music .works-collage__tile--three {
+  inset: 0 8% 56% 58%;
+  background: linear-gradient(145deg, #d0c8b8, #a99c87);
+}
+
+.works-collage--motion .works-collage__tile--one {
+  inset: 0 25% 22% 4%;
+  background: linear-gradient(135deg, #b8c2d0, #7e91ac);
+}
+
+.works-collage--motion .works-collage__tile--two {
+  inset: 26% 0 0 38%;
+  background: linear-gradient(145deg, #d5c6b7, #b18f7c);
+}
+
+.works-collage--motion .works-collage__tile--three {
+  inset: 0 0 57% 62%;
+  background: linear-gradient(145deg, #c5c1d2, #8e8aa9);
+}
+
+.works-row__copy {
+  min-width: 0;
+  padding-block: 1.25rem;
+}
+
+.works-row__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  color: var(--site-text-secondary);
+}
+
+.works-row__meta span:first-child {
+  color: var(--site-brand-text);
+}
+
+.works-row__copy h3 {
+  max-width: 34rem;
+  margin: 1.6rem 0 1rem;
+  font-family: var(--font-heading);
+  font-size: clamp(1.55rem, 2.35vw, 2.3rem);
+  font-weight: 550;
+  letter-spacing: -0.04em;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.works-row__copy p {
+  max-width: 34rem;
+  margin: 0;
+  color: var(--site-text-secondary);
+  font-size: clamp(0.9rem, 0.98vw, 1rem);
+  line-height: 1.95;
+  text-wrap: pretty;
+}
+
+.works-row__note {
+  display: inline-block;
+  margin-block-start: 1.75rem;
+  color: var(--site-text-secondary);
+  opacity: 0.72;
+}
+
+@media (max-width: 760px) {
+  .works-section {
+    width: calc(100% - 2.5rem);
+    padding-block: 4.5rem 6rem;
+  }
+
+  .works-section__header {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    margin-block-end: 3.5rem;
+  }
+
+  .works-section__eyebrow {
+    padding-block-start: 0;
+  }
+
+  .works-section__list {
+    gap: 4.5rem;
+  }
+
+  .works-row,
+  .works-row:nth-child(even) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
+  }
+
+  .works-row:nth-child(even) .works-row__media {
+    order: 0;
+  }
+
+  .works-row__media {
+    aspect-ratio: 1.18;
+  }
+
+  .works-row__copy {
+    padding-block: 0;
+  }
+
+  .works-row__copy h3 {
+    margin-block-start: 1rem;
+    font-size: clamp(1.45rem, 6vw, 1.9rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .works-section *,
+  .works-section *::before,
+  .works-section *::after {
+    scroll-behavior: auto;
+  }
+}
+
 
 .document-part-section {
   position: relative;
@@ -2514,6 +2878,12 @@ onBeforeUnmount(() => {
 
   .framework-title {
     letter-spacing: -0.025em;
+  }
+
+  .works-scene__heading {
+    min-height: 4.5rem;
+    padding-inline: 1.25rem;
+    font-size: clamp(1.5rem, 7vw, 2.1rem);
   }
 
   .document-part-heading {
