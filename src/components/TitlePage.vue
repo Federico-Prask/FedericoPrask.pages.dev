@@ -623,6 +623,10 @@ let k2ExpandTimer: number | undefined;
 let k3StartTimer: number | undefined;
 let k3Frame: number | undefined;
 let k4Frame: number | undefined;
+let part02Frame: number | undefined;
+let part02WheelReleaseTimer: number | undefined;
+let part02NeedsFreshReverseGesture = false;
+let touchStartedAtPart02Top = false;
 let scrollFrame: number | undefined;
 let activeScrollAnimation: ActiveScrollAnimation | null = null;
 let touchStartY: number | null = null;
@@ -712,6 +716,25 @@ function handleKeyup(event: KeyboardEvent) {
   blockedScrollKeys.delete(key);
 }
 
+function clearPart02ReverseGestureGate() {
+  part02NeedsFreshReverseGesture = false;
+  if (part02WheelReleaseTimer !== undefined) {
+    window.clearTimeout(part02WheelReleaseTimer);
+    part02WheelReleaseTimer = undefined;
+  }
+}
+
+function armPart02ReverseGestureGate() {
+  part02NeedsFreshReverseGesture = true;
+  if (part02WheelReleaseTimer !== undefined) {
+    window.clearTimeout(part02WheelReleaseTimer);
+  }
+  part02WheelReleaseTimer = window.setTimeout(() => {
+    part02NeedsFreshReverseGesture = false;
+    part02WheelReleaseTimer = undefined;
+  }, 240);
+}
+
 function handleWindowBlur() {
   pressedScrollKeys.clear();
   blockedScrollKeys.clear();
@@ -719,6 +742,8 @@ function handleWindowBlur() {
   touchLastY = null;
   touchGestureActive = false;
   touchBlockedUntilEnd = false;
+  touchStartedAtPart02Top = false;
+  clearPart02ReverseGestureGate();
 }
 
 let scrollBehaviorBeforeAnimation: string | null = null;
@@ -793,6 +818,142 @@ function animateDocumentScroll(
   };
 
   scrollFrame = window.requestAnimationFrame(frame);
+}
+
+function clearPart02ReverseGestureGate() {
+  part02NeedsFreshReverseGesture = false;
+  if (part02WheelReleaseTimer !== undefined) {
+    window.clearTimeout(part02WheelReleaseTimer);
+    part02WheelReleaseTimer = undefined;
+  }
+}
+
+function armPart02ReverseGestureGate() {
+  part02NeedsFreshReverseGesture = true;
+  if (part02WheelReleaseTimer !== undefined) {
+    window.clearTimeout(part02WheelReleaseTimer);
+  }
+  part02WheelReleaseTimer = window.setTimeout(() => {
+    part02NeedsFreshReverseGesture = false;
+    part02WheelReleaseTimer = undefined;
+  }, 240);
+}
+
+function animatePart02Expansion(reverse = false) {
+  if (prefersReducedMotion) {
+    part02ExpansionProgress.value = reverse ? 0 : 1;
+    part02Playback.value = reverse ? "idle" : "complete";
+    return;
+  }
+
+  const startProgress = part02ExpansionProgress.value;
+  const targetProgress = reverse ? 0 : 1;
+  const startTime = performance.now();
+  part02Playback.value = reverse ? "reverse-expand" : "expand";
+
+  const frame = (now: number) => {
+    const progress = Math.min(1, (now - startTime) / PART02_EXPANSION_DURATION);
+    const eased = reverse ? easeOutCubic(progress) : easeInCubic(progress);
+    part02ExpansionProgress.value =
+      startProgress + (targetProgress - startProgress) * eased;
+
+    if (progress < 1) {
+      part02Frame = window.requestAnimationFrame(frame);
+      return;
+    }
+
+    part02Frame = undefined;
+    part02ExpansionProgress.value = targetProgress;
+
+    if (reverse) {
+      beginPart02ReverseRecompose();
+    } else {
+      part02Playback.value = "complete";
+      lastScrollY = window.scrollY;
+    }
+  };
+
+  part02Frame = window.requestAnimationFrame(frame);
+}
+
+function beginPart02ReverseRecompose() {
+  const startY = window.scrollY;
+  const startTime = performance.now();
+  part02Playback.value = "reverse-recompose";
+  part02RecomposeProgress.value = 1;
+
+  const frame = (now: number) => {
+    const progress = Math.min(1, (now - startTime) / PART02_RECOMPOSE_DURATION);
+    const eased = easeOutCubic(progress);
+    part02RecomposeProgress.value = 1 - eased;
+    const nextY = startY + (part02TriggerY.value - startY) * eased;
+    scrollToImmediately(nextY);
+    lastScrollY = window.scrollY;
+
+    if (progress < 1) {
+      part02Frame = window.requestAnimationFrame(frame);
+      return;
+    }
+
+    part02Frame = undefined;
+    part02RecomposeProgress.value = 0;
+    part02ExpansionProgress.value = 0;
+    part02Playback.value = "idle";
+    clearPart02ReverseGestureGate();
+    lastScrollY = window.scrollY;
+  };
+
+  part02Frame = window.requestAnimationFrame(frame);
+}
+
+function beginPart02Reverse() {
+  if (
+    part02Playback.value !== "complete" ||
+    window.scrollY > part02RowTop.value + 1
+  ) return;
+
+  clearPart02ReverseGestureGate();
+  blockCurrentInputGestures();
+  animatePart02Expansion(true);
+}
+
+function beginPart02Transition() {
+  if (
+    prefersReducedMotion ||
+    transitionPlayback.value !== "complete" ||
+    part02Playback.value !== "idle" ||
+    !part02RowTop.value
+  ) return;
+
+  blockCurrentInputGestures();
+  clearPart02ReverseGestureGate();
+  part02Playback.value = "recompose";
+  part02RecomposeProgress.value = 0;
+  part02ExpansionProgress.value = 0;
+
+  const startY = window.scrollY;
+  const startTime = performance.now();
+  const frame = (now: number) => {
+    const progress = Math.min(1, (now - startTime) / PART02_RECOMPOSE_DURATION);
+    const eased = easeOutCubic(progress);
+    part02RecomposeProgress.value = eased;
+    const nextY = startY + (part02RowTop.value - startY) * eased;
+    scrollToImmediately(nextY);
+    lastScrollY = window.scrollY;
+
+    if (progress < 1) {
+      part02Frame = window.requestAnimationFrame(frame);
+      return;
+    }
+
+    part02Frame = undefined;
+    part02RecomposeProgress.value = 1;
+    scrollToImmediately(part02RowTop.value);
+    lastScrollY = window.scrollY;
+    animatePart02Expansion(false);
+  };
+
+  part02Frame = window.requestAnimationFrame(frame);
 }
 
 function scrollImmediatelyToFramework() {
@@ -1099,8 +1260,54 @@ function reverseK2StageA() {
 
 function handleWheel(event: WheelEvent) {
   if (event.ctrlKey) return;
+
+  if (
+    part02Playback.value === "recompose" ||
+    part02Playback.value === "expand" ||
+    part02Playback.value === "reverse-expand" ||
+    part02Playback.value === "reverse-recompose"
+  ) {
+    event.preventDefault();
+    return;
+  }
+
   if (transitionPlayback.value === "forward" || transitionPlayback.value === "reverse") {
     event.preventDefault();
+    return;
+  }
+
+  if (part02Playback.value === "complete" && event.deltaY < 0) {
+    if (window.scrollY <= part02RowTop.value + 1) {
+      event.preventDefault();
+      if (part02NeedsFreshReverseGesture) {
+        armPart02ReverseGestureGate();
+        return;
+      }
+      beginPart02Reverse();
+      return;
+    }
+
+    if (window.scrollY + event.deltaY <= part02RowTop.value) {
+      event.preventDefault();
+      scrollToImmediately(part02RowTop.value);
+      lastScrollY = window.scrollY;
+      armPart02ReverseGestureGate();
+      return;
+    }
+  }
+
+  if (
+    part02Playback.value === "idle" &&
+    transitionPlayback.value === "complete" &&
+    !prefersReducedMotion &&
+    event.deltaY > 0 &&
+    window.scrollY < part02TriggerY.value &&
+    window.scrollY + event.deltaY >= part02TriggerY.value
+  ) {
+    event.preventDefault();
+    scrollToImmediately(part02TriggerY.value);
+    lastScrollY = window.scrollY;
+    beginPart02Transition();
     return;
   }
 
@@ -1133,15 +1340,26 @@ function handleTouchStart(event: TouchEvent) {
     touchBlockedUntilEnd =
       transitionPlayback.value === "forward" ||
       transitionPlayback.value === "reverse" ||
+      part02Playback.value === "recompose" ||
+      part02Playback.value === "expand" ||
+      part02Playback.value === "reverse-expand" ||
+      part02Playback.value === "reverse-recompose" ||
       pendingK2;
     return;
   }
 
   touchStartY = event.touches[0].clientY;
   touchLastY = touchStartY;
+  touchStartedAtPart02Top =
+    part02Playback.value === "complete" &&
+    window.scrollY <= part02RowTop.value + 1;
   touchBlockedUntilEnd =
     transitionPlayback.value === "forward" ||
     transitionPlayback.value === "reverse" ||
+    part02Playback.value === "recompose" ||
+    part02Playback.value === "expand" ||
+    part02Playback.value === "reverse-expand" ||
+    part02Playback.value === "reverse-recompose" ||
     pendingK2;
 }
 
@@ -1153,6 +1371,10 @@ function handleTouchMove(event: TouchEvent) {
     if (
       transitionPlayback.value === "forward" ||
       transitionPlayback.value === "reverse" ||
+      part02Playback.value === "recompose" ||
+      part02Playback.value === "expand" ||
+      part02Playback.value === "reverse-expand" ||
+      part02Playback.value === "reverse-recompose" ||
       pendingK2
     ) touchBlockedUntilEnd = true;
     return;
@@ -1169,9 +1391,54 @@ function handleTouchMove(event: TouchEvent) {
   const stepDelta = touchLastY - currentY;
   touchLastY = currentY;
 
-  if (transitionPlayback.value === "forward" || transitionPlayback.value === "reverse") {
+  if (
+    transitionPlayback.value === "forward" ||
+    transitionPlayback.value === "reverse" ||
+    part02Playback.value === "recompose" ||
+    part02Playback.value === "expand" ||
+    part02Playback.value === "reverse-expand" ||
+    part02Playback.value === "reverse-recompose"
+  ) {
     touchBlockedUntilEnd = true;
     event.preventDefault();
+    return;
+  }
+
+  if (
+    part02Playback.value === "complete" &&
+    touchStartedAtPart02Top &&
+    stepDelta < -8
+  ) {
+    event.preventDefault();
+    beginPart02Reverse();
+    touchBlockedUntilEnd = true;
+    return;
+  }
+
+  if (
+    part02Playback.value === "idle" &&
+    transitionPlayback.value === "complete" &&
+    !prefersReducedMotion &&
+    stepDelta > 8 &&
+    window.scrollY + stepDelta >= part02TriggerY.value
+  ) {
+    event.preventDefault();
+    scrollToImmediately(part02TriggerY.value);
+    lastScrollY = window.scrollY;
+    beginPart02Transition();
+    touchBlockedUntilEnd = true;
+    return;
+  }
+
+  if (
+    part02Playback.value === "complete" &&
+    window.scrollY > part02RowTop.value + 1 &&
+    window.scrollY + stepDelta <= part02RowTop.value
+  ) {
+    event.preventDefault();
+    scrollToImmediately(part02RowTop.value);
+    lastScrollY = window.scrollY;
+    touchBlockedUntilEnd = true;
     return;
   }
 
@@ -1201,6 +1468,7 @@ function handleTouchEnd(event: TouchEvent) {
   touchGestureActive = event.touches.length > 0;
   touchStartY = null;
   touchLastY = null;
+  touchStartedAtPart02Top = false;
 
   if (event.touches.length > 0) {
     if (
@@ -1227,7 +1495,45 @@ function handleDocumentScroll() {
   const movedUp = currentY < lastScrollY - 1;
   const movedDown = currentY > lastScrollY;
 
-  if (transitionPlayback.value === "complete" && movedUp && currentY < heroHeight.value - 1) {
+  if (
+    part02Playback.value === "recompose" ||
+    part02Playback.value === "expand" ||
+    part02Playback.value === "reverse-expand" ||
+    part02Playback.value === "reverse-recompose"
+  ) {
+    lastScrollY = currentY;
+    return;
+  }
+
+  if (
+    part02Playback.value === "complete" &&
+    movedUp &&
+    currentY < part02RowTop.value - 1
+  ) {
+    scrollToImmediately(part02RowTop.value);
+    lastScrollY = window.scrollY;
+    armPart02ReverseGestureGate();
+    return;
+  }
+
+  if (
+    part02Playback.value === "idle" &&
+    transitionPlayback.value === "complete" &&
+    !prefersReducedMotion &&
+    movedDown &&
+    currentY >= part02TriggerY.value
+  ) {
+    scrollToImmediately(part02TriggerY.value);
+    lastScrollY = window.scrollY;
+    beginPart02Transition();
+    return;
+  }
+
+  if (
+    transitionPlayback.value === "complete" &&
+    movedUp &&
+    currentY < heroHeight.value - 1
+  ) {
     scrollToImmediately(heroHeight.value);
     lastScrollY = window.scrollY;
     beginReverseInitialTransition();
@@ -1274,11 +1580,53 @@ function handleKeydown(event: KeyboardEvent) {
 
   if (
     transitionPlayback.value === "forward" ||
-    transitionPlayback.value === "reverse"
+    transitionPlayback.value === "reverse" ||
+    part02Playback.value === "recompose" ||
+    part02Playback.value === "expand" ||
+    part02Playback.value === "reverse-expand" ||
+    part02Playback.value === "reverse-recompose"
   ) {
     event.preventDefault();
     blockedScrollKeys.add(key);
     return;
+  }
+
+  if (part02Playback.value === "complete" && scrollUp) {
+    if (window.scrollY <= part02RowTop.value + 1) {
+      event.preventDefault();
+      beginPart02Reverse();
+      blockedScrollKeys.add(key);
+      return;
+    }
+    const estimatedDelta =
+      event.key === "Home" ? Number.POSITIVE_INFINITY :
+      event.key === "PageUp" || event.key === " " ? viewport.value.height : 64;
+    if (window.scrollY - estimatedDelta <= part02RowTop.value) {
+      event.preventDefault();
+      scrollToImmediately(part02RowTop.value);
+      lastScrollY = window.scrollY;
+      blockedScrollKeys.add(key);
+      return;
+    }
+  }
+
+  if (
+    part02Playback.value === "idle" &&
+    transitionPlayback.value === "complete" &&
+    !prefersReducedMotion &&
+    scrollDown
+  ) {
+    const estimatedDelta =
+      event.key === "End" ? Number.POSITIVE_INFINITY :
+      event.key === "PageDown" || event.key === " " ? viewport.value.height : 64;
+    if (window.scrollY + estimatedDelta >= part02TriggerY.value) {
+      event.preventDefault();
+      scrollToImmediately(part02TriggerY.value);
+      lastScrollY = window.scrollY;
+      beginPart02Transition();
+      blockedScrollKeys.add(key);
+      return;
+    }
   }
 
   if (transitionPlayback.value === "idle" && !k2Started.value && scrollDown) {
@@ -1356,6 +1704,16 @@ async function handleResize() {
   }
 
   if (
+    part02Playback.value === "recompose" ||
+    part02Playback.value === "expand" ||
+    part02Playback.value === "reverse-expand" ||
+    part02Playback.value === "reverse-recompose"
+  ) {
+    lastScrollY = window.scrollY;
+    return;
+  }
+
+  if (
     transitionPlayback.value === "complete" &&
     previousScrollY >= previousHeroHeight - 1
   ) {
@@ -1404,6 +1762,8 @@ onBeforeUnmount(() => {
   if (k3StartTimer !== undefined) window.clearTimeout(k3StartTimer);
   if (k3Frame !== undefined) window.cancelAnimationFrame(k3Frame);
   if (k4Frame !== undefined) window.cancelAnimationFrame(k4Frame);
+  if (part02Frame !== undefined) window.cancelAnimationFrame(part02Frame);
+  clearPart02ReverseGestureGate();
   if (scrollFrame !== undefined) {
     window.cancelAnimationFrame(scrollFrame);
     scrollFrame = undefined;
@@ -1644,8 +2004,14 @@ onBeforeUnmount(() => {
       :class="{
         'is-k3': k3Started,
         'is-k3-reversing': k3Reversing,
-        'is-k5': k5Started,
+        'is-k5': k5Started && part02Playback === 'idle',
         'is-k5-complete': transitionPlayback === 'complete',
+        'is-part02-transition':
+          part02Playback === 'recompose' ||
+          part02Playback === 'expand' ||
+          part02Playback === 'reverse-expand' ||
+          part02Playback === 'reverse-recompose',
+        'is-part02-complete': part02Playback === 'complete',
         'is-reversing': k2Phase === 'reverse-titles',
       }"
       :style="frameworkTitlesStyle"
@@ -2243,7 +2609,8 @@ onBeforeUnmount(() => {
   display: grid;
   grid-template-rows:
     minmax(0, var(--framework-first-row-height, 1fr))
-    repeat(3, minmax(0, var(--framework-compact-row-height, 1fr)));
+    minmax(0, var(--framework-part02-row-height, var(--framework-compact-row-height, 1fr)))
+    repeat(2, minmax(0, var(--framework-compact-row-height, 1fr)));
   color: var(--site-hero-foreground);
   pointer-events: none;
   transition: color 1500ms cubic-bezier(0.333333, 1, 0.666667, 1);
@@ -2258,9 +2625,17 @@ onBeforeUnmount(() => {
   transition: color 1500ms cubic-bezier(0.333333, 0, 0.666667, 0);
 }
 
-/* Parts 03 and 04 leave the opening overlay after K5. Their document-flow
-   headings are placed after the complete preceding sections. */
+/* Parts 03 and 04 rejoin the shared framework during the Part.02 transition,
+   then return to their later document-flow headings. */
 .framework-titles.is-k5-complete .framework-title:nth-child(n + 3) {
+  visibility: hidden;
+}
+
+.framework-titles.is-part02-transition .framework-title {
+  visibility: visible;
+}
+
+.framework-titles.is-part02-complete .framework-title:nth-child(n + 3) {
   visibility: hidden;
 }
 
@@ -2307,6 +2682,22 @@ onBeforeUnmount(() => {
 .framework-title:first-child {
   align-self: start;
   margin-block-start: var(--framework-first-title-offset, 0px);
+}
+
+.framework-titles.is-part02-transition .framework-title:first-child {
+  transform:
+    translateY(var(--framework-recompose-offset, 0px))
+    scale(var(--framework-title-scale, 1));
+}
+
+.framework-titles.is-part02-transition .framework-title:nth-child(2) {
+  align-self: start;
+  margin-block-start: var(--framework-second-title-offset, 0px);
+  transform: scale(var(--framework-title-scale, 1));
+}
+
+.framework-titles.is-part02-transition .framework-title:nth-child(n + 3) {
+  transform: scale(var(--framework-title-scale, 1));
 }
 
 .framework-titles.is-k5 .framework-title:not(:first-child) {
