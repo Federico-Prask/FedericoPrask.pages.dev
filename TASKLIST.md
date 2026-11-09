@@ -301,3 +301,7 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Duplicate the Part.02 lower framework rule at its compact title-row position while the original line expands to the 60vh row boundary.
 - [x] Hide semantic Part.03/Part.04 headings directly during Part.02 reassembly and expansion; restore them after the transition.
 - [ ] Browser-verify both retained title dividers, the expanded Part.02 lower boundary, and the absence of duplicate/overlapping Part.03/Part.04 titles.
+- [x] Place the Works introduction inside the expanded Part.02 row; keep the Work list after the expanded lower rule.
+- [x] Add viewport-triggered entrance animation to the Works introduction, each editorial row, and the Part.03/Part.04 headings with their top/bottom rules.
+- [ ] Browser-verify the Works introduction is vertically centered between the Part.02 title divider and the expanded lower rule, and that the work collage list begins after that rule.
+- [ ] Browser-verify Part.03/Part.04 titles reveal on entry, with both horizontal rules drawing outward and no duplicate framework titles.
