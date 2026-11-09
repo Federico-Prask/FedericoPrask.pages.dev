@@ -386,9 +386,15 @@ const part02ExpansionExtra = computed(() =>
 const part02RowHeight = computed(
   () => k4Geometry.value.compactRowHeight + part02ExpansionExtra.value,
 );
+// The title row itself stays compact. The remaining 60vh expansion is
+// occupied by the Works introduction, not by an empty flow spacer.
 const part02HeadingSpacerHeight = computed(
-  () => part02RowHeight.value + PART_TITLE_CONTENT_GAP,
+  () => k4Geometry.value.compactRowHeight + PART_TITLE_CONTENT_GAP,
 );
+const worksSectionStyle = computed(() => ({
+  "--works-expanded-row-height": part02RowHeight.value + "px",
+  "--works-title-row-height": k4Geometry.value.compactRowHeight + "px",
+}));
 const part02TriggerY = computed(() =>
   Math.max(
     heroHeight.value,
@@ -650,6 +656,42 @@ let pendingK2 = false;
 let lastScrollY = 0;
 let isUnmounting = false;
 let reverseIntroductionAnimations: Animation[] = [];
+let documentPartHeadingObserver: IntersectionObserver | null = null;
+
+function observeDocumentPartHeadings() {
+  documentPartHeadingObserver?.disconnect();
+  documentPartHeadingObserver = null;
+
+  const headings = Array.from(
+    document.querySelectorAll<HTMLElement>(".document-part-heading"),
+  );
+  if (headings.length === 0) return;
+
+  if (
+    prefersReducedMotion ||
+    typeof IntersectionObserver === "undefined"
+  ) {
+    headings.forEach((heading) => heading.classList.add("is-visible"));
+    return;
+  }
+
+  documentPartHeadingObserver = new IntersectionObserver((entries, observer) => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+
+      const heading = entry.target as HTMLElement;
+      if (window.getComputedStyle(heading).visibility !== "visible") continue;
+
+      heading.classList.add("is-visible");
+      observer.unobserve(heading);
+    }
+  }, {
+    threshold: 0.2,
+    rootMargin: "0px 0px -12% 0px",
+  });
+
+  headings.forEach((heading) => documentPartHeadingObserver?.observe(heading));
+}
 
 const K2_RECOMPOSE_DURATION = 720;
 const K2_ANNOTATION_FADE_DURATION = 420;
@@ -963,6 +1005,8 @@ async function beginK4() {
     k4Progress.value = 1;
     transitionPlayback.value = "complete";
     lastScrollY = window.scrollY;
+    await nextTick();
+    observeDocumentPartHeadings();
     return;
   }
 
@@ -984,6 +1028,7 @@ async function beginK4() {
       transitionPlayback.value = "complete";
       lastScrollY = window.scrollY;
       void updatePart02FrameworkPosition();
+      void nextTick().then(observeDocumentPartHeadings);
     }
   };
 
@@ -1782,6 +1827,8 @@ onBeforeUnmount(() => {
   if (k4Frame !== undefined) window.cancelAnimationFrame(k4Frame);
   if (part02Frame !== undefined) window.cancelAnimationFrame(part02Frame);
   clearPart02ReverseGestureGate();
+  documentPartHeadingObserver?.disconnect();
+  documentPartHeadingObserver = null;
   if (scrollFrame !== undefined) {
     window.cancelAnimationFrame(scrollFrame);
     scrollFrame = undefined;
@@ -1941,6 +1988,7 @@ onBeforeUnmount(() => {
       v-if="introductionStarted"
       id="works-section"
       class="works-section"
+      :style="worksSectionStyle"
       aria-labelledby="works-heading"
     >
         <header class="works-section__header">
@@ -1988,7 +2036,7 @@ onBeforeUnmount(() => {
             part02Playback === 'recompose' ||
             part02Playback === 'expand' ||
             part02Playback === 'reverse-expand' ||
-            part02Playback === 'reverse-recompose' }">Part.03 Milestones</h2>
+            part02Playback === 'reverse-recompose' }"><span class="document-part-heading__text">Part.03 Milestones</span></h2>
         </section>
         <section id="beyond-section" class="document-part-section" aria-labelledby="beyond-heading">
           <h2 id="beyond-heading" class="document-part-heading" :class="{ 'is-part02-temporarily-hidden':
@@ -1996,7 +2044,7 @@ onBeforeUnmount(() => {
             part02Playback === 'recompose' ||
             part02Playback === 'expand' ||
             part02Playback === 'reverse-expand' ||
-            part02Playback === 'reverse-recompose' }">Part.04 Beyond</h2>
+            part02Playback === 'reverse-recompose' }"><span class="document-part-heading__text">Part.04 Beyond</span></h2>
         </section>
   </div>
 
@@ -2260,7 +2308,7 @@ onBeforeUnmount(() => {
 .works-section {
   width: min(100% - clamp(2.5rem, 8vw, 8rem), 76rem);
   margin-inline: auto;
-  padding-block: clamp(5.5rem, 11vw, 10rem) clamp(6rem, 12vw, 11rem);
+  padding-block: 0 clamp(6rem, 12vw, 11rem);
   color: var(--site-text-primary);
 }
 
@@ -2268,8 +2316,17 @@ onBeforeUnmount(() => {
   display: grid;
   grid-template-columns: minmax(8rem, 0.38fr) minmax(0, 1fr);
   gap: clamp(1.5rem, 5vw, 5rem);
+  align-content: center;
   align-items: start;
-  margin-block-end: clamp(4rem, 8vw, 7.5rem);
+  min-height: max(
+    0px,
+    calc(
+      var(--works-expanded-row-height, 0px) -
+      var(--works-title-row-height, 0px) -
+      24px
+    )
+  );
+  margin-block-end: 0;
 }
 
 .works-section__eyebrow,
@@ -2511,18 +2568,58 @@ onBeforeUnmount(() => {
 }
 
 .document-part-heading {
+  position: relative;
   display: flex;
   min-height: clamp(4.5rem, 9vw, 8rem);
   align-items: center;
   margin: 0;
   padding-inline: clamp(1.5rem, 4.2vw, 4.5rem);
-  border-block: 0.35px solid var(--site-framework-rule);
   color: var(--site-text-primary);
   font-family: "SF Pro Display", var(--font-heading);
   font-size: clamp(1.7rem, 3.4vw, 3.4rem);
   font-weight: 800;
   letter-spacing: -0.035em;
   line-height: 1;
+}
+
+.document-part-heading::before,
+.document-part-heading::after {
+  position: absolute;
+  inset-inline: clamp(1.5rem, 4.2vw, 4.5rem);
+  height: 0;
+  border-top: 0.35px solid var(--site-framework-rule);
+  content: "";
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 820ms cubic-bezier(0.22, 0.7, 0.24, 1);
+}
+
+.document-part-heading::before {
+  inset-block-start: 0;
+}
+
+.document-part-heading::after {
+  inset-block-end: 0;
+  transition-delay: 140ms;
+}
+
+.document-part-heading__text {
+  opacity: 0;
+  transform: translateY(0.38em);
+  transition:
+    opacity 560ms cubic-bezier(0.22, 0.7, 0.24, 1),
+    transform 680ms cubic-bezier(0.22, 0.7, 0.24, 1);
+  transition-delay: 110ms;
+}
+
+.document-part-heading.is-visible::before,
+.document-part-heading.is-visible::after {
+  transform: scaleX(1);
+}
+
+.document-part-heading.is-visible .document-part-heading__text {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .document-part-content {
@@ -2983,6 +3080,14 @@ onBeforeUnmount(() => {
 
   .framework-vertical-line {
     border-color: var(--site-framework-rule);
+    transition: none;
+  }
+
+  .document-part-heading::before,
+  .document-part-heading::after,
+  .document-part-heading__text {
+    opacity: 1;
+    transform: none;
     transition: none;
   }
 }
