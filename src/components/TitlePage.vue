@@ -723,9 +723,6 @@ function animateDocumentScroll(
   easing: ScrollEasing = "in-out-cubic",
   onComplete?: () => void,
 ) {
-  worksOverlayAnimation?.cancel();
-  worksOverlayAnimation = null;
-  clearFreshWorksWheelGesture();
   if (scrollFrame !== undefined) {
     window.cancelAnimationFrame(scrollFrame);
     scrollFrame = undefined;
@@ -1645,6 +1642,9 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   isUnmounting = true;
+  worksOverlayAnimation?.cancel();
+  worksOverlayAnimation = null;
+  clearFreshWorksWheelGesture();
   reverseIntroductionAnimations.forEach((animation) => animation.cancel());
   if (k2RecomposeTimer !== undefined) window.clearTimeout(k2RecomposeTimer);
   if (k2SettleTimer !== undefined) window.clearTimeout(k2SettleTimer);
