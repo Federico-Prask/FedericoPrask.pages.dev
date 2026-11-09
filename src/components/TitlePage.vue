@@ -814,25 +814,6 @@ function animateDocumentScroll(
   scrollFrame = window.requestAnimationFrame(frame);
 }
 
-function clearPart02ReverseGestureGate() {
-  part02NeedsFreshReverseGesture = false;
-  if (part02WheelReleaseTimer !== undefined) {
-    window.clearTimeout(part02WheelReleaseTimer);
-    part02WheelReleaseTimer = undefined;
-  }
-}
-
-function armPart02ReverseGestureGate() {
-  part02NeedsFreshReverseGesture = true;
-  if (part02WheelReleaseTimer !== undefined) {
-    window.clearTimeout(part02WheelReleaseTimer);
-  }
-  part02WheelReleaseTimer = window.setTimeout(() => {
-    part02NeedsFreshReverseGesture = false;
-    part02WheelReleaseTimer = undefined;
-  }, 240);
-}
-
 function animatePart02Expansion(reverse = false) {
   if (prefersReducedMotion) {
     part02ExpansionProgress.value = reverse ? 0 : 1;
