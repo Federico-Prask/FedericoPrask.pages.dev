@@ -21,6 +21,7 @@ const props = withDefaults(
     k3Reversing?: boolean;
     k5Started?: boolean;
     k5DividerCopyTransform?: string;
+    part02DividerCopyTransform?: string;
   }>(),
   {
     k2Started: false,
@@ -31,6 +32,7 @@ const props = withDefaults(
     k3Reversing: false,
     k5Started: false,
     k5DividerCopyTransform: "",
+    part02DividerCopyTransform: "",
   },
 );
 
@@ -90,6 +92,14 @@ function k2PathStyle(id: string) {
         data-k2-persistent="true"
         d="M 0 72 L 256 72"
         :style="{ transform: props.k5DividerCopyTransform }"
+      />
+      <path
+        v-if="props.part02DividerCopyTransform"
+        id="guide-part02-title-divider-copy"
+        class="framework-rule-copy"
+        data-k2-persistent="true"
+        d="M 0 131 L 256 131"
+        :style="{ transform: props.part02DividerCopyTransform }"
       />
     </g>
 
