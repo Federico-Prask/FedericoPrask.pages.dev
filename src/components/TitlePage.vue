@@ -1501,9 +1501,12 @@ function handleDocumentScroll() {
     part02Playback.value === "expand" ||
     part02Playback.value === "reverse-expand"
   ) {
-    const part02Offset = Math.max(0, currentY - previousPart02RowTop);
-    scrollToImmediately(part02RowTop.value + part02Offset);
-    lastScrollY = window.scrollY;
+    // The expansion animation updates lastScrollY together with each
+    // programmatic scroll. Any different position is external input
+    // (for example, dragging the scrollbar), which must stay locked.
+    if (Math.abs(currentY - lastScrollY) > 1) {
+      scrollToImmediately(lastScrollY);
+    }
     return;
   }
 
