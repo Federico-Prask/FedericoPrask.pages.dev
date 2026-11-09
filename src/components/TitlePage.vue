@@ -760,6 +760,7 @@ function handleWindowBlur() {
   touchLastY = null;
   touchGestureActive = false;
   touchBlockedUntilEnd = false;
+  touchStartedAtWorksTop = false;
 }
 
 let scrollBehaviorBeforeAnimation: string | null = null;
@@ -1230,6 +1231,7 @@ function handleTouchStart(event: TouchEvent) {
   if (event.touches.length !== 1) {
     touchStartY = null;
     touchLastY = null;
+    touchStartedAtWorksTop = false;
     touchBlockedUntilEnd =
       transitionPlayback.value === "forward" ||
       transitionPlayback.value === "reverse" ||
@@ -1583,52 +1585,43 @@ function updateAnnotationBounds() {
 async function handleResize() {
   const previousHeroHeight = heroHeight.value;
   const previousWorksBoundary = getWorksBoundaryY();
-  const previousWorksDockY = getWorksDockScrollY();
   const currentScrollY = window.scrollY;
   const hasActiveTransition =
     transitionPlayback.value === "forward" ||
     transitionPlayback.value === "reverse";
   const previousScrollY = hasActiveTransition ? lastScrollY : currentScrollY;
 
-  if (worksPlayback.value === "complete") {
-    updateAnnotationBounds();
-    lastScrollY = window.scrollY;
-    return;
-  }
-
   updateAnnotationBounds();
   await updateWorksSpacer();
 
   const nextWorksBoundary = getWorksBoundaryY();
   const nextWorksDockY = getWorksDockScrollY();
+
   if (
-    (worksPlayback.value === "forward" || worksPlayback.value === "reverse") &&
-    activeScrollAnimation
+    worksPlayback.value === "forward" ||
+    worksPlayback.value === "reverse"
   ) {
-    activeScrollAnimation.startY = window.scrollY;
-    activeScrollAnimation.startEased = resolveScrollEasing(
-      activeScrollAnimation.easing,
-      activeScrollAnimation.progress,
-    );
+    const targetY = worksPlayback.value === "forward"
+      ? nextWorksDockY
+      : nextWorksBoundary;
+    if (targetY !== null) scrollToImmediately(targetY);
     lastScrollY = window.scrollY;
     return;
   }
-  if (
-    worksPlayback.value === "complete" &&
-    previousWorksBoundary !== null &&
-    nextWorksBoundary !== null
-  ) {
-    const worksOffset = Math.max(0, previousScrollY - previousWorksBoundary);
-    scrollToImmediately(nextWorksBoundary + worksOffset);
+
+  if (worksPlayback.value === "complete") {
+    const worksOffset = previousWorksBoundary === null
+      ? 0
+      : Math.max(0, currentScrollY - previousWorksBoundary);
+    if (nextWorksBoundary !== null) {
+      scrollToImmediately(nextWorksBoundary + worksOffset);
+    }
     lastScrollY = window.scrollY;
     return;
   }
-  if (
-    worksPlayback.value === "docked" &&
-    previousWorksDockY !== null &&
-    nextWorksDockY !== null
-  ) {
-    scrollToImmediately(nextWorksDockY);
+
+  if (worksPlayback.value === "docked") {
+    if (nextWorksDockY !== null) scrollToImmediately(nextWorksDockY);
     lastScrollY = window.scrollY;
     return;
   }
@@ -1637,9 +1630,7 @@ async function handleResize() {
     transitionPlayback.value === "forward" ||
     transitionPlayback.value === "reverse"
   ) {
-    // Keep the in-flight choreography at the same normalized document
-    // position when the Hero height changes. Rebase an active scroll segment
-    // at its current progress so its easing continues without a restart.
+    // Preserve the normalized K2 scroll position when the Hero height changes.
     const scale = previousHeroHeight > 0
       ? heroHeight.value / previousHeroHeight
       : 1;
@@ -1659,9 +1650,6 @@ async function handleResize() {
     return;
   }
 
-  // Preserve the reader's offset inside Part.01 when a viewport resize changes
-  // the Hero height. Otherwise a taller Hero could make a normal resize look
-  // like an upward gesture across the reverse boundary.
   if (
     transitionPlayback.value === "complete" &&
     previousScrollY >= previousHeroHeight - 1
@@ -1670,8 +1658,6 @@ async function handleResize() {
     scrollToImmediately(heroHeight.value + contentOffset);
   }
 
-  // Ignore layout-induced scroll changes from resize before native scrolling
-  // resumes or a new K1 downward gesture is detected.
   lastScrollY = window.scrollY;
 }
 
