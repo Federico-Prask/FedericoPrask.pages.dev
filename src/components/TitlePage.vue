@@ -1784,10 +1784,22 @@ onBeforeUnmount(() => {
       aria-hidden="true"
     ></div>
 
+    <div
+      v-if="prefersReducedMotion && introductionStarted"
+      class="works-section-stage"
+    >
+      <WorksSection />
+      <section id="milestones-section" class="document-part-section" aria-labelledby="milestones-heading">
+        <h2 id="milestones-heading" class="document-part-heading">Part.03 Milestones</h2>
+      </section>
+      <section id="beyond-section" class="document-part-section" aria-labelledby="beyond-heading">
+        <h2 id="beyond-heading" class="document-part-heading">Part.04 Beyond</h2>
+      </section>
+    </div>
   </div>
 
   <div
-    v-if="introductionStarted"
+    v-if="introductionStarted && !prefersReducedMotion"
     ref="worksOverlayRef"
     class="works-overlay"
     :class="{ 'is-docked': worksPlayback === 'docked' || worksPlayback === 'forward' || worksPlayback === 'reverse', 'is-active': worksPlayback === 'complete' }"
