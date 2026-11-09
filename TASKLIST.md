@@ -31,7 +31,7 @@ The active application is a deliberately small Vue page. The old page compositio
 - K4/K5 use one 1250ms In Cubic driver, with reverse playback following the same trajectory. The retained Part.01/Part.02 divider is recalculated from current viewport geometry and the Introduction highlighter is raised slightly. K5 preserves title scale and changes position only. Build and browser verification remain pending.
 - A local production build and browser visual review have not been completed.
 
-**Next implementation target:** run a local production build and browser review. Verify K0–K5 forward and reverse, especially the Introduction article's complete removal from normal flow before Part.01 contracts; verify wheel/touch/keyboard locking and free scrolling through reading regions; check responsive divider/highlighter placement, both themes, reduced motion, and desktop/mobile layouts. Part.02 reuses the second title row from the shared four-Part framework; native document scrolling moves Part.01 out of view and naturally brings Part.02 into view.
+**Next implementation target:** run a local production build and browser review. Verify K0–K5 and the new Part.02 two-stage transition in both directions; specifically check the four-title/five-rule reassembly, Part.01 leaving the viewport, Part.02 remaining at its document coordinate, input-boundary behavior, responsive geometry, both themes and reduced motion. Source-level implementation is present; visual and build verification remain pending.
 
 ## 2. Foundation and repository cleanup
 
@@ -211,10 +211,13 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Specify Part.02 as alternating editorial collage-and-copy rows in `DESIGN.md`.
 - [x] Reuse the Part.02 title from the shared four-Part framework; do not create a separate heading strip.
 - [x] Keep Part.02 title typography, scale, row alignment and horizontal rules identical to Part.01.
+- [x] Reassemble all four Part titles and five original rules before the Part.02 pull-out.
 - [x] Design four alternating editorial rows: media-left/copy-right, then copy-left/media-right.
 - [x] Add bilingual category-level copy for Development, Visual Design, Music Production, and Video & Motion.
-- [x] Align the Part.02 row's lower rule after the measured Introduction using its compact framework row height plus a 24px gap.
-- [x] Let native document scrolling push Part.01 out of the viewport and bring Part.02 into view; remove the dock, fixed cover and custom Works scroll interception.
+- [x] Measure the Part.02 row from the actual Introduction end and preserve its original document coordinate.
+- [x] Reuse the Part.01 60vh expansion geometry and expand the Part.02 row.
+- [x] Scroll the document during framework reassembly so Part.01 leaves the viewport while Part.02 stays in its normal document position.
+- [x] Reverse the two-stage transition at the Part.02 top boundary after a separate upward gesture.
 - [ ] Define separate entrance behavior for Parts 03 and 04; do not assume they share Part.02's motion.
 - [ ] Curate Development projects.
 - [ ] Curate Graphic Design works.
@@ -282,9 +285,12 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Put the page under one page-level Scene owned by `TitlePage.vue`.
 - [x] Inline Works data, layout and content in that Scene; remove the separate Works section component.
 - [x] Keep Works, Milestones and Beyond in the same normal document flow after Introduction.
-- [x] Remove the fixed Part.02 layer, temporary viewport slot, dock and cover/reverse states.
-- [x] Keep all reading on native `window` scrolling; do not add a nested scroll container or manually adjust wheel/touch deltas.
+- [x] Remove the fixed Part.02 layer and temporary viewport slot.
+- [x] Implement the Part.02 framework reassembly and pull-out transition with reverse boundary handling.
+- [x] Keep ordinary reading on native `window` scrolling; do not add a nested scroll container or manually adjust wheel/touch deltas.
 - [x] Keep the page-edge vertical rails attached to the shared Scene.
 - [ ] Run `vp build` locally.
-- [ ] Browser-test native wheel/trackpad momentum, touch/keyboard/scrollbar reading, responsive resize and reduced-motion mode.
-- [ ] Verify the Part.02 shared title row begins 24px after the tagline, matches Part.01 typography exactly, and does not overlap Works content.
+- [ ] Run `vp build` locally and resolve any Vue/TypeScript/template errors.
+- [ ] Browser-test the four-title/five-rule reassembly, Part.01 exit, Part.02 row expansion and reverse animation.
+- [ ] Verify the Part.02 title stays at its original document coordinate and Works content starts after the expanded row plus 24px.
+- [ ] Test wheel/trackpad, touch, keyboard, scrollbar, resize, light/dark themes and reduced-motion behavior.
