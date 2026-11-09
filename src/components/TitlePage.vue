@@ -656,41 +656,46 @@ let pendingK2 = false;
 let lastScrollY = 0;
 let isUnmounting = false;
 let reverseIntroductionAnimations: Animation[] = [];
-let documentPartHeadingObserver: IntersectionObserver | null = null;
+let pageContentObserver: IntersectionObserver | null = null;
 
-function observeDocumentPartHeadings() {
-  documentPartHeadingObserver?.disconnect();
-  documentPartHeadingObserver = null;
+function observePageContent() {
+  pageContentObserver?.disconnect();
+  pageContentObserver = null;
 
-  const headings = Array.from(
-    document.querySelectorAll<HTMLElement>(".document-part-heading"),
+  const targets = Array.from(
+    document.querySelectorAll<HTMLElement>(
+      ".works-section__header, .works-row, .document-part-heading",
+    ),
   );
-  if (headings.length === 0) return;
+  if (targets.length === 0) return;
 
   if (
     prefersReducedMotion ||
     typeof IntersectionObserver === "undefined"
   ) {
-    headings.forEach((heading) => heading.classList.add("is-visible"));
+    targets.forEach((target) => target.classList.add("is-visible"));
     return;
   }
 
-  documentPartHeadingObserver = new IntersectionObserver((entries, observer) => {
+  pageContentObserver = new IntersectionObserver((entries, observer) => {
     for (const entry of entries) {
       if (!entry.isIntersecting) continue;
 
-      const heading = entry.target as HTMLElement;
-      if (window.getComputedStyle(heading).visibility !== "visible") continue;
+      const target = entry.target as HTMLElement;
+      if (
+        target.classList.contains("document-part-heading") &&
+        window.getComputedStyle(target).visibility !== "visible"
+      ) continue;
 
-      heading.classList.add("is-visible");
-      observer.unobserve(heading);
+      target.classList.add("is-visible");
+      observer.unobserve(target);
     }
   }, {
-    threshold: 0.2,
+    threshold: 0.18,
     rootMargin: "0px 0px -12% 0px",
   });
 
-  headings.forEach((heading) => documentPartHeadingObserver?.observe(heading));
+  targets.forEach((target) => pageContentObserver?.observe(target));
 }
 
 const K2_RECOMPOSE_DURATION = 720;
@@ -911,6 +916,7 @@ function animatePart02Expansion(reverse = false) {
       beginPart02ReverseRecompose();
     } else {
       part02Playback.value = "complete";
+      void nextTick().then(observePageContent);
     }
   };
 
@@ -1006,7 +1012,7 @@ async function beginK4() {
     transitionPlayback.value = "complete";
     lastScrollY = window.scrollY;
     await nextTick();
-    observeDocumentPartHeadings();
+    observePageContent();
     return;
   }
 
@@ -1028,7 +1034,7 @@ async function beginK4() {
       transitionPlayback.value = "complete";
       lastScrollY = window.scrollY;
       void updatePart02FrameworkPosition();
-      void nextTick().then(observeDocumentPartHeadings);
+      void nextTick().then(observePageContent);
     }
   };
 
@@ -1827,8 +1833,8 @@ onBeforeUnmount(() => {
   if (k4Frame !== undefined) window.cancelAnimationFrame(k4Frame);
   if (part02Frame !== undefined) window.cancelAnimationFrame(part02Frame);
   clearPart02ReverseGestureGate();
-  documentPartHeadingObserver?.disconnect();
-  documentPartHeadingObserver = null;
+  pageContentObserver?.disconnect();
+  pageContentObserver = null;
   if (scrollFrame !== undefined) {
     window.cancelAnimationFrame(scrollFrame);
     scrollFrame = undefined;
@@ -2310,6 +2316,33 @@ onBeforeUnmount(() => {
   margin-inline: auto;
   padding-block: 0 clamp(6rem, 12vw, 11rem);
   color: var(--site-text-primary);
+}
+
+.works-section__header,
+.works-row {
+  opacity: 0;
+  transform: translateY(1.15rem);
+  transition:
+    opacity 620ms cubic-bezier(0.22, 0.7, 0.24, 1),
+    transform 760ms cubic-bezier(0.22, 0.7, 0.24, 1);
+}
+
+.works-section__header.is-visible,
+.works-row.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.works-row:nth-child(2) {
+  transition-delay: 90ms;
+}
+
+.works-row:nth-child(3) {
+  transition-delay: 160ms;
+}
+
+.works-row:nth-child(4) {
+  transition-delay: 230ms;
 }
 
 .works-section__header {
@@ -3070,6 +3103,20 @@ onBeforeUnmount(() => {
     opacity: 1;
     transform: none;
     animation: none;
+  }
+
+  .works-section__header,
+  .works-row,
+  .document-part-heading__text {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .document-part-heading::before,
+  .document-part-heading::after {
+    transform: none;
+    transition: none;
   }
 
   .framework-title__cursor,
