@@ -52,6 +52,9 @@ const introductionContentRef = ref<HTMLElement | null>(null);
 const worksSpacerHeight = ref(0);
 const worksFrameworkDropDistance = ref(0);
 const worksBoundaryRef = ref<HTMLElement | null>(null);
+const worksOverlayRef = ref<HTMLElement | null>(null);
+let worksOverlayAnimation: Animation | null = null;
+let bodyOverflowBeforeWorks: string | null = null;
 const transitionPlayback = ref<TransitionPlayback>("idle");
 const k3Reversing = ref(false);
 const heroNameInset = ref(0);
@@ -534,54 +537,83 @@ function beginWorksEntrance() {
     worksPlayback.value !== "docked"
   ) return;
 
-  const boundary = getWorksBoundaryY();
-  if (boundary === null) return;
+  const overlay = worksOverlayRef.value;
+  if (!overlay) return;
 
   worksPlayback.value = "forward";
   blockCurrentInputGestures();
+  overlay.scrollTop = 0;
 
   if (prefersReducedMotion) {
-    scrollToImmediately(boundary);
+    activateWorksOverlay();
     worksPlayback.value = "complete";
-    lastScrollY = window.scrollY;
     return;
   }
 
-  animateDocumentScroll(
-    () => getWorksBoundaryY() ?? boundary,
-    WORKS_TRANSITION_DURATION,
-    "in-out-cubic",
-    () => {
-      worksPlayback.value = "complete";
-      lastScrollY = window.scrollY;
-    },
+  worksOverlayAnimation?.cancel();
+  worksOverlayAnimation = overlay.animate(
+    [
+      { transform: "translate3d(0, calc(100% - var(--works-overlay-peek)), 0)" },
+      { transform: "translate3d(0, 0, 0)" },
+    ],
+    { duration: WORKS_TRANSITION_DURATION, easing: "cubic-bezier(0.645, 0.045, 0.355, 1)", fill: "forwards" },
   );
+  worksOverlayAnimation.onfinish = () => {
+    worksOverlayAnimation = null;
+    overlay.style.transform = "translate3d(0, 0, 0)";
+    activateWorksOverlay();
+    worksPlayback.value = "complete";
+  };
+}
+
+function activateWorksOverlay() {
+  const overlay = worksOverlayRef.value;
+  if (!overlay) return;
+  bodyOverflowBeforeWorks = document.body.style.overflow;
+  document.body.style.overflow = "hidden";
+  overlay.classList.add("is-active");
+  overlay.scrollTop = 0;
+}
+
+function deactivateWorksOverlay() {
+  const overlay = worksOverlayRef.value;
+  overlay?.classList.remove("is-active");
+  document.body.style.overflow = bodyOverflowBeforeWorks ?? "";
+  bodyOverflowBeforeWorks = null;
 }
 
 function beginWorksReverse() {
   if (worksPlayback.value !== "complete") return;
-  const dockY = getWorksDockScrollY();
-  if (dockY === null) return;
+  const overlay = worksOverlayRef.value;
+  if (!overlay || overlay.scrollTop > 1) return;
 
   worksPlayback.value = "reverse";
   blockCurrentInputGestures();
 
-  if (prefersReducedMotion) {
-    scrollToImmediately(dockY);
+  const finishReverse = () => {
+    deactivateWorksOverlay();
+    overlay.style.transform = "";
     worksPlayback.value = "docked";
     lastScrollY = window.scrollY;
+  };
+
+  if (prefersReducedMotion) {
+    finishReverse();
     return;
   }
 
-  animateDocumentScroll(
-    () => getWorksDockScrollY() ?? dockY,
-    WORKS_TRANSITION_DURATION,
-    "in-out-cubic",
-    () => {
-      worksPlayback.value = "docked";
-      lastScrollY = window.scrollY;
-    },
+  worksOverlayAnimation?.cancel();
+  worksOverlayAnimation = overlay.animate(
+    [
+      { transform: "translate3d(0, 0, 0)" },
+      { transform: "translate3d(0, calc(100% - var(--works-overlay-peek)), 0)" },
+    ],
+    { duration: WORKS_TRANSITION_DURATION, easing: "cubic-bezier(0.645, 0.045, 0.355, 1)", fill: "forwards" },
   );
+  worksOverlayAnimation.onfinish = () => {
+    worksOverlayAnimation = null;
+    finishReverse();
+  };
 }
 
 
@@ -644,6 +676,8 @@ function animateDocumentScroll(
   easing: ScrollEasing = "in-out-cubic",
   onComplete?: () => void,
 ) {
+  worksOverlayAnimation?.cancel();
+  worksOverlayAnimation = null;
   if (scrollFrame !== undefined) {
     window.cancelAnimationFrame(scrollFrame);
     scrollFrame = undefined;
@@ -1018,10 +1052,8 @@ function handleWheel(event: WheelEvent) {
 
   if (
     worksPlayback.value === "complete" &&
-    worksBoundary !== null &&
     event.deltaY < 0 &&
-    (window.scrollY <= worksBoundary + 1 ||
-      window.scrollY + event.deltaY <= worksBoundary)
+    worksOverlayRef.value?.scrollTop === 0
   ) {
     event.preventDefault();
     scrollToImmediately(worksBoundary);
@@ -1143,9 +1175,8 @@ function handleTouchMove(event: TouchEvent) {
 
   if (
     worksPlayback.value === "complete" &&
-    worksBoundary !== null &&
-    stepDelta < -8 &&
-    window.scrollY + stepDelta <= worksBoundary
+    worksOverlayRef.value?.scrollTop === 0 &&
+    stepDelta < -8
   ) {
     event.preventDefault();
     scrollToImmediately(worksBoundary);
@@ -1247,6 +1278,11 @@ function handleDocumentScroll() {
     if (movedUp) worksPlayback.value = "idle";
   }
 
+  if (worksPlayback.value === "complete") {
+    lastScrollY = currentY;
+    return;
+  }
+
   if (
     worksPlayback.value === "complete" &&
     movedUp &&
@@ -1343,10 +1379,7 @@ function handleKeydown(event: KeyboardEvent) {
   if (
     worksPlayback.value === "complete" &&
     scrollUp &&
-    worksBoundary !== null &&
-    (event.key === "Home" ||
-      window.scrollY <= worksBoundary + 1 ||
-      (event.key === "PageUp" && window.scrollY - viewport.value.height <= worksBoundary))
+    worksOverlayRef.value?.scrollTop === 0
   ) {
     event.preventDefault();
     scrollToImmediately(worksBoundary);
@@ -1549,6 +1582,7 @@ onBeforeUnmount(() => {
   }
   activeScrollAnimation = null;
   restoreDocumentScrollBehavior();
+  deactivateWorksOverlay();
   document.documentElement.classList.remove("k3-content-theme");
   document.documentElement.classList.remove("k3-content-theme-reversing");
 
@@ -1693,13 +1727,6 @@ onBeforeUnmount(() => {
       class="works-section-boundary"
       aria-hidden="true"
     ></div>
-    <div
-      v-if="introductionStarted"
-      class="works-section-stage"
-      :aria-hidden="worksPlayback !== 'complete'"
-    >
-      <WorksSection />
-    </div>
 
     <section
       v-if="introductionStarted"
@@ -1720,6 +1747,28 @@ onBeforeUnmount(() => {
       <h2 id="beyond-heading" class="document-part-heading">Part.04 Beyond</h2>
       <div class="document-part-content" aria-hidden="true"></div>
     </section>
+  </div>
+
+  <div
+    v-if="introductionStarted"
+    ref="worksOverlayRef"
+    class="works-overlay"
+    :class="{ 'is-docked': worksPlayback === 'docked' || worksPlayback === 'forward' || worksPlayback === 'reverse', 'is-active': worksPlayback === 'complete' }"
+    :aria-hidden="worksPlayback !== 'complete' && worksPlayback !== 'docked' && worksPlayback !== 'forward' && worksPlayback !== 'reverse'"
+  >
+    <header class="works-overlay__heading">
+      <span>Part.02 Works</span>
+      <span class="works-overlay__rule" aria-hidden="true"></span>
+    </header>
+    <div class="works-overlay__scroll">
+      <WorksSection />
+      <section id="milestones-section" class="document-part-section" aria-labelledby="milestones-heading">
+        <h2 id="milestones-heading" class="document-part-heading">Part.03 Milestones</h2>
+      </section>
+      <section id="beyond-section" class="document-part-section" aria-labelledby="beyond-heading">
+        <h2 id="beyond-heading" class="document-part-heading">Part.04 Beyond</h2>
+      </section>
+    </div>
   </div>
 
   <div
@@ -1968,6 +2017,66 @@ onBeforeUnmount(() => {
   width: 100%;
 }
 
+.works-overlay {
+  --works-overlay-peek: clamp(4.5rem, 9vw, 8rem);
+  position: fixed;
+  z-index: 30;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--site-page-background);
+  color: var(--site-text-primary);
+  transform: translate3d(0, calc(100% - var(--works-overlay-peek)), 0);
+  visibility: hidden;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.works-overlay.is-docked {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.works-overlay.is-active {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.works-overlay__heading {
+  display: flex;
+  flex: 0 0 var(--works-overlay-peek);
+  align-items: center;
+  gap: 1.5rem;
+  padding-inline: clamp(1.5rem, 4.2vw, 4.5rem);
+  border-block: 0.35px solid var(--site-framework-rule);
+  color: var(--site-text-primary);
+  font-family: "SF Pro Display", var(--font-heading);
+  font-size: clamp(1.7rem, 3.4vw, 3.4rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1;
+}
+
+.works-overlay__rule {
+  flex: 1;
+  height: 0.35px;
+  background: var(--site-framework-rule);
+}
+
+.works-overlay__scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.works-overlay.is-docked .works-overlay__scroll,
+.works-overlay.is-docked .works-overlay__heading {
+  pointer-events: none;
+}
+
 .document-part-section {
   position: relative;
   width: 100%;
@@ -2140,7 +2249,7 @@ onBeforeUnmount(() => {
 
 /* Parts 03 and 04 leave the opening overlay after K5. Their document-flow
    headings are placed after the complete preceding sections. */
-.framework-titles.is-k5-complete .framework-title.is-flow-replaced {
+.framework-titles.is-k5-complete .framework-title {
   visibility: hidden;
 }
 
