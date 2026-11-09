@@ -1462,38 +1462,18 @@ Until the user supplies the final curated media, each collage is represented by 
 The section is placed after the Introduction in normal document flow. Its dedicated pull-out entrance and reverse-boundary behavior remain a separate implementation task; do not let a mount-time animation play while the reader is still reading Part.01.
 
 
-### 6.7 Part.02 entrance and reverse interaction
+### 6.7 Part.02 as part of one page Scene
 
-Part.02 is a dedicated fixed overlay, not a Works section moved by document scrolling. Its dock point is aligned to the lower horizontal rule of the Part.02 framework row, which is placed 32px after the measured end of the Introduction. The first downward gesture that reaches the dock only snaps the document to that point and reveals the bottom title strip. A separate downward gesture starts the 1150ms In-Out Cubic overlay entrance.
+The page is implemented as one Vue page Scene, owned by `TitlePage.vue`. Introduction, Works, Milestones and Beyond are part of the same page-level document structure. Works content is inline in that Scene; it is not a separately mounted page or an independent nested-scroll component.
 
-The overlay itself moves from the bottom of the viewport to cover the stationary Part.01 layer. The document `scrollY` does not animate during this transition. Once the cover finishes, the document root and body are locked and the overlay's own scroll container takes over. Reverse animation is available only after the overlay content has been scrolled all the way to its top; the gesture that merely returns content to the top does not also reverse the cover.
+Part.02 is in normal document flow at its actual position immediately after the Introduction. Only at the Part.02 entrance boundary does that same DOM section temporarily switch to fixed positioning. A temporary `100svh` flow slot preserves its original place in the document while the section is fixed.
 
-Touch input uses the end of the current touch gesture as the dock/entrance boundary. Keyboard input uses key release. A continuous wheel burst is not treated as two gestures: after docking, a 240ms wheel-idle interval is required before the next downward wheel gesture can start the cover. Reduced-motion users skip the dock and cover and read Works, Milestones and Beyond in normal document flow.
+The first downward gesture that reaches the dock only stops at the Part.02 boundary and exposes the heading strip at the viewport bottom. A separate downward gesture, after the current wheel burst has ended, starts the 1150ms In-Out Cubic cover animation. The Part.02 Scene moves upward over the stationary Part.01 content. When the cover finishes, the document position is transferred to the Part.02 start while the cover still obscures the change; the temporary flow slot is removed and the same Part.02 element returns to normal document flow.
 
-### 6.8 Part heading ownership and content boundaries
+After the cover, the browser's native page scrolling handles Works, Milestones and Beyond. Do not create a nested scroll container for Works. Do not translate each Works row independently. Do not manually add wheel deltas to `scrollTop` or `window.scrollY` during normal reading; this would discard native trackpad momentum and make scrolling feel stepped.
 
-The opening framework introduces all four Part titles during K2–K5. After K5, the Part.01 title remains visible; the fallen Part.02–04 title instances in the opening framework are hidden to prevent duplicates. A separate Part.02 heading belongs to the fixed overlay and appears only at the dock.
+At the top boundary of Part.02, a fresh upward input reverses the Scene cover. If a gesture merely crosses the boundary, first stop at the boundary and wait for a separate gesture; do not reverse on the same gesture. After reverse completes, Part.02 returns to the dock and upward page scrolling resumes through Part.01.
 
-In normal-motion mode, Part.03 is rendered after the complete Works section inside the Part.02 overlay. Part.04 follows the Milestones section inside that same overlay. Their positions therefore follow the actual preceding content heights. They are not floating rows in the middle of Works. In reduced-motion mode, all three content sections are placed in normal document flow.
+The page-edge vertical rails remain part of the shared Scene and use the measured K3 left/right insets. The Part.01 title stays visible after K5; only the fallen Part.02–04 title instances in the opening framework are hidden, because the corresponding content headings belong to their actual sections.
 
-### 6.9 Part.02 is a fixed overlay, not document scrolling
-
-At the Part.02 dock, a dedicated fixed overlay exposes only its heading strip at the bottom edge of the viewport. The next downward gesture animates the overlay itself from `translateY(100% - peek)` to `translateY(0)` over 1150ms with In-Out Cubic easing. The Introduction remains stationary underneath; the document's `scrollY` is not animated during this cover transition.
-
-After the entrance, the body scroll is locked and the overlay's own content viewport becomes the active scroll container. Works, Milestones, and Beyond live inside this same overlay in document order. An upward gesture at the overlay's scroll origin reverses the overlay animation and restores the underlying Introduction. The previous absolute framework titles are hidden after K5 to avoid duplicating or overlapping the dedicated Part.02 heading.
-
-
-### 6.10 Part.02 geometry, persistent Part.01 title, and scroll ownership corrections
-
-The Part.02 dock is keyed to the **lower rule of the Part.02 row**. With five horizontal rules defining four rows, that boundary is after the expanded Part.01 row plus exactly one compact Part.02 row. Including two compact rows moves the Part.02 lower rule one row too far down and makes it appear before its intended dock point.
-
-After K5, Part.01's title remains visible. Only the fallen Part.02–04 titles in the opening overlay are hidden; the dedicated Part.02 dock/cover heading is rendered by the fixed overlay.
-
-The active overlay owns all scroll input. Both the document root and body are locked while it is active. Wheel and touch deltas are routed into the Works scroll container; an upward gesture reverses the cover only when that inner container is already at its top. A gesture that merely scrolls the content back to the top does not also reverse the cover. Keyboard scrolling uses the same inner container. The two page-edge vertical rules are recreated inside the overlay using K3's measured left/right insets.
-
-Reduced-motion users do not receive the fixed cover/dock interaction. Works, Milestones, and Beyond remain in ordinary document flow so the content is still reachable with native scrolling.
-
-
-### 6.11 Separate wheel gestures at the Part.02 dock
-
-The wheel event that reaches the Part.02 dock only places the page at rest and reveals the strip. Further wheel events in the same continuous burst are consumed. A 240ms idle interval is required before a fresh downward wheel gesture can start the fixed-overlay cover animation. Touch input uses the end of the current touch gesture as its boundary; keyboard input uses key release. This prevents a high-resolution trackpad burst from being interpreted as both the docking gesture and the separate entrance gesture.
+Reduced-motion users skip the dock and cover animation. The same Parts remain in normal document flow and use native page scrolling.
