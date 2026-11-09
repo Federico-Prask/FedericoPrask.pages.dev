@@ -1736,7 +1736,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <main class="page-scene">
+  <div class="page-scene">
   <section
     id="title-page"
     ref="titlePageRef"
@@ -2010,7 +2010,7 @@ onBeforeUnmount(() => {
       </div>
     </div>
   </div>
-  </main>
+  </div>
 </template>
 
 <style scoped>
