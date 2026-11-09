@@ -294,3 +294,6 @@ The active application is a deliberately small Vue page. The old page compositio
 - [ ] Browser-test the four-title/five-rule reassembly, Part.01 exit, Part.02 row expansion and reverse animation.
 - [ ] Verify the Part.02 title stays at its original document coordinate and Works content starts after the expanded row plus 24px.
 - [ ] Test wheel/trackpad, touch, keyboard, scrollbar, resize, light/dark themes and reduced-motion behavior.
+- [x] Hide duplicate Part.03/Part.04 document-flow headings while the shared four-title framework is being reassembled or pulled out.
+- [x] Fade shared Part.03/Part.04 framework labels out when Part.02 expansion begins so they cannot overlap Works content.
+- [ ] Browser-verify the reassembly frame contains exactly one copy of each Part title and that Part.03/Part.04 are absent during the Part.02 expansion.
