@@ -31,7 +31,7 @@ The active application is a deliberately small Vue page. The old page compositio
 - K4/K5 use one 1250ms In Cubic driver, with reverse playback following the same trajectory. The retained Part.01/Part.02 divider is recalculated from current viewport geometry and the Introduction highlighter is raised slightly. K5 preserves title scale and changes position only. Build and browser verification remain pending.
 - A local production build and browser visual review have not been completed.
 
-**Next implementation target:** run a local production build and browser review. Verify K0–K5 forward and reverse, especially the Introduction article's complete removal from normal flow before Part.01 contracts; verify wheel/touch/keyboard locking and free scrolling through reading regions; check responsive divider/highlighter placement, both themes, reduced motion, and desktop/mobile layouts. Part.02 still has no content markup; implement its specified controlled pull-out when the Works structure is designed.
+**Next implementation target:** run a local production build and browser review. Verify K0–K5 forward and reverse, especially the Introduction article's complete removal from normal flow before Part.01 contracts; verify wheel/touch/keyboard locking and free scrolling through reading regions; check responsive divider/highlighter placement, both themes, reduced motion, and desktop/mobile layouts. Part.02 collage-and-copy content is implemented; its two-step dock and whole-document scroll choreography are implemented, pending browser verification.
 
 ## 2. Foundation and repository cleanup
 
@@ -208,12 +208,12 @@ The active application is a deliberately small Vue page. The old page compositio
 ### 6.1 Part.02 — Works
 
 - [x] Specify Part.02 as alternating editorial collage-and-copy rows in `DESIGN.md`.
-- [x] Specify a one-piece upward pull-out entrance using In-Out Cubic easing, beginning below the final Part.01 content.
+- [x] Specify a two-step Part.02 dock: the title row's lower rule rests at the viewport bottom, then a separate downward gesture scrolls the full document upward.
 - [x] Keep Part.02 typography at its designed final size during the entrance; do not scale its title or content.
 - [x] Design four alternating editorial rows: media-left/copy-right, then copy-left/media-right.
 - [x] Add bilingual category-level copy for Development, Visual Design, Music Production, and Video & Motion.
-- [x] Implement the Part.02 one-piece upward pull-out entrance and reverse playback at its boundary, using a 1150ms In-Out Cubic trajectory without scaling typography.
-- [x] Integrate the boundary with wheel, single-touch, keyboard, native-scroll and scrollbar input; keep the preceding Introduction and gap freely scrollable.
+- [x] Implement the 1150ms In-Out Cubic whole-document entrance from the dock to the Works start, with reverse playback to the dock and no typography scaling.
+- [x] Integrate two-step docking and entrance with wheel, single-touch, keyboard, native-scroll and scrollbar input; preserve free Part.01 reading and reduced-motion native flow.
 - [ ] Define separate entrance behavior for Parts 03 and 04; do not assume they share Part.02's motion.
 - [ ] Curate Development projects.
 - [ ] Curate Graphic Design works.
@@ -282,14 +282,14 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Add four alternating media/copy rows with responsive stacking.
 - [x] Add colored collage placeholders to establish the intended media proportions and overlap.
 - [ ] Replace placeholders with the user's actual curated work images after they are uploaded/selected.
-- [ ] Implement and verify the dedicated Part.02 pull-out and reverse-boundary interaction.
+- [x] Implement the two-step Part.02 dock and whole-document entrance/reverse interaction; browser verification remains pending.
 
 
 ### Part.02 transition implementation
 
-- [x] Keep a normal-flow boundary marker separate from the translated Works stage.
-- [x] Lock directional scroll input while the stage enters or reverses.
-- [x] Preserve the section offset when viewport resizing changes the Works boundary.
-- [x] Cancel the Works animation frame on unmount.
-- [ ] Browser-test forward/reverse playback, boundary snapping, scrollbar input, touch input, keyboard input and responsive resizing.
-- [ ] Verify reduced-motion behavior in a browser.
+- [x] Align a normal-flow Works boundary marker with the Part.02 framework row's lower rule using a measured spacer.
+- [x] Dock on the first downward gesture; start the whole-document In-Out Cubic scroll on the next downward gesture.
+- [x] Reverse the whole-document scroll from the Works start boundary back to the dock.
+- [x] Lock directional input during the document-scroll transition and preserve its progress on viewport resize.
+- [ ] Browser-test the first-gesture dock, second-gesture whole-document entrance, reverse playback, boundary alignment, scrollbar/touch/keyboard input and responsive resizing.
+- [ ] Verify reduced-motion native scrolling and the Part.02 dock alignment in a browser.

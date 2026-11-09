@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
 import { useI18n } from "../composables/useI18n";
 import { useTheme } from "../composables/useTheme";
 import LogoMark from "./LogoMark.vue";
@@ -46,9 +46,10 @@ const k4Progress = ref(0);
 const k5Started = ref(false);
 const k5Progress = ref(0);
 const introductionStarted = ref(false);
-type WorksPlayback = "idle" | "forward" | "complete" | "reverse";
+type WorksPlayback = "idle" | "docked" | "forward" | "complete" | "reverse";
 const worksPlayback = ref<WorksPlayback>("idle");
-const worksProgress = ref(prefersReducedMotion ? 1 : 0);
+const introductionContentRef = ref<HTMLElement | null>(null);
+const worksSpacerHeight = ref(0);
 const worksBoundaryRef = ref<HTMLElement | null>(null);
 const transitionPlayback = ref<TransitionPlayback>("idle");
 const k3Reversing = ref(false);
@@ -429,13 +430,6 @@ const introductionStageStyle = computed(() => ({
   paddingInlineEnd: `${k3Geometry.value.titleInset}px`,
 }));
 
-const worksStageStyle = computed(() => ({
-  transform: `translate3d(0, ${((1 - worksProgress.value) * viewport.value.height).toFixed(2)}px, 0)`,
-  willChange: worksPlayback.value === "forward" || worksPlayback.value === "reverse" || worksProgress.value === 0
-    ? "transform"
-    : "auto",
-}));
-
 const frameworkVerticalLeftStyle = computed(() => ({
   left: k3Geometry.value.boundaryInset + "px",
 }));
@@ -453,7 +447,6 @@ let k2ExpandTimer: number | undefined;
 let k3StartTimer: number | undefined;
 let k3Frame: number | undefined;
 let k4Frame: number | undefined;
-let worksFrame: number | undefined;
 let scrollFrame: number | undefined;
 let activeScrollAnimation: ActiveScrollAnimation | null = null;
 let touchStartY: number | null = null;
@@ -500,57 +493,88 @@ function getWorksBoundaryY(): number | null {
   return marker.getBoundingClientRect().top + window.scrollY;
 }
 
-function animateWorksProgress(target: 0 | 1, direction: "forward" | "reverse") {
-  if (worksFrame !== undefined) {
-    window.cancelAnimationFrame(worksFrame);
-    worksFrame = undefined;
-  }
+function getPart02RowBottomY(): number {
+  return (
+    heroHeight.value +
+    k3Geometry.value.stageInset +
+    k4Geometry.value.firstRowHeight +
+    k4Geometry.value.compactRowHeight
+  );
+}
 
-  worksPlayback.value = direction;
-  blockCurrentInputGestures();
+async function updateWorksSpacer() {
+  await nextTick();
+  const article = introductionContentRef.value;
+  if (!article) return;
 
-  const from = worksProgress.value;
-  const distance = Math.abs(target - from);
-  if (prefersReducedMotion || distance === 0) {
-    worksProgress.value = target;
-    worksPlayback.value = target === 1 ? "complete" : "idle";
-    lastScrollY = window.scrollY;
-    return;
-  }
+  const articleBottom = article.getBoundingClientRect().bottom + window.scrollY;
+  worksSpacerHeight.value = Math.max(0, getPart02RowBottomY() - articleBottom);
+  await nextTick();
+}
 
-  const startTime = performance.now();
-  const duration = WORKS_TRANSITION_DURATION * distance;
-  const frame = (now: number) => {
-    const progress = Math.min(1, (now - startTime) / duration);
-    const eased = easeInOutCubic(progress);
-    worksProgress.value = from + (target - from) * eased;
-
-    if (progress < 1) {
-      worksFrame = window.requestAnimationFrame(frame);
-    } else {
-      worksFrame = undefined;
-      worksProgress.value = target;
-      worksPlayback.value = target === 1 ? "complete" : "idle";
-      lastScrollY = window.scrollY;
-    }
-  };
-
-  worksFrame = window.requestAnimationFrame(frame);
+function getWorksDockScrollY(): number | null {
+  const boundary = getWorksBoundaryY();
+  if (boundary === null) return null;
+  return Math.max(0, boundary - viewport.value.height);
 }
 
 function beginWorksEntrance() {
   if (
     !introductionStarted.value ||
     transitionPlayback.value !== "complete" ||
-    worksPlayback.value !== "idle"
+    worksPlayback.value !== "docked"
   ) return;
-  animateWorksProgress(1, "forward");
+
+  const boundary = getWorksBoundaryY();
+  if (boundary === null) return;
+
+  worksPlayback.value = "forward";
+  blockCurrentInputGestures();
+
+  if (prefersReducedMotion) {
+    scrollToImmediately(boundary);
+    worksPlayback.value = "complete";
+    lastScrollY = window.scrollY;
+    return;
+  }
+
+  animateDocumentScroll(
+    () => getWorksBoundaryY() ?? boundary,
+    WORKS_TRANSITION_DURATION,
+    "in-out-cubic",
+    () => {
+      worksPlayback.value = "complete";
+      lastScrollY = window.scrollY;
+    },
+  );
 }
 
 function beginWorksReverse() {
   if (worksPlayback.value !== "complete") return;
-  animateWorksProgress(0, "reverse");
+  const dockY = getWorksDockScrollY();
+  if (dockY === null) return;
+
+  worksPlayback.value = "reverse";
+  blockCurrentInputGestures();
+
+  if (prefersReducedMotion) {
+    scrollToImmediately(dockY);
+    worksPlayback.value = "docked";
+    lastScrollY = window.scrollY;
+    return;
+  }
+
+  animateDocumentScroll(
+    () => getWorksDockScrollY() ?? dockY,
+    WORKS_TRANSITION_DURATION,
+    "in-out-cubic",
+    () => {
+      worksPlayback.value = "docked";
+      lastScrollY = window.scrollY;
+    },
+  );
 }
+
 
 function resolveScrollEasing(
   easing: ScrollEasing,
@@ -609,6 +633,7 @@ function animateDocumentScroll(
   targetY: number | (() => number),
   duration: number,
   easing: ScrollEasing = "in-out-cubic",
+  onComplete?: () => void,
 ) {
   if (scrollFrame !== undefined) {
     window.cancelAnimationFrame(scrollFrame);
@@ -653,6 +678,7 @@ function animateDocumentScroll(
       window.scrollTo(0, finalTargetY);
       restoreDocumentScrollBehavior();
       lastScrollY = finalTargetY;
+      onComplete?.();
     }
   };
 
@@ -676,6 +702,7 @@ function beginK4() {
     introductionStarted.value = true;
     transitionPlayback.value = "complete";
     lastScrollY = window.scrollY;
+    void updateWorksSpacer();
     return;
   }
 
@@ -698,6 +725,7 @@ function beginK4() {
       k5Progress.value = 1;
       transitionPlayback.value = "complete";
       lastScrollY = window.scrollY;
+      void updateWorksSpacer();
     }
   };
 
@@ -962,25 +990,35 @@ function reverseK2StageA() {
 }
 
 function handleWheel(event: WheelEvent) {
-  // Trackpad pinch gestures are commonly exposed as Ctrl+wheel. Preserve
-  // browser zoom instead of consuming them as page-navigation input.
   if (event.ctrlKey) return;
-
   if (worksPlayback.value === "forward" || worksPlayback.value === "reverse") {
     event.preventDefault();
     return;
   }
 
   const worksBoundary = getWorksBoundaryY();
+  const worksDockY = getWorksDockScrollY();
+
+  if (worksPlayback.value === "docked") {
+    if (event.deltaY > 0) {
+      event.preventDefault();
+      beginWorksEntrance();
+    } else if (event.deltaY < 0) {
+      worksPlayback.value = "idle";
+    }
+    return;
+  }
+
   if (
     worksPlayback.value === "complete" &&
     worksBoundary !== null &&
     event.deltaY < 0 &&
-    (window.scrollY <= worksBoundary + 1 || window.scrollY + event.deltaY <= worksBoundary)
+    (window.scrollY <= worksBoundary + 1 ||
+      window.scrollY + event.deltaY <= worksBoundary)
   ) {
     event.preventDefault();
     scrollToImmediately(worksBoundary);
-    lastScrollY = worksBoundary;
+    lastScrollY = window.scrollY;
     beginWorksReverse();
     return;
   }
@@ -988,15 +1026,16 @@ function handleWheel(event: WheelEvent) {
   if (
     !prefersReducedMotion &&
     worksPlayback.value === "idle" &&
-    introductionStarted.value &&
-    worksBoundary !== null &&
+    transitionPlayback.value === "complete" &&
+    worksDockY !== null &&
     event.deltaY > 0 &&
-    (window.scrollY >= worksBoundary - 1 || window.scrollY + event.deltaY >= worksBoundary)
+    (window.scrollY >= worksDockY - 1 ||
+      window.scrollY + event.deltaY >= worksDockY)
   ) {
     event.preventDefault();
-    scrollToImmediately(worksBoundary);
-    lastScrollY = worksBoundary;
-    beginWorksEntrance();
+    scrollToImmediately(worksDockY);
+    worksPlayback.value = "docked";
+    lastScrollY = window.scrollY;
     return;
   }
 
@@ -1004,7 +1043,6 @@ function handleWheel(event: WheelEvent) {
     event.preventDefault();
     return;
   }
-
   if (
     transitionPlayback.value === "complete" &&
     event.deltaY < 0 &&
@@ -1017,18 +1055,14 @@ function handleWheel(event: WheelEvent) {
     beginReverseInitialTransition();
     return;
   }
-
-  if (
-    transitionPlayback.value === "idle" &&
-    !k2Started.value &&
-    event.deltaY > 0
-  ) {
+  if (transitionPlayback.value === "idle" && !k2Started.value && event.deltaY > 0) {
     event.preventDefault();
     beginK2();
   } else if (pendingK2 && event.deltaY > 0) {
     event.preventDefault();
   }
 }
+
 
 function handleTouchStart(event: TouchEvent) {
   touchGestureActive = event.touches.length > 0;
@@ -1066,14 +1100,9 @@ function handleTouchMove(event: TouchEvent) {
       worksPlayback.value === "forward" ||
       worksPlayback.value === "reverse" ||
       pendingK2
-    ) {
-      touchBlockedUntilEnd = true;
-    }
+    ) touchBlockedUntilEnd = true;
     return;
   }
-
-  // Keep pinch zoom available, but do not let the remaining finger resume a
-  // page gesture that began while a transition was locked.
   if (touchBlockedUntilEnd) {
     event.preventDefault();
     return;
@@ -1081,7 +1110,6 @@ function handleTouchMove(event: TouchEvent) {
 
   const currentY = event.touches[0]?.clientY;
   if (currentY === undefined || touchStartY === null || touchLastY === null) return;
-
   const delta = touchStartY - currentY;
   const stepDelta = touchLastY - currentY;
   touchLastY = currentY;
@@ -1093,6 +1121,19 @@ function handleTouchMove(event: TouchEvent) {
   }
 
   const worksBoundary = getWorksBoundaryY();
+  const worksDockY = getWorksDockScrollY();
+
+  if (worksPlayback.value === "docked") {
+    if (stepDelta > 8) {
+      event.preventDefault();
+      beginWorksEntrance();
+      touchBlockedUntilEnd = true;
+    } else if (stepDelta < -8) {
+      worksPlayback.value = "idle";
+    }
+    return;
+  }
+
   if (
     worksPlayback.value === "complete" &&
     worksBoundary !== null &&
@@ -1101,7 +1142,7 @@ function handleTouchMove(event: TouchEvent) {
   ) {
     event.preventDefault();
     scrollToImmediately(worksBoundary);
-    lastScrollY = worksBoundary;
+    lastScrollY = window.scrollY;
     beginWorksReverse();
     touchBlockedUntilEnd = true;
     return;
@@ -1110,15 +1151,15 @@ function handleTouchMove(event: TouchEvent) {
   if (
     !prefersReducedMotion &&
     worksPlayback.value === "idle" &&
-    introductionStarted.value &&
-    worksBoundary !== null &&
+    transitionPlayback.value === "complete" &&
+    worksDockY !== null &&
     stepDelta > 8 &&
-    window.scrollY + stepDelta >= worksBoundary
+    window.scrollY + stepDelta >= worksDockY
   ) {
     event.preventDefault();
-    scrollToImmediately(worksBoundary);
-    lastScrollY = worksBoundary;
-    beginWorksEntrance();
+    scrollToImmediately(worksDockY);
+    worksPlayback.value = "docked";
+    lastScrollY = window.scrollY;
     touchBlockedUntilEnd = true;
     return;
   }
@@ -1128,14 +1169,12 @@ function handleTouchMove(event: TouchEvent) {
     event.preventDefault();
     return;
   }
-
   if (transitionPlayback.value === "idle" && !k2Started.value && delta > 8) {
     event.preventDefault();
     beginK2();
     touchBlockedUntilEnd = true;
     return;
   }
-
   if (
     transitionPlayback.value === "complete" &&
     delta < -8 &&
@@ -1150,6 +1189,7 @@ function handleTouchMove(event: TouchEvent) {
     touchBlockedUntilEnd = true;
   }
 }
+
 
 function handleTouchEnd(event: TouchEvent) {
   touchGestureActive = event.touches.length > 0;
@@ -1174,22 +1214,31 @@ function handleTouchEnd(event: TouchEvent) {
 
 function handleDocumentScroll() {
   const currentY = window.scrollY;
-
   if (
     transitionPlayback.value === "forward" ||
     transitionPlayback.value === "reverse" ||
     worksPlayback.value === "forward" ||
     worksPlayback.value === "reverse"
   ) {
-    if (Math.abs(currentY - lastScrollY) > 1) {
-      scrollToImmediately(lastScrollY);
-    }
+    if (Math.abs(currentY - lastScrollY) > 1) scrollToImmediately(lastScrollY);
     return;
   }
 
   const movedUp = currentY < lastScrollY - 1;
   const movedDown = currentY > lastScrollY;
   const worksBoundary = getWorksBoundaryY();
+  const worksDockY = getWorksDockScrollY();
+
+  if (worksPlayback.value === "docked") {
+    if (movedDown) {
+      const dockY = getWorksDockScrollY();
+      if (dockY !== null) scrollToImmediately(dockY);
+      lastScrollY = window.scrollY;
+      beginWorksEntrance();
+      return;
+    }
+    if (movedUp) worksPlayback.value = "idle";
+  }
 
   if (
     worksPlayback.value === "complete" &&
@@ -1198,7 +1247,7 @@ function handleDocumentScroll() {
     currentY < worksBoundary - 1
   ) {
     scrollToImmediately(worksBoundary);
-    lastScrollY = worksBoundary;
+    lastScrollY = window.scrollY;
     beginWorksReverse();
     return;
   }
@@ -1206,27 +1255,23 @@ function handleDocumentScroll() {
   if (
     !prefersReducedMotion &&
     worksPlayback.value === "idle" &&
-    introductionStarted.value &&
+    transitionPlayback.value === "complete" &&
     movedDown &&
-    worksBoundary !== null &&
-    currentY >= worksBoundary - 1
+    worksDockY !== null &&
+    currentY >= worksDockY - 1
   ) {
-    scrollToImmediately(worksBoundary);
-    lastScrollY = worksBoundary;
-    beginWorksEntrance();
+    scrollToImmediately(worksDockY);
+    worksPlayback.value = "docked";
+    lastScrollY = window.scrollY;
     return;
   }
-  if (
-    transitionPlayback.value === "complete" &&
-    movedUp &&
-    currentY < heroHeight.value - 1
-  ) {
+
+  if (transitionPlayback.value === "complete" && movedUp && currentY < heroHeight.value - 1) {
     scrollToImmediately(heroHeight.value);
     lastScrollY = heroHeight.value;
     beginReverseInitialTransition();
     return;
   }
-
   lastScrollY = currentY;
   if (movedDown && !k2Started.value) {
     scrollToImmediately(0);
@@ -1234,6 +1279,7 @@ function handleDocumentScroll() {
     beginK2();
   }
 }
+
 
 function isInteractiveTarget(target: EventTarget | null): boolean {
   if (!(target instanceof Element)) return false;
@@ -1247,22 +1293,14 @@ function handleKeydown(event: KeyboardEvent) {
     event.ctrlKey ||
     event.metaKey ||
     isInteractiveTarget(event.target)
-  ) {
-    return;
-  }
-
+  ) return;
   const scrollDown =
     !event.shiftKey &&
-    (event.key === "ArrowDown" ||
-      event.key === "PageDown" ||
-      event.key === " " ||
-      event.key === "End");
+    (event.key === "ArrowDown" || event.key === "PageDown" ||
+      event.key === " " || event.key === "End");
   const scrollUp =
-    event.key === "ArrowUp" ||
-    event.key === "PageUp" ||
-    event.key === "Home" ||
-    (event.key === " " && event.shiftKey);
-
+    event.key === "ArrowUp" || event.key === "PageUp" ||
+    event.key === "Home" || (event.key === " " && event.shiftKey);
   if (!scrollDown && !scrollUp) return;
 
   const key = getScrollKeyId(event);
@@ -1271,7 +1309,6 @@ function handleKeydown(event: KeyboardEvent) {
     event.preventDefault();
     return;
   }
-
   if (
     transitionPlayback.value === "forward" ||
     transitionPlayback.value === "reverse" ||
@@ -1284,6 +1321,18 @@ function handleKeydown(event: KeyboardEvent) {
   }
 
   const worksBoundary = getWorksBoundaryY();
+  const worksDockY = getWorksDockScrollY();
+  if (worksPlayback.value === "docked") {
+    if (scrollDown) {
+      event.preventDefault();
+      beginWorksEntrance();
+      blockedScrollKeys.add(key);
+    } else if (scrollUp) {
+      worksPlayback.value = "idle";
+    }
+    return;
+  }
+
   if (
     worksPlayback.value === "complete" &&
     scrollUp &&
@@ -1294,10 +1343,30 @@ function handleKeydown(event: KeyboardEvent) {
   ) {
     event.preventDefault();
     scrollToImmediately(worksBoundary);
-    lastScrollY = worksBoundary;
+    lastScrollY = window.scrollY;
     beginWorksReverse();
     blockedScrollKeys.add(key);
     return;
+  }
+
+  if (
+    !prefersReducedMotion &&
+    worksPlayback.value === "idle" &&
+    transitionPlayback.value === "complete" &&
+    scrollDown &&
+    worksDockY !== null
+  ) {
+    const estimatedDelta =
+      event.key === "End" ? Number.POSITIVE_INFINITY :
+      event.key === "PageDown" || event.key === " " ? viewport.value.height : 64;
+    if (window.scrollY + estimatedDelta >= worksDockY) {
+      event.preventDefault();
+      scrollToImmediately(worksDockY);
+      worksPlayback.value = "docked";
+      lastScrollY = window.scrollY;
+      blockedScrollKeys.add(key);
+      return;
+    }
   }
 
   if (transitionPlayback.value === "idle" && !k2Started.value && scrollDown) {
@@ -1306,7 +1375,6 @@ function handleKeydown(event: KeyboardEvent) {
     blockedScrollKeys.add(key);
     return;
   }
-
   if (
     transitionPlayback.value === "complete" &&
     scrollUp &&
@@ -1321,6 +1389,7 @@ function handleKeydown(event: KeyboardEvent) {
     blockedScrollKeys.add(key);
   }
 }
+
 
 function updateAnnotationBounds() {
   if (!markSpaceRef.value) return;
@@ -1340,9 +1409,10 @@ function updateAnnotationBounds() {
   };
 }
 
-function handleResize() {
+async function handleResize() {
   const previousHeroHeight = heroHeight.value;
   const previousWorksBoundary = getWorksBoundaryY();
+  const previousWorksDockY = getWorksDockScrollY();
   const currentScrollY = window.scrollY;
   const hasActiveTransition =
     transitionPlayback.value === "forward" ||
@@ -1350,17 +1420,22 @@ function handleResize() {
   const previousScrollY = hasActiveTransition ? lastScrollY : currentScrollY;
 
   updateAnnotationBounds();
+  await updateWorksSpacer();
 
   const nextWorksBoundary = getWorksBoundaryY();
+  const nextWorksDockY = getWorksDockScrollY();
   if (
     (worksPlayback.value === "forward" || worksPlayback.value === "reverse") &&
-    nextWorksBoundary !== null
+    activeScrollAnimation
   ) {
-    scrollToImmediately(nextWorksBoundary);
+    activeScrollAnimation.startY = window.scrollY;
+    activeScrollAnimation.startEased = resolveScrollEasing(
+      activeScrollAnimation.easing,
+      activeScrollAnimation.progress,
+    );
     lastScrollY = window.scrollY;
     return;
   }
-
   if (
     worksPlayback.value === "complete" &&
     previousWorksBoundary !== null &&
@@ -1368,6 +1443,15 @@ function handleResize() {
   ) {
     const worksOffset = Math.max(0, previousScrollY - previousWorksBoundary);
     scrollToImmediately(nextWorksBoundary + worksOffset);
+    lastScrollY = window.scrollY;
+    return;
+  }
+  if (
+    worksPlayback.value === "docked" &&
+    previousWorksDockY !== null &&
+    nextWorksDockY !== null
+  ) {
+    scrollToImmediately(nextWorksDockY);
     lastScrollY = window.scrollY;
     return;
   }
@@ -1452,7 +1536,6 @@ onBeforeUnmount(() => {
   if (k3StartTimer !== undefined) window.clearTimeout(k3StartTimer);
   if (k3Frame !== undefined) window.cancelAnimationFrame(k3Frame);
   if (k4Frame !== undefined) window.cancelAnimationFrame(k4Frame);
-  if (worksFrame !== undefined) window.cancelAnimationFrame(worksFrame);
   if (scrollFrame !== undefined) {
     window.cancelAnimationFrame(scrollFrame);
     scrollFrame = undefined;
@@ -1558,6 +1641,7 @@ onBeforeUnmount(() => {
   >
     <article
       v-if="introductionStarted"
+      ref="introductionContentRef"
       class="introduction-content"
       aria-labelledby="introduction-greeting"
     >
@@ -1592,6 +1676,12 @@ onBeforeUnmount(() => {
     </article>
     <div
       v-if="introductionStarted"
+      class="works-dock-spacer"
+      :style="{ height: worksSpacerHeight + 'px' }"
+      aria-hidden="true"
+    ></div>
+    <div
+      v-if="introductionStarted"
       ref="worksBoundaryRef"
       class="works-section-boundary"
       aria-hidden="true"
@@ -1599,8 +1689,7 @@ onBeforeUnmount(() => {
     <div
       v-if="introductionStarted"
       class="works-section-stage"
-      :style="worksStageStyle"
-      :aria-hidden="worksProgress < 1"
+      :aria-hidden="worksPlayback !== 'complete'"
     >
       <WorksSection />
     </div>
@@ -1832,6 +1921,12 @@ onBeforeUnmount(() => {
   transition: background-color 1500ms cubic-bezier(0.333333, 1, 0.666667, 1);
 }
 
+.works-dock-spacer {
+  display: block;
+  width: 100%;
+  pointer-events: none;
+}
+
 .works-section-boundary {
   display: block;
   width: 100%;
@@ -1842,8 +1937,6 @@ onBeforeUnmount(() => {
 .works-section-stage {
   position: relative;
   width: 100%;
-  transform-origin: top center;
-  backface-visibility: hidden;
 }
 
 .introduction-content {
