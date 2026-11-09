@@ -31,7 +31,7 @@ The active application is a deliberately small Vue page. The old page compositio
 - K4/K5 use one 1250ms In Cubic driver, with reverse playback following the same trajectory. The retained Part.01/Part.02 divider is recalculated from current viewport geometry and the Introduction highlighter is raised slightly. K5 preserves title scale and changes position only. Build and browser verification remain pending.
 - A local production build and browser visual review have not been completed.
 
-**Next implementation target:** run a local production build and browser review. Verify K0–K5 forward and reverse, especially the Introduction article's complete removal from normal flow before Part.01 contracts; verify wheel/touch/keyboard locking and free scrolling through reading regions; check responsive divider/highlighter placement, both themes, reduced motion, and desktop/mobile layouts. Part.02 collage-and-copy content is implemented; its two-step dock and whole-document scroll choreography are implemented, pending browser verification.
+**Next implementation target:** run a local production build and browser review. Verify K0–K5 forward and reverse, especially the Introduction article's complete removal from normal flow before Part.01 contracts; verify wheel/touch/keyboard locking and free scrolling through reading regions; check responsive divider/highlighter placement, both themes, reduced motion, and desktop/mobile layouts. Part.02 reuses the second title row from the shared four-Part framework; native document scrolling moves Part.01 out of view and naturally brings Part.02 into view.
 
 ## 2. Foundation and repository cleanup
 
@@ -282,7 +282,6 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Put the page under one page-level Scene owned by `TitlePage.vue`.
 - [x] Inline Works data, layout and content in that Scene; remove the separate Works section component.
 - [x] Keep Works, Milestones and Beyond in the same normal document flow after Introduction.
-- [x] Keep Part.02, Milestones and Beyond in normal document flow inside the single page Scene.
 - [x] Remove the fixed Part.02 layer, temporary viewport slot, dock and cover/reverse states.
 - [x] Keep all reading on native `window` scrolling; do not add a nested scroll container or manually adjust wheel/touch deltas.
 - [x] Keep the page-edge vertical rails attached to the shared Scene.
