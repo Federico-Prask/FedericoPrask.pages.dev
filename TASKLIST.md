@@ -321,3 +321,8 @@ The active application is a deliberately small Vue page. The old page compositio
 - [ ] Browser-test the four interaction states and desktop/mobile boundary alignment.
 
 - [x] Require a fresh wheel gesture after the docking gesture; continuous wheel bursts cannot immediately trigger the cover.
+
+- [x] Correct Part.02 dock geometry to the lower rule after the expanded Part.01 row and one compact Part.02 row.
+- [x] Keep the Part.01 title visible after the K5 fall; hide only the duplicate fallen Part.02–04 titles.
+- [x] Show the Part.02 dock only after K5 has completed and the measured Introduction boundary is reached.
+- [x] Separate the docking gesture from the next wheel gesture with an idle interval; touch and keyboard use their own gesture/key boundaries.
