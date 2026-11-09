@@ -295,7 +295,7 @@ The active application is a deliberately small Vue page. The old page compositio
 - [ ] Verify the Part.02 title stays at its original document coordinate and Works content starts after the expanded row plus 24px.
 - [ ] Test wheel/trackpad, touch, keyboard, scrollbar, resize, light/dark themes and reduced-motion behavior.
 - [x] Hide duplicate Part.03/Part.04 document-flow headings while the shared four-title framework is being reassembled or pulled out.
-- [x] Fade shared Part.03/Part.04 framework labels out when Part.02 expansion begins so they cannot overlap Works content.
+- [x] Hide shared Part.03/Part.04 framework labels immediately when Part.02 expansion begins so they cannot overlap Works content.
 - [ ] Browser-verify the reassembly frame contains exactly one copy of each Part title and that Part.03/Part.04 are absent during the Part.02 expansion.
 - [x] Keep the Part.01 compact divider copy visible during the Part.02 transition.
 - [x] Duplicate the Part.02 lower framework rule at its compact title-row position while the original line expands to the 60vh row boundary.
