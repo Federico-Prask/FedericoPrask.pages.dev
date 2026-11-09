@@ -841,15 +841,21 @@ function animatePart02Expansion(reverse = false) {
   }
 
   const startProgress = part02ExpansionProgress.value;
-  const targetProgress = reverse ? 0 : 1;
+  const startY = window.scrollY;
+  const targetY = reverse ? part02TriggerY.value : part02RowTop.value;
   const startTime = performance.now();
   part02Playback.value = reverse ? "reverse-expand" : "expand";
 
   const frame = (now: number) => {
     const progress = Math.min(1, (now - startTime) / PART02_EXPANSION_DURATION);
-    const eased = reverse ? easeOutCubic(progress) : easeInCubic(progress);
-    part02ExpansionProgress.value =
-      startProgress + (targetProgress - startProgress) * eased;
+    const eased = easeInCubic(progress);
+    part02ExpansionProgress.value = reverse
+      ? startProgress * (1 - eased)
+      : startProgress + (1 - startProgress) * eased;
+
+    const currentTargetY = reverse ? part02TriggerY.value : part02RowTop.value;
+    scrollToImmediately(startY + (currentTargetY - startY) * eased);
+    lastScrollY = window.scrollY;
 
     if (progress < 1) {
       part02Frame = window.requestAnimationFrame(frame);
@@ -857,13 +863,14 @@ function animatePart02Expansion(reverse = false) {
     }
 
     part02Frame = undefined;
-    part02ExpansionProgress.value = targetProgress;
+    part02ExpansionProgress.value = reverse ? 0 : 1;
+    scrollToImmediately(currentTargetY);
+    lastScrollY = window.scrollY;
 
     if (reverse) {
       beginPart02ReverseRecompose();
     } else {
       part02Playback.value = "complete";
-      lastScrollY = window.scrollY;
     }
   };
 
@@ -871,18 +878,13 @@ function animatePart02Expansion(reverse = false) {
 }
 
 function beginPart02ReverseRecompose() {
-  const startY = window.scrollY;
   const startTime = performance.now();
   part02Playback.value = "reverse-recompose";
   part02RecomposeProgress.value = 1;
 
   const frame = (now: number) => {
     const progress = Math.min(1, (now - startTime) / PART02_RECOMPOSE_DURATION);
-    const eased = easeOutCubic(progress);
-    part02RecomposeProgress.value = 1 - eased;
-    const nextY = startY + (part02TriggerY.value - startY) * eased;
-    scrollToImmediately(nextY);
-    lastScrollY = window.scrollY;
+    part02RecomposeProgress.value = 1 - easeInCubic(progress);
 
     if (progress < 1) {
       part02Frame = window.requestAnimationFrame(frame);
@@ -925,15 +927,10 @@ function beginPart02Transition() {
   part02RecomposeProgress.value = 0;
   part02ExpansionProgress.value = 0;
 
-  const startY = window.scrollY;
   const startTime = performance.now();
   const frame = (now: number) => {
     const progress = Math.min(1, (now - startTime) / PART02_RECOMPOSE_DURATION);
-    const eased = easeOutCubic(progress);
-    part02RecomposeProgress.value = eased;
-    const nextY = startY + (part02RowTop.value - startY) * eased;
-    scrollToImmediately(nextY);
-    lastScrollY = window.scrollY;
+    part02RecomposeProgress.value = easeOutCubic(progress);
 
     if (progress < 1) {
       part02Frame = window.requestAnimationFrame(frame);
@@ -942,8 +939,8 @@ function beginPart02Transition() {
 
     part02Frame = undefined;
     part02RecomposeProgress.value = 1;
-    scrollToImmediately(part02RowTop.value);
-    lastScrollY = window.scrollY;
+    // Only after the four titles and five rules have regrouped do we expand
+    // Part.02 and move the document, carrying Part.01 out of the viewport.
     animatePart02Expansion(false);
   };
 
@@ -1492,13 +1489,21 @@ function handleDocumentScroll() {
 
   if (
     part02Playback.value === "recompose" ||
-    part02Playback.value === "expand" ||
-    part02Playback.value === "reverse-expand" ||
     part02Playback.value === "reverse-recompose"
   ) {
     if (Math.abs(currentY - lastScrollY) > 1) {
       scrollToImmediately(lastScrollY);
     }
+    return;
+  }
+
+  if (
+    part02Playback.value === "expand" ||
+    part02Playback.value === "reverse-expand"
+  ) {
+    const part02Offset = Math.max(0, currentY - previousPart02RowTop);
+    scrollToImmediately(part02RowTop.value + part02Offset);
+    lastScrollY = window.scrollY;
     return;
   }
 
