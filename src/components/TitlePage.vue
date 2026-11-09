@@ -533,7 +533,6 @@ const k2LineDelays = computed<Record<string, string>>(() =>
 );
 
 const k5DividerCopyTransform = computed(() => {
-  if (part02Playback.value !== "idle") return "";
   const bounds = annotationBounds.value;
   const { width, height } = viewport.value;
   if (!bounds.width || !width || !height) return "";
@@ -547,6 +546,24 @@ const k5DividerCopyTransform = computed(() => {
     finalRowGap * k3Geometry.value.compression;
 
   return makeLineMatrix(divider.y, 0, dividerY, width);
+});
+
+const part02DividerCopyTransform = computed(() => {
+  if (
+    part02Playback.value !== "expand" &&
+    part02Playback.value !== "reverse-expand" &&
+    part02Playback.value !== "complete"
+  ) return "";
+
+  const bounds = annotationBounds.value;
+  const { width } = viewport.value;
+  if (!bounds.width || !width || !part02RowTop.value) return "";
+
+  // Keep the compact Part.02 title divider in place while its original
+  // lower rule travels down to the expanded row boundary, mirroring K5's
+  // retained Part.01 divider.
+  const compactRowHeight = k4Geometry.value.compactRowHeight;
+  return makeLineMatrix(131, 0, part02RowTop.value + compactRowHeight, width);
 });
 
 const frameworkTitlesStyle = computed(() => {
@@ -1966,10 +1983,18 @@ onBeforeUnmount(() => {
         </div>
       </section>
         <section id="milestones-section" class="document-part-section" aria-labelledby="milestones-heading">
-          <h2 id="milestones-heading" class="document-part-heading">Part.03 Milestones</h2>
+          <h2 id="milestones-heading" class="document-part-heading" :class="{ 'is-part02-temporarily-hidden':
+            part02Playback === 'recompose' ||
+            part02Playback === 'expand' ||
+            part02Playback === 'reverse-expand' ||
+            part02Playback === 'reverse-recompose' }">Part.03 Milestones</h2>
         </section>
         <section id="beyond-section" class="document-part-section" aria-labelledby="beyond-heading">
-          <h2 id="beyond-heading" class="document-part-heading">Part.04 Beyond</h2>
+          <h2 id="beyond-heading" class="document-part-heading" :class="{ 'is-part02-temporarily-hidden':
+            part02Playback === 'recompose' ||
+            part02Playback === 'expand' ||
+            part02Playback === 'reverse-expand' ||
+            part02Playback === 'reverse-recompose' }">Part.04 Beyond</h2>
         </section>
   </div>
 
@@ -1993,6 +2018,7 @@ onBeforeUnmount(() => {
       :k3-reversing="k3Reversing"
       :k5-started="k5Started"
       :k5-divider-copy-transform="k5DividerCopyTransform"
+      :part02-divider-copy-transform="part02DividerCopyTransform"
     />
     <div
       v-if="k2Phase === 'titles' || k2Phase === 'reverse-titles'"
@@ -2033,7 +2059,14 @@ onBeforeUnmount(() => {
         v-for="(part, partIndex) in frameworkParts"
         :key="part"
         class="framework-title"
-        :class="{ 'is-flow-replaced': partIndex >= 2 }"
+        :class="{
+          'is-flow-replaced': partIndex >= 2,
+          'is-part02-hidden':
+            partIndex >= 2 &&
+            (part02Playback === 'expand' ||
+              part02Playback === 'reverse-expand' ||
+              part02Playback === 'complete'),
+        }"
       >
         <span class="framework-title__text">
           <span
@@ -2471,6 +2504,10 @@ onBeforeUnmount(() => {
   width: 100%;
 }
 
+.document-part-heading.is-part02-temporarily-hidden {
+  visibility: hidden;
+}
+
 .document-part-heading {
   display: flex;
   min-height: clamp(4.5rem, 9vw, 8rem);
@@ -2709,6 +2746,11 @@ onBeforeUnmount(() => {
   z-index: 1;
   transform: scale(var(--framework-title-scale, 1));
   transform-origin: left center;
+}
+
+.framework-title.is-part02-hidden {
+  visibility: hidden;
+  opacity: 0;
 }
 
 .framework-title:first-child {
