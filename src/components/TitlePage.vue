@@ -295,6 +295,18 @@ const sectionIntro = computed(() => isZh.value
   ? "从软件开发到视觉与音视频创作。不同媒介，不同方法，都是探索与表达的一部分。"
   : "From software development to visual and audio-visual creation. Different media and methods, all part of the same process of exploration and expression.");
 
+const worksScenePeekHeight = computed(() => {
+  const rootFontSize = typeof document === "undefined"
+    ? 16
+    : Number.parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16;
+  return Math.max(
+    rootFontSize * 4.5,
+    Math.min(viewport.value.width * 0.09, rootFontSize * 8),
+  );
+});
+
+const worksPart02Gap = computed(() => worksScenePeekHeight.value + 24);
+
 const worksSceneSlotHeight = computed(() =>
   !prefersReducedMotion &&
   (worksPlayback.value === "docked" || worksPlayback.value === "forward" || worksPlayback.value === "reverse")
@@ -566,7 +578,6 @@ const K2_LINE_STAGGER = 65;
 const K3_GEOMETRY_DURATION = 1500;
 const K3_CURSOR_HOLD_CYCLES = 1;
 const K4_K5_TRANSITION_DURATION = 1250;
-const WORKS_PART02_GAP = 32;
 const WORKS_TRANSITION_DURATION = 1150;
 
 function easeInOutCubic(value: number): number {
@@ -607,13 +618,13 @@ async function updateWorksSpacer() {
   if (!article) return;
 
   const articleBottom = article.getBoundingClientRect().bottom + window.scrollY;
-  const targetPart02Bottom = articleBottom + WORKS_PART02_GAP;
+  const targetPart02Bottom = articleBottom + worksPart02Gap.value;
 
-  // Place the falling Part.02 row immediately after the actual Introduction
-  // end. A fixed viewport-sized offset lets its absolute title overlay Works.
+  // Leave enough room for the full Part.02 heading strip plus a 24px
+  // separation from the tagline at the dock position.
   worksFrameworkDropDistance.value =
     targetPart02Bottom - getFinalPart02RowBottomY();
-  worksSpacerHeight.value = WORKS_PART02_GAP;
+  worksSpacerHeight.value = worksPart02Gap.value;
   await nextTick();
 }
 
@@ -1860,6 +1871,7 @@ onBeforeUnmount(() => {
       v-if="introductionStarted"
       ref="worksSceneRef"
       class="works-scene"
+      :style="{ '--part02-peek': worksScenePeekHeight + 'px' }"
       :class="{
         'is-fixed': worksPlayback === 'docked' || worksPlayback === 'forward' || worksPlayback === 'reverse',
         'is-docked': worksPlayback === 'docked',
@@ -2186,7 +2198,6 @@ onBeforeUnmount(() => {
 }
 
 .works-scene {
-  --part02-peek: clamp(4.5rem, 9vw, 8rem);
   position: fixed;
   z-index: 30;
   inset: 0;
