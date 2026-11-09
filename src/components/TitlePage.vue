@@ -1728,25 +1728,6 @@ onBeforeUnmount(() => {
       aria-hidden="true"
     ></div>
 
-    <section
-      v-if="introductionStarted"
-      id="milestones-section"
-      class="document-part-section"
-      aria-labelledby="milestones-heading"
-    >
-      <h2 id="milestones-heading" class="document-part-heading">Part.03 Milestones</h2>
-      <div class="document-part-content" aria-hidden="true"></div>
-    </section>
-
-    <section
-      v-if="introductionStarted"
-      id="beyond-section"
-      class="document-part-section"
-      aria-labelledby="beyond-heading"
-    >
-      <h2 id="beyond-heading" class="document-part-heading">Part.04 Beyond</h2>
-      <div class="document-part-content" aria-hidden="true"></div>
-    </section>
   </div>
 
   <div
