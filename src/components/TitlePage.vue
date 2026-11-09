@@ -561,19 +561,12 @@ const frameworkTitlesStyle = computed(() => {
   const recomposeOffset =
     k4Geometry.value.extraHeight + k5Geometry.value.dropOffset;
   const groupTop = part02RowTop.value - compactRowHeight;
-  const titleTop = part02TransitionActive
-    ? originalTop + (groupTop - originalTop) * progress
-    : originalTop;
-  const firstRowHeight = part02TransitionActive
-    ? k4Geometry.value.firstRowHeight +
-      (compactRowHeight - k4Geometry.value.firstRowHeight) * progress
-    : k4Geometry.value.firstRowHeight;
+  const titleTop = originalTop;
+  const firstRowHeight = k4Geometry.value.firstRowHeight;
   const secondRowHeight = part02TransitionActive
     ? part02RowHeight.value
     : compactRowHeight;
-  const fallOffset = part02TransitionActive
-    ? k5Geometry.value.dropOffset * (1 - progress)
-    : k5Geometry.value.dropOffset;
+  const fallOffset = k5Geometry.value.dropOffset;
 
   return {
     left: geometry.titleInset - bounds.left + "px",
@@ -2693,11 +2686,29 @@ onBeforeUnmount(() => {
 .framework-titles.is-part02-transition .framework-title:nth-child(2) {
   align-self: start;
   margin-block-start: var(--framework-second-title-offset, 0px);
-  transform: scale(var(--framework-title-scale, 1));
+  transform:
+    translateY(var(--framework-fall-offset, 0px))
+    scale(var(--framework-title-scale, 1));
 }
 
 .framework-titles.is-part02-transition .framework-title:nth-child(n + 3) {
-  transform: scale(var(--framework-title-scale, 1));
+  transform:
+    translateY(var(--framework-fall-offset, 0px))
+    scale(var(--framework-title-scale, 1));
+}
+
+.framework-titles.is-part02-complete .framework-title:first-child {
+  transform:
+    translateY(var(--framework-recompose-offset, 0px))
+    scale(var(--framework-title-scale, 1));
+}
+
+.framework-titles.is-part02-complete .framework-title:nth-child(2) {
+  align-self: start;
+  margin-block-start: var(--framework-second-title-offset, 0px);
+  transform:
+    translateY(var(--framework-fall-offset, 0px))
+    scale(var(--framework-title-scale, 1));
 }
 
 .framework-titles.is-k5 .framework-title:not(:first-child) {
