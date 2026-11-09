@@ -2,7 +2,7 @@
 
 > **Project:** Federico Prask — Personal Website  
 > **Branch:** `dev`  
-> **Last updated:** 2026-11-04  
+> **Last updated:** 2026-11-07  
 > **Design authority:** `DESIGN.md`
 >
 > This file tracks implementation work only. It must not redefine visual or interaction requirements. When a design decision changes, update `DESIGN.md` first, then update the corresponding task here.
@@ -25,13 +25,13 @@ The active application is a deliberately small Vue page. The old page compositio
 - The Hero name and FP Logo now use a compact base scale from K0 onward (approximately 84% of their previous CSS sizing); the overall layout width and column gap are reduced. The `DARK` / `LANGUAGE` controls and website designation retain their prior sizes. Visual sizing still needs browser review.
 - K0 has a source-level two-stage prototype: opacity-and-blur plate entrance, reverse contour trace of the original monogram path, then the original solid fill. Visual interpretation and timing still require browser review.
 - K1 has a source-derived construction view of the complete FP Logo: solid plate/monogram outlines, nineteen dashed guides, coordinate labels and Force handles. K0/K1 are not yet visually approved.
-- K2 has been rewritten at source level. The five original paths become full viewport-width rules during the first movement, while the document scrolls 22% of the Hero height with In-Out Cubic. After a short hold, the lowest line becomes the visual anchor; the remaining document scroll and the four upper lines move with matching Out Cubic timing, unfolding upward from the anchor. The annotation SVG is not stretched. Four Part titles then reveal together, character by character. Source files are fetched and checked; local build, animation rendering and input behavior remain unverified.
+- K2–K5 use a controlled directional playback state. Forward and reverse inputs are locked during the choreography; at the completed Hero/Part.01 boundary, upward input retraces the sequence. The Introduction exits from its actual rendered chunk styles in reverse reading order, then the entire article is unmounted from normal flow before Part.01 contracts. Build and browser verification remain pending.
 - Part titles use the original local SF Pro variable TTF at public/fonts/SF-Pro.ttf. Its wght axis (1–1000) and opsz axis (17–28) are confirmed; titles request weight 800 (Heavy), and the TTF is preloaded. Browser rendering still requires verification.
-- K3 is implemented at source level with one shared 1500ms Out Cubic progress driver. Full-height vertical rules start at the viewport/browser edges and move inward; title position, title scale, title-row height and full-width horizontal-rule spacing are computed from that same progress. At the end of K3, the top horizontal rule and left vertical rule have matching distances from their respective viewport edges, using the same measured inset. The synchronized cursors now wait one 900ms blink cycle rather than two before K3 begins. Local build and browser review remain pending.
-- K4/K5 are implemented as one continuous source-level transition: after K3, Part.01 expands toward 60% of the viewport while Parts 02–04 fall from the same first frame. One 1250ms In Cubic progress value drives both effects; the lower four rules and titles travel together, beyond the viewport. Part.02–04 title font sizes and scales remain unchanged during the fall. A copy of the Part.01/Part.02 shared rule is captured before the expansion and remains close to the Part.01 title, while the original moves away with Parts 02–04. Reduced-motion users get the expanded Part.01 with Parts 02–04 still visible. The actual Part.01 content and reveal sequence are not implemented; current revision needs a fresh build and browser review.
+- K3 is implemented at source level with one shared 1500ms Out Cubic progress driver, and its root page/body palette transitions use the matching time-reversed curve during reverse playback. Full-height vertical rules start at the viewport/browser edges and move inward; title position, title scale, title-row height and full-width horizontal-rule spacing are computed from that same progress. At the end of K3, the top horizontal rule and left vertical rule have matching distances from their respective viewport edges, using the same measured inset. The synchronized cursors now wait one 900ms blink cycle rather than two before K3 begins. Local build and browser review remain pending.
+- K4/K5 use one 1250ms In Cubic driver, with reverse playback following the same trajectory. The retained Part.01/Part.02 divider is recalculated from current viewport geometry and the Introduction highlighter is raised slightly. K5 preserves title scale and changes position only. Build and browser verification remain pending.
 - A local production build and browser visual review have not been completed.
 
-**Next implementation target:** pull dev, run a local production build, then verify K0–K5 in the browser. Check the compact K0 Hero dimensions at desktop/mobile sizes, SF Pro Display Heavy loading, the complete K0–K2 choreography, K3's equal top/left page-edge insets and shortened wait, both palettes, K4's 60%-viewport expansion, and K5's simultaneous scale-and-fall, acceleration, off-screen exit and retained Part.01 bottom rule.
+**Next implementation target:** run a local production build and browser review. Verify K0–K5 forward and reverse, especially the Introduction article's complete removal from normal flow before Part.01 contracts; verify wheel/touch/keyboard locking and free scrolling through reading regions; check responsive divider/highlighter placement, both themes, reduced motion, and desktop/mobile layouts. Part.02 still has no content markup; implement its specified controlled pull-out when the Works structure is designed.
 
 ## 2. Foundation and repository cleanup
 
@@ -128,7 +128,18 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Use a baseline-aligned single-color underline cursor with binary 0%/100% opacity blink; keep each cursor attached to its title's final character.
 - [x] Start all four cursor blink cycles together, after the longest title has completed, using one shared delay and period.
 - [x] Set desktop title line-box size to at least 0.4 of the adjacent rule spacing; preserve the current mobile size.
-- [ ] Verify wheel, touch, keyboard and scrollbar-triggered input; confirm K2 runs once and upward scrolling never reverses it.
+- [x] Exit Part titles in the exact reverse of their shared per-character entrance cadence at the completed boundary.
+- [x] Retract the four upper rules from top to bottom into the compact group with inverse In Cubic timing and a 65ms stagger while returning the document to its 22% scroll position.
+- [x] Reverse the initial five-line recomposition and return the document to the top before restoring the K1 waiting state.
+- [x] Restore the original K1 Logo outline, coordinate labels and Force handles with a 420ms inverse-eased fade before unlocking input.
+- [x] Pass multi-touch gestures through rather than treating them as vertical page navigation.
+- [x] Pass Ctrl+wheel trackpad pinch/zoom gestures through without intercepting browser zoom.
+- [x] Keep a touch gesture or held scroll key consumed until it ends when it overlaps an active transition.
+- [x] Reverse the root HTML/body palette transitions with the time-reversed K3 easing, and clear the reverse-transition class at the end.
+- [ ] Verify wheel, touch, keyboard and scrollbar input: active transitions lock input; completed transition boundaries reverse; ordinary reading regions remain freely scrollable.
+- [x] Recalculate active scroll destinations from the live Hero height during resize; rebase an in-flight segment at its current eased progress instead of restarting it.
+- [x] Preserve the normalized document position during non-scrolling forward/reverse phases when the Hero height changes.
+- [x] Preserve the reader's offset relative to the Introduction when the viewport changes, and require actual upward movement before starting the reverse boundary.
 - [ ] Verify that the initial 22% document movement leaves the Hero visible and the five full-width rules occupy the lower area with moderate spacing.
 - [ ] Verify that the lowest rule remains fixed in the viewport while the remaining scroll and upper-rule expansion use the same Out Cubic curve.
 - [ ] Verify that the four upper lines unfold upward in bottom-to-top order without changing horizontal width.
@@ -196,16 +207,18 @@ The active application is a deliberately small Vue page. The old page compositio
 
 ### 6.1 Part.02 — Works
 
-- [x] Specify Part.02 as a structured, table-like information section in `DESIGN.md`.
+- [x] Specify Part.02 as alternating editorial collage-and-copy rows in `DESIGN.md`.
 - [x] Specify a one-piece upward pull-out entrance using In-Out Cubic easing, beginning below the final Part.01 content.
 - [x] Keep Part.02 typography at its designed final size during the entrance; do not scale its title or content.
-- [ ] Design the exact Works rows, columns and content hierarchy.
-- [ ] Implement and browser-test the Part.02 pull-out entrance.
+- [x] Design four alternating editorial rows: media-left/copy-right, then copy-left/media-right.
+- [x] Add bilingual category-level copy for Development, Visual Design, Music Production, and Video & Motion.
+- [x] Implement the Part.02 one-piece upward pull-out entrance and reverse playback at its boundary, using a 1150ms In-Out Cubic trajectory without scaling typography.
+- [x] Integrate the boundary with wheel, single-touch, keyboard, native-scroll and scrollbar input; keep the preceding Introduction and gap freely scrollable.
 - [ ] Define separate entrance behavior for Parts 03 and 04; do not assume they share Part.02's motion.
 - [ ] Curate Development projects.
 - [ ] Curate Graphic Design works.
-- [ ] Establish a distinctive editorial composition for the portfolio.
-- [ ] Ensure work previews appear as complete visual objects.
+- [x] Establish a distinctive editorial composition with three overlapping, differently sized color placeholders per collage.
+- [x] Use complete collage placeholder compositions; replace them with actual work media after assets are supplied.
 - [ ] Keep the structure expandable as more work is added.
 
 ### 6.2 Part.03 — Milestones
@@ -227,7 +240,7 @@ The active application is a deliberately small Vue page. The old page compositio
 - [ ] Review the initial state in a browser at desktop width.
 - [ ] Review the initial state at tablet and mobile widths.
 - [ ] Verify K0–K5 sequencing and first-scroll behavior.
-- [ ] Verify no transition reverses or replays after upward scrolling.
+- [ ] Verify only defined transition boundaries reverse, no input is queued, and the Introduction article is removed from document flow before Part.01 contracts.
 - [ ] Verify language and theme controls throughout the animation sequence.
 - [ ] Verify Light and Dark palettes.
 - [ ] Implement and verify reduced-motion behavior.
@@ -256,8 +269,27 @@ The active application is a deliberately small Vue page. The old page compositio
 2. Check Logo sizing at several viewport widths; tune the minimum, preferred and maximum sizes if the Logo still feels too sensitive to window width.
 3. Review and calibrate revised K0/K1 in a local browser, including the full waiting state, reduced-motion behavior and responsive sizes.
 4. Browser-test the revised K2 sequence: full-width Stage A rules, the lower-rule viewport anchor, bottom-to-top upward unfolding with matched Out Cubic scroll, and simultaneous character-by-character Part title reveals.
-5. Browser-test K3–K5: verify equal top/left page-edge insets, the shorter pre-K3 wait, and that Part.01 expansion plus Parts 02–04 scale-and-fall form one continuous motion with no two-stage drop; verify the retained shared rule stays close to the Part.01 title.
+5. Browser-test K3–K5: verify equal top/left page-edge insets, the shorter pre-K3 wait, and that Part.01 expansion plus the position-only Parts 02–04 fall form one continuous motion with no two-stage drop; verify the retained shared rule stays close to the Part.01 title.
 6. Browser-review Introduction: check the start position below the retained divider, paragraph spacing and full-page scroll range; verify the LXGW WenKai Lite name mark in both themes and at mobile widths.
 7. Verify Chinese/English switching, reduced-motion behavior and on-demand font loading.
 8. Update this file and `DESIGN.md` after each completed implementation slice.
 9. Do not mark visual verification tasks complete until they have been checked in a browser.
+
+
+### Part.02 first layout pass
+
+- [x] Add the Works section after the Introduction in normal document flow.
+- [x] Add four alternating media/copy rows with responsive stacking.
+- [x] Add colored collage placeholders to establish the intended media proportions and overlap.
+- [ ] Replace placeholders with the user's actual curated work images after they are uploaded/selected.
+- [ ] Implement and verify the dedicated Part.02 pull-out and reverse-boundary interaction.
+
+
+### Part.02 transition implementation
+
+- [x] Keep a normal-flow boundary marker separate from the translated Works stage.
+- [x] Lock directional scroll input while the stage enters or reverses.
+- [x] Preserve the section offset when viewport resizing changes the Works boundary.
+- [x] Cancel the Works animation frame on unmount.
+- [ ] Browser-test forward/reverse playback, boundary snapping, scrollbar input, touch input, keyboard input and responsive resizing.
+- [ ] Verify reduced-motion behavior in a browser.

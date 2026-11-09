@@ -1,7 +1,15 @@
 <script setup lang="ts">
 import LogoMark from "./LogoMark.vue";
 
-type K2Phase = "idle" | "recompose" | "settled" | "expand" | "titles";
+type K2Phase =
+  | "idle"
+  | "recompose"
+  | "settled"
+  | "expand"
+  | "titles"
+  | "reverse-titles"
+  | "reverse-expand"
+  | "reverse-recompose";
 
 const props = withDefaults(
   defineProps<{
@@ -10,6 +18,7 @@ const props = withDefaults(
     k2LineTransforms?: Record<string, string>;
     k2LineDelays?: Record<string, string>;
     k3Started?: boolean;
+    k3Reversing?: boolean;
     k5Started?: boolean;
     k5DividerCopyTransform?: string;
   }>(),
@@ -19,6 +28,7 @@ const props = withDefaults(
     k2LineTransforms: () => ({}),
     k2LineDelays: () => ({}),
     k3Started: false,
+    k3Reversing: false,
     k5Started: false,
     k5DividerCopyTransform: "",
   },
@@ -41,7 +51,10 @@ function k2PathStyle(id: string) {
       'is-k2-started': props.k2Started,
       'is-k2-recompose': props.k2Phase === 'recompose',
       'is-k2-expand': props.k2Phase === 'expand',
+      'is-k2-reverse-expand': props.k2Phase === 'reverse-expand',
+      'is-k2-reverse-recompose': props.k2Phase === 'reverse-recompose',
       'is-k3': props.k3Started,
+      'is-k3-reversing': props.k3Reversing,
     }"
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 256 256"
@@ -261,11 +274,32 @@ function k2PathStyle(id: string) {
     stroke-width 420ms ease;
 }
 
+.logo-annotation.is-k2-reverse-expand .axis-guides path[data-k2-persistent="true"] {
+  transition:
+    transform 1100ms cubic-bezier(0.333333, 0, 0.666667, 0),
+    stroke 420ms ease,
+    stroke-width 420ms ease;
+}
+
+.logo-annotation.is-k2-reverse-recompose .axis-guides path[data-k2-persistent="true"] {
+  transition:
+    transform 720ms cubic-bezier(0.333333, 0, 0.666667, 0),
+    stroke 420ms ease,
+    stroke-width 420ms ease;
+}
+
 .logo-annotation.is-k3 .axis-guides path[data-k2-persistent="true"] {
   stroke: var(--site-framework-rule);
   transition:
     stroke 1500ms cubic-bezier(0.333333, 1, 0.666667, 1),
     stroke-width 1500ms cubic-bezier(0.333333, 1, 0.666667, 1);
+}
+
+.logo-annotation.is-k3-reversing .axis-guides path[data-k2-persistent="true"] {
+  stroke: var(--site-hero-rule);
+  transition:
+    stroke 1500ms cubic-bezier(0.333333, 0, 0.666667, 0),
+    stroke-width 1500ms cubic-bezier(0.333333, 0, 0.666667, 0);
 }
 
 .coordinates {
@@ -292,6 +326,14 @@ function k2PathStyle(id: string) {
   transition:
     opacity 420ms cubic-bezier(0.22, 0.7, 0.24, 1),
     visibility 0s linear 420ms;
+}
+
+.logo-annotation.is-k2-reverse-recompose #annotation-original-logo,
+.logo-annotation.is-k2-reverse-recompose #annotation-coordinate-labels,
+.logo-annotation.is-k2-reverse-recompose #annotation-force-handles {
+  transition:
+    opacity 420ms cubic-bezier(0.333333, 0, 0.666667, 0),
+    visibility 0s linear;
 }
 
 .coordinate-label {

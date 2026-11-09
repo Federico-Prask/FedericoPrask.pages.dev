@@ -93,6 +93,17 @@
     outline-color: var(--site-brand-strong);
     outline-offset: 3px;
   }
+
+  /* K3's reverse transition follows the time-reversed Out Cubic trajectory. */
+  html.k3-content-theme-reversing {
+    transition: background-color 1500ms cubic-bezier(0.333333, 0, 0.666667, 0);
+  }
+
+  html.k3-content-theme-reversing body {
+    transition:
+      background-color 1500ms cubic-bezier(0.333333, 0, 0.666667, 0),
+      color 1500ms cubic-bezier(0.333333, 0, 0.666667, 0);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -102,6 +113,11 @@
   }
 
   body {
+    transition: none;
+  }
+
+  html.k3-content-theme-reversing,
+  html.k3-content-theme-reversing body {
     transition: none;
   }
 }

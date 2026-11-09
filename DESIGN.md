@@ -3,7 +3,7 @@
 > **Document status:** Active design specification  
 > **Target branch:** `dev`  
 > **Project:** Federico Prask — Personal Website  
-> **Last updated:** 2026-11-06  
+> **Last updated:** 2026-11-07  
 >
 > This document is the source of truth for the redesign. Implementation decisions should follow it. If a later discussion changes a confirmed requirement, update this document before or together with the corresponding code change.
 
@@ -389,13 +389,13 @@ K2 converts the SVG annotation into the initial layout framework for the four Pa
 
 **Confirmed: K2 is triggered by the user's first downward scroll.**
 
-This is a one-time state transition, not a continuous animation mapped to scroll distance.
+The first downward input starts the forward sequence once; after it completes, the defined Hero/Part.01 boundary can retrace that sequence in reverse.
 
-Do not bind the transformation to `scrollY` progress. Scrolling back up must not reverse the animation or replay it.
+Do not bind the transformation to `scrollY` progress. Ordinary upward reading scroll must not reverse or replay it; reverse playback is allowed only at the explicitly defined completed boundary.
 
 Support real downward input across desktop and touch devices. Keyboard-based downward navigation should also be considered.
 
-The trigger must not fire repeatedly.
+Repeated input during an active forward or reverse sequence must be consumed rather than restarting or queuing the transition. After a complete reverse returns the page to the K1 waiting state, a new downward gesture may intentionally start another cycle.
 
 ### 6.2 Remove temporary SVG construction details
 
@@ -449,7 +449,7 @@ Use the dedicated `--site-framework-rule` token. Do not reuse `--site-guide`, wh
 
 ### 6.5 K2 motion sequence
 
-K2 is a one-shot choreography triggered by the first downward user input. The browser document itself scrolls; the Hero must move upward through the viewport rather than being translated independently. Preserve the five designated original SVG path elements and transform them individually. Never stretch the annotation SVG or replace those paths with newly drawn rules.
+K2–K5 form a controlled choreography triggered by downward input at the K1 boundary. After completion, the animation can be retraced in reverse when the user returns to that boundary and scrolls upward. The browser document itself scrolls; the Hero must move upward through the viewport rather than being translated independently. Preserve the five designated original SVG path elements and transform them individually. Never stretch the annotation SVG or replace those paths with newly drawn rules.
 
 **Stage A — Recompose into five full-width rules**
 
@@ -468,6 +468,8 @@ The **lowest rule is the visual anchor**. As the page scrolls through the remain
 The four rules above it expand **upward**, increasing their separation from the lower anchor until the five rules reach the four Part boundaries. Begin with the rule immediately above the anchor, then stagger the remaining rules upward in sequence (65ms between starts); the topmost rule starts last. Their horizontal width remains unchanged at the full page width. The document's remaining scroll uses the same Out Cubic easing as the lower anchor rule, not In-Out Cubic. The Hero leaves the viewport as the upper rules unfold.
 
 At the end, the five full-width rules frame four Part rows. No line is added, removed, or replaced.
+
+**Reverse playback at the completed Hero/Part.01 boundary:** First retract the four Part titles in reverse character order. Then return the four upper rules toward the compact group from top to bottom (the reverse of their bottom-to-top entrance), using the time-reversed In Cubic trajectory while the document scroll returns from the Hero/Part.01 boundary to the 22% scroll position. After the compact group settles, reverse the initial Stage A recomposition and return the document to the top. Restore the original K1 Logo outline, coordinate labels and Force handles with a final 420ms inverse-eased fade; only after that fade completes is input restored. Ordinary upward scrolling within the reading area remains native; only the completed boundary starts this sequence.
 
 **Part title reveal**
 
@@ -548,6 +550,8 @@ The colors must maintain readable contrast throughout the transition, not only a
 The first source implementation uses a cool blue-neutral destination palette: Light mode targets a pale blue surface (hex #eaf0f7) with dark blue-gray text. Dark mode targets a much darker, lower-saturation blue-black surface (hex #080d14), with subdued blue-gray text and rules (the framework rule is #596a7e). These are first-pass values for browser review.
 
 The same principle applies in both Light and Dark modes, with different destination palettes.
+
+When the completed Hero/Part.01 transition is reversed, the K3 geometry, page palette, annotation color, title color and boundary-rule colors retrace their forward trajectories over the same 1500ms duration. The reverse uses the time-reversed Out Cubic curve (the corresponding In Cubic interpolation); it must not jump directly to the Hero palette.
 
 ### 7.5 Part background blending
 
@@ -705,15 +709,15 @@ The Chinese copy is the supplied first-person text and must not be rewritten int
 
 Part.02 begins only after the complete Part.01 Introduction content. It must appear immediately below the actual end of Part.01 in normal document flow; do not position it against the viewport bottom or the old compact framework coordinates.
 
-Treat the Part.02 content as a structured, table-like section: clear rows and columns, aligned labels and values, and consistent horizontal divisions. It should read as an organized information surface rather than a loose collection of unrelated cards. The precise columns and content hierarchy belong to the Works design phase.
+Treat Part.02 as an editorial portfolio composed of alternating collage-and-copy rows, not as a table or a grid of uniform project cards. The first row places its collage on the left and copy on the right; the second reverses those sides; subsequent rows continue the alternation. Each collage uses overlapping, differently sized media surfaces with intentional offsets and varied aspect ratios. On narrow screens, stack the collage above its copy while preserving the row sequence. The four initial editorial groups are Development, Visual Design, Music Production, and Video & Motion. The current colored surfaces are format placeholders, not claimed portfolio artifacts; replace them with the user's actual selected media when supplied.
 
-The entrance should feel as if the Part.02 section is being pulled out from beneath the end of Part.01. Begin with the section concealed below its final position and translate it upward into place. Use an **In-Out Cubic** easing curve for this upward movement: the entrance accelerates from rest, passes through the middle, and decelerates smoothly into its final position. The movement should reveal the section as one coherent surface, not as separately falling or rising rows.
+The entrance should feel as if the Part.02 section is being pulled out from beneath the end of Part.01. Begin with the section concealed below its final position and translate it upward into place. Use an **In-Out Cubic** easing curve for this upward movement: the entrance accelerates from rest, passes through the middle, and decelerates smoothly into its final position. The movement should reveal the section as one coherent surface, not as separately falling or rising rows. Reverse input at the completed boundary uses the time-reversed trajectory to return the whole surface beneath Part.01.
 
 Do not scale the Part.02 title or content during this entrance. Keep typography at its designed final size; the animation is positional. The final position must follow the end of Part.01 with a deliberate section gap, and the page must reserve normal-flow space for the full Part.02 section so later content does not overlap it.
 
 Part.03 and Part.04 remain later sections in document order. This specification defines the Part.02 entrance only; do not assume that Parts 03 and 04 share the same pull-out animation or timing until their own entrance behavior is designed.
 
-The entrance should be one-shot and should not reverse when the visitor scrolls upward. Reduced-motion mode should place Part.02 directly in its final position with all content available.
+At the completed Part.02 boundary, upward input retraces the same positional trajectory beneath Part.01. This reverse behavior is limited to that boundary; ordinary scrolling through the section remains native. Reduced-motion mode should place Part.02 directly in its final position with all content available.
 
 ---
 
@@ -723,14 +727,14 @@ The entrance should be one-shot and should not reverse when the visitor scrolls 
 |---|---|---|---|
 | K0 | Logo Reveal | Supplied FP Logo extends into view | Use `public/images/fp-logo.svg`; preserve its source geometry |
 | K1 | SVG Annotation | Logo crossfades into vector annotation | Logo and annotation are not both fully visible |
-| K2 | First Scroll | First downward scroll removes temporary annotations; original guide lines move and expand; Part titles appear | One-time trigger; not scroll-progress-driven |
+| K2 | First Scroll | First downward scroll removes temporary annotations; original guide lines move and expand; Part titles appear | Controlled directional transition; reverses at the completed boundary |
 | K3 | Part Framework & Theme Transition | Side boundaries move inward; titles/rules shrink; all colors transition | Layout and theme transition are synchronized |
 | K4 | Part.01 Expansion | Part.01 expands vertically | Other Parts remain compact |
 | K5 | Part Fall & Content Reveal | Parts 02–04 translate downward without title scaling; Part.01 content flows into view | Text and large components use different reveal granularity |
 
 ### 10.1 High-level state model
 
-The implementation should have an explicit, one-way state model. A practical naming scheme is:
+The implementation should have an explicit state model with reversible transition boundaries. A practical naming scheme is:
 
 ```text
 K0_LOGO_REVEAL
@@ -750,14 +754,17 @@ The names may change in code, but the ordering and state boundaries must remain 
 
 - K1 must finish before the layout transformation begins.
 - The SVG annotation remains still while waiting.
-- K2 can be entered only once.
-- Scrolling upward never reverses the state.
+- K2–K5 run as one controlled forward transition and can be retraced in reverse at the completed Hero/Part.01 boundary.
+- During reverse, Introduction text chunks leave in reverse reading order; after their exit animation completes, the entire Introduction article is unmounted from normal document flow before Part.01 contracts.
+- Input received during either direction is consumed and never queued.
+- Part.01 reading and its intentional gap remain native, unrestricted document scrolling.
+- Part.02 has its own controlled forward/reverse boundary; no other Part is assumed to behave this way.
 - K3 does not begin before the K2 guide expansion and title reveal have reached their intended completion point.
 - K4 and K5 begin together after the K3 framework and theme transition is complete.
 - Part.01 expansion and the Part.02–04 position-only fall share one continuous 1250ms In Cubic timeline; preserve title font sizes and scales, with no intermediate downward hold or second fall.
 - The original Part.02 top rule falls with the lower framework, while an exact-position copy remains at the bottom of Part.01.
 - The falling titles and lower rules travel beyond the viewport; reduced-motion users retain the compact Parts without the fall.
-- Once the content state is complete, ordinary scrolling and reading behave like a normal page.
+- Once the Hero → Part.01 transition is complete, ordinary scrolling and reading behave like a normal page except at its explicitly defined reverse boundary.
 
 ### 10.3 Timing
 
@@ -782,15 +789,30 @@ Do not hardcode arbitrary values as if they were approved design decisions.
 
 ## 11. Interaction and page behavior
 
-### 11.1 First-scroll semantics
+### 11.1 Controlled directional transitions
 
-The first downward scroll is a **trigger**, not a progress controller.
+The site intercepts scroll input only at explicit animation boundaries; it does not take over ordinary reading.
 
-The animation sequence runs according to its own timeline after it has been triggered. Moving the wheel farther must not accelerate it or skip stages; scrolling upward must not reverse it.
+For Hero → Part.01:
 
-Do not implement scroll-jacking that continuously maps the entire animation to a large scroll distance.
+- A downward gesture at the K1 waiting state starts K2–K5.
+- Additional wheel, touch or keyboard input is consumed until the complete forward choreography finishes. Input is never queued.
+- Only single-finger vertical touch gestures participate in the choreography; multi-touch gestures such as pinch zoom pass through unchanged.
+- Ctrl+wheel trackpad pinch/zoom gestures pass through unchanged so browser zoom remains available.
+- A single-finger touch gesture or held scroll key that overlaps an active transition remains consumed until `touchend` or `keyup`, even when the transition finishes before that input gesture ends.
+- Normal document scrolling is restored so the user can read Part.01 and its complete Introduction.
+- After returning naturally to the Hero/Part.01 boundary, an upward gesture starts the reverse sequence.
+- The Introduction text chunks animate out from their current rendered opacity and transform in reverse reading order. Once all chunks have exited, the entire Introduction article is unmounted from normal flow; only then does Part.01 contract.
+- The reverse continues through K4/K5, K3, the title reveal and K2, returning to the K1 waiting state.
+- Input is restored only after the reverse has completed.
 
-Whether browser scrolling should be temporarily held during the K2–K5 choreography is still an open interaction detail. It must be tested deliberately: the user should not lose the initial gesture, experience an accidental page jump, or feel that scrolling is broken.
+For Part.01 → Part.02:
+
+- Ordinary scrolling through Part.01 and the intentional gap remains native.
+- A downward gesture at the Part.02 entrance boundary starts the pull-out and locks further input until completion.
+- An upward gesture at the completed boundary reverses the same pull-out. No other Part receives an assumed entrance animation.
+
+Do not globally prevent wheel events, force page snapping, or continuously map the whole document's scroll position to animation progress.
 
 ### 11.2 Language selection
 
@@ -821,7 +843,7 @@ After the choreography finishes, the page should behave like an ordinary long-fo
 - Natural vertical scrolling.
 - No persistent navigation header.
 - No repeated entrance transition when revisiting a Part.
-- No reverse transformation when scrolling upward.
+- Reverse playback occurs only at explicitly defined completed boundaries; ordinary upward reading scroll remains native.
 - Content remains available after animation completion.
 
 ### 11.5 Reduced motion
@@ -902,9 +924,13 @@ The animation should run smoothly on normal desktop and mobile hardware.
 
 The guide-line target positions depend on the Title Page and viewport geometry.
 
-If the viewport changes during K0–K5, the implementation must not leave guide lines at stale coordinates or cause the Part framework to break.
+If the viewport changes during K0–K5, all measured annotation bounds, Hero dimensions, framework geometry, and active scroll destinations are recalculated from the new viewport.
 
-The exact behavior—recalculate the remaining animation geometry, finish at the new layout, or defer resize handling until the sequence completes—must be tested and chosen deliberately.
+The K2 document-scroll driver retains its current animation progress and easing, but resolves the target position from the current Hero height on every frame. This keeps the 22%-of-Hero and full-Hero scroll destinations aligned with the live viewport without restarting the choreography. If a resize occurs during a scroll segment, the active segment rebases at its current eased progress and scaled document position, then continues along the remaining part of the same easing curve. During non-scrolling forward/reverse phases, the document position is scaled with the new Hero height so the framework remains aligned.
+
+During ordinary Part.01 reading, a viewport resize preserves the reader's offset relative to the top of the Introduction area as the Hero height changes. A layout-induced scroll adjustment must never be interpreted as an upward gesture at the reverse boundary; reverse playback starts only after actual upward scrolling crosses that boundary.
+
+Resize and orientation changes during K0–K5 must not leave guide lines at stale coordinates, create scroll jumps, or trigger an unintended transition.
 
 ### 13.4 Failure-safe content
 
@@ -1056,7 +1082,7 @@ No new animation library is mandated by this document. First evaluate whether th
 
 **Scope**
 
-- One-time downward-scroll trigger.
+- Downward-scroll trigger from the K1 waiting state; a new cycle is permitted only after a complete reverse returns to K1.
 - Remove temporary SVG details.
 - Preserve original guide lines.
 - Move guides to the full Title Page lower boundary.
@@ -1065,9 +1091,9 @@ No new animation library is mandated by this document. First evaluate whether th
 
 **Acceptance criteria**
 
-- The trigger fires once.
+- The trigger fires at most once per K1 waiting-state activation; it cannot restart during the active forward or reverse sequence.
 - The animation is not controlled by scroll distance.
-- Scrolling upward does not reverse it.
+- Reverse playback is available only at the completed Hero/Part.01 boundary; the initial forward trigger does not repeat.
 - The surviving lines visibly continue from the original SVG lines.
 - Guides target the bottom edge of the entire Title Page, not a text baseline.
 - Part titles appear after guide expansion and a short pause.
@@ -1140,7 +1166,7 @@ No new animation library is mandated by this document. First evaluate whether th
 
 - The page remains usable on narrow and wide viewports.
 - No essential content depends on animation.
-- No accidental replays or reverse transitions occur.
+- No accidental replays or reverse transitions occur outside the explicitly defined completed boundaries.
 - The final layout remains stable after all transitions.
 - Both language and theme controls work through the complete sequence.
 
@@ -1232,7 +1258,7 @@ Use this checklist when reviewing implementation changes.
 - [ ] K5 reveals Part.01 content in reading order.
 - [ ] Ordinary text appears in short, fast groups.
 - [ ] Large visual components appear as complete objects.
-- [ ] The animation never reverses when scrolling upward.
+- [ ] Reverse playback occurs only at the explicitly defined completed boundaries; ordinary upward reading scroll remains native.
 - [ ] Reduced-motion users can access all content.
 - [ ] No fake Logo, project, award or biographical detail is introduced.
 
@@ -1383,6 +1409,8 @@ The current source sequence is:
 4. The remaining document scroll uses 1100ms Out Cubic. The lowest rule receives a matching document-space translation over the same duration and easing, so it stays visually anchored in the viewport. The four upper rules then unfold upward from that anchor, starting with the rule immediately above it and staggering upward by 65ms. The rule width does not change during this stage.
 5. After the uppermost rule finishes, all four Part titles start together. Each title is rendered character by character; every glyph pops upward into place with a 36ms per-character delay and a 420ms Out Cubic transition. All four underline cursors use one shared start delay calculated from the longest title, so their blink cycles start and remain synchronized; they share the title color and binary opacity blinking.
 
+6. At the completed boundary, title characters exit in the exact reverse of their shared entrance cadence: all rows use the same longest-title timeline, so the last character of the longest title exits first and earlier character positions follow in reverse order. The four upper rules retract top-to-bottom into the compact group with inverse In Cubic timing and a 65ms stagger, while document scrolling returns to the 22% position. The initial recomposition and 22%-to-top scroll then reverse to restore the K1 waiting state.
+
 Rules remain 0.35px solid. Title text retains its page-edge inset; desktop title size/line-box height remains 0.4 of each Part-row height, while the existing mobile size is unchanged. The normal face is loaded from public/fonts/SF-Pro.ttf, whose wght axis spans 1–1000 and whose opsz axis spans 17–28; the existing SF-Pro-Italic.woff remains a separate italic face registered at weight 400. Part titles request weight 800 (Heavy) with optical sizing enabled. Separate Text/Display/Rounded aliases have not yet been established from the inspected font metadata.
 
 This is a source-level implementation only. **No local production build or browser verification has been run.** Check the full-width Stage A composition, the lower-rule viewport anchor, bottom-to-top upward unfolding, matched Out Cubic scroll, character pop timing, title size, responsive behavior and reduced-motion state before treating K2 as approved.
@@ -1419,3 +1447,25 @@ The user-supplied Chinese Introduction is preserved as five paragraphs. A matchi
 
 Only “丰朴 FedericoPrask” in the opening sentence uses the uploaded `LXGWWenKaiLite-Regular.ttf` face, registered as `LXGW WenKai Lite`. Light and Medium faces are also registered for future use. The handwritten face is not preloaded, so it is requested only when the Introduction is rendered. The name receives an angled translucent highlight based on `--site-brand`; all other copy retains the regular site typography. Reduced-motion mode displays the complete text without its reveal animation and retains the Part.01/Part.02 divider copy.
 
+
+
+## 6.6 Part.02 — Works visual composition
+
+The first implementation uses four editorial rows, not project cards. Each row alternates the collage and copy columns: media-left/copy-right, then copy-left/media-right. On narrow screens, each row stacks media above its copy.
+
+The four current editorial groups are Development, Visual Design, Music Production, and Video & Motion. Copy describes the user's established areas of practice at category level; it does not claim specific project outcomes or awards.
+
+Until the user supplies the final curated media, each collage is represented by three overlapping, differently sized color fields. These are layout placeholders only, not portfolio images. Replace each field with a real work preview when its corresponding asset is available; preserve the collage geometry and varied aspect ratios rather than turning the media area into a uniform card grid.
+
+The section is placed after the Introduction in normal document flow. Its dedicated pull-out entrance and reverse-boundary behavior remain a separate implementation task; do not let a mount-time animation play while the reader is still reading Part.01.
+
+
+### 6.7 Part.02 entrance and reverse interaction
+
+The Works section is mounted after the Introduction and retains its natural document height. Its visual stage begins translated downward by one viewport height, while a zero-height boundary marker remains in normal flow immediately before it. The marker, not the transformed element's visual bounding box, defines the transition boundary.
+
+When downward input reaches that boundary, the document is held at the marker and the complete Works stage moves upward as one piece over 1150ms with In-Out Cubic easing. Typography remains at its final size; no scale animation is applied. Scroll input is locked while the stage moves. After completion the reader scrolls through Works normally.
+
+When upward input reaches the same boundary from within Works, the page is held at the boundary and the stage returns downward along the reverse trajectory. The preceding Introduction and the gap above the boundary remain ordinary free-scroll regions. Wheel, single-touch, keyboard, native document-scroll and scrollbar movement are handled; multi-touch and Ctrl+wheel zoom remain untouched. Reduced-motion users pass directly to the completed or resting state without interpolation.
+
+The Works stage's reveal progress is independent of K0–K5. Part.02 does not yet define the entrance behavior for Parts 03 and 04.

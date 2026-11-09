@@ -4,12 +4,30 @@ import { useI18n } from "../composables/useI18n";
 import { useTheme } from "../composables/useTheme";
 import LogoMark from "./LogoMark.vue";
 import LogoAnnotation from "./LogoAnnotation.vue";
+import WorksSection from "./WorksSection.vue";
 
 const { locale, setLocale } = useI18n();
 const { pref, resolved, cycle } = useTheme();
 
 type LogoStage = "reveal" | "crossfade" | "waiting";
-type K2Phase = "idle" | "recompose" | "settled" | "expand" | "titles";
+type K2Phase =
+  | "idle"
+  | "recompose"
+  | "settled"
+  | "expand"
+  | "titles"
+  | "reverse-titles"
+  | "reverse-expand"
+  | "reverse-recompose";
+type TransitionPlayback = "idle" | "forward" | "complete" | "reverse";
+type ScrollEasing = "in-out-cubic" | "out-cubic" | "reverse-out-cubic";
+type ActiveScrollAnimation = {
+  progress: number;
+  startY: number;
+  startEased: number;
+  easing: ScrollEasing;
+  resolveTargetY: () => number;
+};
 
 const prefersReducedMotion =
   typeof window !== "undefined" &&
@@ -28,7 +46,12 @@ const k4Progress = ref(0);
 const k5Started = ref(false);
 const k5Progress = ref(0);
 const introductionStarted = ref(false);
-const k5DividerCopyTransform = ref("");
+type WorksPlayback = "idle" | "forward" | "complete" | "reverse";
+const worksPlayback = ref<WorksPlayback>("idle");
+const worksProgress = ref(prefersReducedMotion ? 1 : 0);
+const worksBoundaryRef = ref<HTMLElement | null>(null);
+const transitionPlayback = ref<TransitionPlayback>("idle");
+const k3Reversing = ref(false);
 const heroNameInset = ref(0);
 
 const annotationBounds = ref({ left: 0, top: 0, width: 0, height: 0 });
@@ -53,8 +76,11 @@ const frameworkParts = [
   "Part.04 Beyond",
 ] as const;
 
+const frameworkMaxTitleLength = Math.max(
+  ...frameworkParts.map((part) => part.length),
+);
 const frameworkTitleRevealDuration =
-  Math.max(...frameworkParts.map((part) => part.length - 1)) * 36 + 420;
+  (frameworkMaxTitleLength - 1) * 36 + 420;
 const frameworkCursorDelay = frameworkTitleRevealDuration + "ms";
 
 type IntroductionCopy = {
@@ -262,7 +288,7 @@ const k5Geometry = computed(() => {
   return {
     dropDistance,
     dropOffset: dropDistance * k5Progress.value,
-    scale: 1 - 0.58 * k5Progress.value,
+
   };
 });
 
@@ -290,7 +316,13 @@ function makeLineMatrix(
 const k2LineTransforms = computed<Record<string, string>>(() => {
   const bounds = annotationBounds.value;
   const { width, height } = viewport.value;
-  if (!bounds.width || !width || !height || k2Phase.value === "idle") return {};
+  if (
+    !bounds.width ||
+    !width ||
+    !height ||
+    k2Phase.value === "idle" ||
+    k2Phase.value === "reverse-recompose"
+  ) return {};
 
   const initialScroll = heroHeight.value * K2_INITIAL_SCROLL_RATIO;
   const compactBottomY = initialScroll + heroHeight.value - verticalInset.value;
@@ -303,7 +335,14 @@ const k2LineTransforms = computed<Record<string, string>>(() => {
   const finalBottomY = heroHeight.value + height - stageInset;
   const finalRowGap =
     (height - stageInset * 2) / (lineDefinitions.length - 1);
-  const isExpanding = k2Phase.value === "expand" || k2Phase.value === "titles";
+  const isExpanding =
+    k2Phase.value === "expand" ||
+    k2Phase.value === "titles" ||
+    k2Phase.value === "reverse-titles";
+
+  // Keep the expanded geometry while reverse-title exit runs. As soon as
+  // reverse-expand begins, the targets become the compact five-line group;
+  // LogoAnnotation supplies the inverse In Cubic transition for that move.
 
   return Object.fromEntries(
     lineDefinitions.map((line, index) => {
@@ -311,9 +350,11 @@ const k2LineTransforms = computed<Record<string, string>>(() => {
         ? finalBottomY - (lineDefinitions.length - 1 - index) * finalRowGap
         : compactTopY + index * compactLineGap.value;
 
-      // During K2, preserve the compact regrouping. Once the full framework
-      // opens, keep its first rule on the shared top/left page inset and
-      // compress the four row gaps below that fixed upper boundary.
+      // The initial and reverse-recompose phases use the compact group.
+      // Hold the expanded geometry through title entry/exit; reverse-expand
+      // changes the targets back to compact positions using its inverse easing.
+      // In expanded geometry, the first rule stays on the shared page inset
+      // while the four row gaps compress below that fixed upper boundary.
       const compressedY = isExpanding
         ? heroHeight.value +
           stageInset +
@@ -335,10 +376,28 @@ const k2LineDelays = computed<Record<string, string>>(() =>
       line.id,
       k2Phase.value === "expand"
         ? (lineDefinitions.length - 1 - index) * K2_LINE_STAGGER + "ms"
-        : "0ms",
+        : k2Phase.value === "reverse-expand"
+          ? index * K2_LINE_STAGGER + "ms"
+          : "0ms",
     ]),
   ),
 );
+
+const k5DividerCopyTransform = computed(() => {
+  const bounds = annotationBounds.value;
+  const { width, height } = viewport.value;
+  if (!bounds.width || !width || !height) return "";
+
+  const divider = lineDefinitions[1];
+  const stageInset = k3Geometry.value.stageInset;
+  const finalRowGap = (height - stageInset * 2) / (lineDefinitions.length - 1);
+  const dividerY =
+    heroHeight.value +
+    stageInset +
+    finalRowGap * k3Geometry.value.compression;
+
+  return makeLineMatrix(divider.y, 0, dividerY, width);
+});
 
 const frameworkTitlesStyle = computed(() => {
   const bounds = annotationBounds.value;
@@ -357,7 +416,6 @@ const frameworkTitlesStyle = computed(() => {
     "--framework-first-title-offset":
       (k4Geometry.value.compactRowHeight - geometry.titleFontSize) / 2 + "px",
     "--framework-fall-offset": k5Geometry.value.dropOffset + "px",
-    "--framework-fall-scale": k5Geometry.value.scale,
   };
 });
 
@@ -369,6 +427,13 @@ const introductionStageStyle = computed(() => ({
   paddingBlockStart: `${k3Geometry.value.stageInset + k4Geometry.value.compactRowHeight + 24}px`,
   paddingInlineStart: `${k3Geometry.value.titleInset}px`,
   paddingInlineEnd: `${k3Geometry.value.titleInset}px`,
+}));
+
+const worksStageStyle = computed(() => ({
+  transform: `translate3d(0, ${((1 - worksProgress.value) * viewport.value.height).toFixed(2)}px, 0)`,
+  willChange: worksPlayback.value === "forward" || worksPlayback.value === "reverse" || worksProgress.value === 0
+    ? "transform"
+    : "auto",
 }));
 
 const frameworkVerticalLeftStyle = computed(() => ({
@@ -388,12 +453,22 @@ let k2ExpandTimer: number | undefined;
 let k3StartTimer: number | undefined;
 let k3Frame: number | undefined;
 let k4Frame: number | undefined;
+let worksFrame: number | undefined;
 let scrollFrame: number | undefined;
+let activeScrollAnimation: ActiveScrollAnimation | null = null;
 let touchStartY: number | null = null;
+let touchLastY: number | null = null;
+let touchGestureActive = false;
+let touchBlockedUntilEnd = false;
+const pressedScrollKeys = new Set<string>();
+const blockedScrollKeys = new Set<string>();
 let pendingK2 = false;
 let lastScrollY = 0;
+let isUnmounting = false;
+let reverseIntroductionAnimations: Animation[] = [];
 
 const K2_RECOMPOSE_DURATION = 720;
+const K2_ANNOTATION_FADE_DURATION = 420;
 const K2_INITIAL_SCROLL_DURATION = 560;
 const K2_INITIAL_SCROLL_RATIO = 0.22;
 const K2_SETTLE_HOLD = 170;
@@ -403,6 +478,7 @@ const K2_LINE_STAGGER = 65;
 const K3_GEOMETRY_DURATION = 1500;
 const K3_CURSOR_HOLD_CYCLES = 1;
 const K4_K5_TRANSITION_DURATION = 1250;
+const WORKS_TRANSITION_DURATION = 1150;
 
 function easeInOutCubic(value: number): number {
   return value < 0.5
@@ -418,34 +494,165 @@ function easeInCubic(value: number): number {
   return value * value * value;
 }
 
-function animateDocumentScroll(
-  targetY: number,
-  duration: number,
-  easing: "in-out-cubic" | "out-cubic" = "in-out-cubic",
-) {
-  if (scrollFrame !== undefined) window.cancelAnimationFrame(scrollFrame);
+function getWorksBoundaryY(): number | null {
+  const marker = worksBoundaryRef.value;
+  if (!marker) return null;
+  return marker.getBoundingClientRect().top + window.scrollY;
+}
 
-  const startY = window.scrollY;
-  const distance = targetY - startY;
+function animateWorksProgress(target: 0 | 1, direction: "forward" | "reverse") {
+  if (worksFrame !== undefined) {
+    window.cancelAnimationFrame(worksFrame);
+    worksFrame = undefined;
+  }
+
+  worksPlayback.value = direction;
+  blockCurrentInputGestures();
+
+  const from = worksProgress.value;
+  const distance = Math.abs(target - from);
+  if (prefersReducedMotion || distance === 0) {
+    worksProgress.value = target;
+    worksPlayback.value = target === 1 ? "complete" : "idle";
+    lastScrollY = window.scrollY;
+    return;
+  }
+
   const startTime = performance.now();
-  const previousBehavior = document.documentElement.style.scrollBehavior;
+  const duration = WORKS_TRANSITION_DURATION * distance;
+  const frame = (now: number) => {
+    const progress = Math.min(1, (now - startTime) / duration);
+    const eased = easeInOutCubic(progress);
+    worksProgress.value = from + (target - from) * eased;
+
+    if (progress < 1) {
+      worksFrame = window.requestAnimationFrame(frame);
+    } else {
+      worksFrame = undefined;
+      worksProgress.value = target;
+      worksPlayback.value = target === 1 ? "complete" : "idle";
+      lastScrollY = window.scrollY;
+    }
+  };
+
+  worksFrame = window.requestAnimationFrame(frame);
+}
+
+function beginWorksEntrance() {
+  if (
+    !introductionStarted.value ||
+    transitionPlayback.value !== "complete" ||
+    worksPlayback.value !== "idle"
+  ) return;
+  animateWorksProgress(1, "forward");
+}
+
+function beginWorksReverse() {
+  if (worksPlayback.value !== "complete") return;
+  animateWorksProgress(0, "reverse");
+}
+
+function resolveScrollEasing(
+  easing: ScrollEasing,
+  progress: number,
+): number {
+  if (easing === "out-cubic") return easeOutCubic(progress);
+  if (easing === "reverse-out-cubic") return easeInCubic(progress);
+  return easeInOutCubic(progress);
+}
+
+function blockCurrentInputGestures() {
+  for (const key of pressedScrollKeys) {
+    blockedScrollKeys.add(key);
+  }
+  if (touchGestureActive) touchBlockedUntilEnd = true;
+}
+
+function getScrollKeyId(event: KeyboardEvent): string {
+  return event.code || event.key;
+}
+
+function handleKeyup(event: KeyboardEvent) {
+  const key = getScrollKeyId(event);
+  pressedScrollKeys.delete(key);
+  blockedScrollKeys.delete(key);
+}
+
+function handleWindowBlur() {
+  pressedScrollKeys.clear();
+  blockedScrollKeys.clear();
+  touchStartY = null;
+  touchLastY = null;
+  touchGestureActive = false;
+  touchBlockedUntilEnd = false;
+}
+
+let scrollBehaviorBeforeAnimation: string | null = null;
+
+function restoreDocumentScrollBehavior() {
+  if (scrollBehaviorBeforeAnimation === null) return;
+  document.documentElement.style.scrollBehavior = scrollBehaviorBeforeAnimation;
+  scrollBehaviorBeforeAnimation = null;
+}
+
+function scrollToImmediately(targetY: number) {
+  // The global stylesheet enables smooth scrolling; boundary locks must snap
+  // to the exact document position before the reverse sequence begins.
+  const root = document.documentElement;
+  const previousBehavior = root.style.scrollBehavior;
+  root.style.scrollBehavior = "auto";
+  window.scrollTo(0, targetY);
+  root.style.scrollBehavior = previousBehavior;
+}
+
+function animateDocumentScroll(
+  targetY: number | (() => number),
+  duration: number,
+  easing: ScrollEasing = "in-out-cubic",
+) {
+  if (scrollFrame !== undefined) {
+    window.cancelAnimationFrame(scrollFrame);
+    scrollFrame = undefined;
+    activeScrollAnimation = null;
+    restoreDocumentScrollBehavior();
+  }
+
+  const resolveTargetY =
+    typeof targetY === "function" ? targetY : () => targetY;
+  const animation: ActiveScrollAnimation = {
+    progress: 0,
+    startY: window.scrollY,
+    startEased: 0,
+    easing,
+    resolveTargetY,
+  };
+  const startTime = performance.now();
+  activeScrollAnimation = animation;
+  scrollBehaviorBeforeAnimation = document.documentElement.style.scrollBehavior;
   document.documentElement.style.scrollBehavior = "auto";
 
   const frame = (now: number) => {
     const progress = Math.min(1, (now - startTime) / duration);
-    const eased =
-      easing === "out-cubic"
-        ? easeOutCubic(progress)
-        : easeInOutCubic(progress);
-    window.scrollTo(0, startY + distance * eased);
+    animation.progress = progress;
+    const eased = resolveScrollEasing(easing, progress);
+    const easedRange = 1 - animation.startEased;
+    const segmentProgress = easedRange <= Number.EPSILON
+      ? 1
+      : Math.min(1, Math.max(0, (eased - animation.startEased) / easedRange));
+    const currentTargetY = animation.resolveTargetY();
+    lastScrollY =
+      animation.startY + (currentTargetY - animation.startY) * segmentProgress;
+    window.scrollTo(0, lastScrollY);
 
     if (progress < 1) {
       scrollFrame = window.requestAnimationFrame(frame);
     } else {
       scrollFrame = undefined;
-      window.scrollTo(0, targetY);
-      document.documentElement.style.scrollBehavior = previousBehavior;
-      lastScrollY = targetY;
+      activeScrollAnimation = null;
+      const finalTargetY = animation.resolveTargetY();
+      window.scrollTo(0, finalTargetY);
+      restoreDocumentScrollBehavior();
+      lastScrollY = finalTargetY;
     }
   };
 
@@ -453,10 +660,7 @@ function animateDocumentScroll(
 }
 
 function scrollImmediatelyToFramework() {
-  const previousBehavior = document.documentElement.style.scrollBehavior;
-  document.documentElement.style.scrollBehavior = "auto";
-  window.scrollTo(0, heroHeight.value);
-  document.documentElement.style.scrollBehavior = previousBehavior;
+  scrollToImmediately(heroHeight.value);
   lastScrollY = window.scrollY;
 }
 
@@ -464,15 +668,14 @@ function beginK4() {
   if (k4Started.value) return;
   k4Started.value = true;
 
-  // Capture the shared Part.01 / Part.02 divider before either side moves.
-  // Its copy stays beside the Part.01 title while the original travels away.
-  k5DividerCopyTransform.value =
-    k2LineTransforms.value[lineDefinitions[1].id] ?? "";
+  // The divider copy is recomputed from the live viewport geometry.
   k5Started.value = true;
 
   if (prefersReducedMotion) {
     k4Progress.value = 1;
     introductionStarted.value = true;
+    transitionPlayback.value = "complete";
+    lastScrollY = window.scrollY;
     return;
   }
 
@@ -493,6 +696,8 @@ function beginK4() {
       k4Frame = undefined;
       k4Progress.value = 1;
       k5Progress.value = 1;
+      transitionPlayback.value = "complete";
+      lastScrollY = window.scrollY;
     }
   };
 
@@ -526,17 +731,21 @@ function animateK3Geometry() {
 function beginK3() {
   if (k3Started.value) return;
   k3Started.value = true;
+  document.documentElement.classList.remove("k3-content-theme-reversing");
   document.documentElement.classList.add("k3-content-theme");
   animateK3Geometry();
 }
 
 function beginK2() {
-  if (k2Started.value) return;
+  if (k2Started.value || transitionPlayback.value !== "idle") return;
   if (logoStage.value !== "waiting") {
     pendingK2 = true;
+    blockCurrentInputGestures();
     return;
   }
 
+  transitionPlayback.value = "forward";
+  blockCurrentInputGestures();
   k2Started.value = true;
   pendingK2 = false;
 
@@ -553,7 +762,7 @@ function beginK2() {
   // The Hero remains mostly visible while the five paths settle into a
   // moderately spaced group near its lower edge.
   animateDocumentScroll(
-    heroHeight.value * K2_INITIAL_SCROLL_RATIO,
+    () => heroHeight.value * K2_INITIAL_SCROLL_RATIO,
     K2_INITIAL_SCROLL_DURATION,
   );
 
@@ -565,7 +774,7 @@ function beginK2() {
     k2SettleTimer = window.setTimeout(() => {
       k2Phase.value = "expand";
       animateDocumentScroll(
-        heroHeight.value,
+        () => heroHeight.value,
         K2_OPEN_SCROLL_DURATION,
         "out-cubic",
       );
@@ -583,43 +792,451 @@ function beginK2() {
   }, K2_RECOMPOSE_DURATION);
 }
 
+function reverseIntroductionContent(): Promise<void> {
+  const chunks = Array.from(
+    document.querySelectorAll<HTMLElement>(".introduction-content__chunk"),
+  );
+
+  if (chunks.length === 0) {
+    introductionStarted.value = false;
+    return Promise.resolve();
+  }
+
+  // Read the rendered state before creating the reverse effects. This keeps
+  // chunks whose delayed entrance has not started from flashing into view.
+  reverseIntroductionAnimations = chunks.map((chunk, index) => {
+    const computed = window.getComputedStyle(chunk);
+    const opacity = Number.parseFloat(computed.opacity) || 0;
+    const transform = computed.transform === "none"
+      ? "translateY(0)"
+      : computed.transform;
+
+    return chunk.animate(
+      [
+        { opacity, transform },
+        { opacity: 0, transform: "translateY(0.42em)" },
+      ],
+      {
+        duration: 420,
+        delay: (chunks.length - index - 1) * 58,
+        easing: "cubic-bezier(0.333333, 0, 0.666667, 0)",
+        fill: "forwards",
+      },
+    );
+  });
+
+  return Promise.all(
+    reverseIntroductionAnimations.map((animation) =>
+      animation.finished.catch(() => undefined),
+    ),
+  ).then(() => {
+    if (isUnmounting) return;
+
+    // Unmount the complete article only after its text has left. Opacity alone
+    // would leave paragraph margins and the full article height in normal flow.
+    introductionStarted.value = false;
+    reverseIntroductionAnimations = [];
+  });
+}
+
+function beginReverseInitialTransition() {
+  if (transitionPlayback.value !== "complete") return;
+  transitionPlayback.value = "reverse";
+  blockCurrentInputGestures();
+
+  if (prefersReducedMotion) {
+    introductionStarted.value = false;
+    k4Progress.value = 0;
+    k5Progress.value = 0;
+    k3Progress.value = 0;
+    k2Phase.value = "idle";
+    k2Started.value = false;
+    k3Started.value = false;
+    k4Started.value = false;
+    k5Started.value = false;
+    k3Reversing.value = false;
+    document.documentElement.classList.remove("k3-content-theme");
+    document.documentElement.classList.remove("k3-content-theme-reversing");
+    scrollToImmediately(0);
+    lastScrollY = 0;
+    transitionPlayback.value = "idle";
+    return;
+  }
+
+  // Remove the entire Introduction from normal flow before contracting
+  // Part.01, so no invisible blank content block remains behind.
+  void reverseIntroductionContent().then(() => {
+    if (isUnmounting) return;
+
+    const startTime = performance.now();
+    const frame = (now: number) => {
+      const progress = Math.min(1, (now - startTime) / K4_K5_TRANSITION_DURATION);
+      const reversed = 1 - easeOutCubic(progress);
+      k4Progress.value = reversed;
+      k5Progress.value = reversed;
+
+      if (progress < 1) {
+        k4Frame = window.requestAnimationFrame(frame);
+      } else {
+        k4Frame = undefined;
+        k4Progress.value = 0;
+        k5Progress.value = 0;
+        k5Started.value = false;
+        k4Started.value = false;
+        reverseK3();
+      }
+    };
+
+    k4Frame = window.requestAnimationFrame(frame);
+  });
+}
+
+function reverseK3() {
+  k3Reversing.value = true;
+  k3Started.value = false;
+  document.documentElement.classList.remove("k3-content-theme");
+  document.documentElement.classList.add("k3-content-theme-reversing");
+
+  const startTime = performance.now();
+  const frame = (now: number) => {
+    const progress = Math.min(1, (now - startTime) / K3_GEOMETRY_DURATION);
+    k3Progress.value = 1 - easeInCubic(progress);
+
+    if (progress < 1) {
+      k3Frame = window.requestAnimationFrame(frame);
+    } else {
+      k3Frame = undefined;
+      k3Progress.value = 0;
+      k3Reversing.value = false;
+      document.documentElement.classList.remove("k3-content-theme-reversing");
+      k2Phase.value = "reverse-titles";
+      k3StartTimer = window.setTimeout(
+        reverseK2StageC,
+        frameworkTitleRevealDuration,
+      );
+    }
+  };
+
+  k3Frame = window.requestAnimationFrame(frame);
+}
+
+function reverseK2StageC() {
+  k2Phase.value = "reverse-expand";
+  animateDocumentScroll(
+    () => heroHeight.value * K2_INITIAL_SCROLL_RATIO,
+    K2_OPEN_SCROLL_DURATION,
+    "reverse-out-cubic",
+  );
+
+  const totalExpandTime =
+    K2_LINE_EXPAND_DURATION + (lineDefinitions.length - 1) * K2_LINE_STAGGER;
+  k2ExpandTimer = window.setTimeout(() => {
+    k2Phase.value = "settled";
+    k2SettleTimer = window.setTimeout(reverseK2StageA, K2_SETTLE_HOLD);
+  }, Math.max(totalExpandTime, K2_OPEN_SCROLL_DURATION) + 80);
+}
+
+function reverseK2StageA() {
+  k2Phase.value = "reverse-recompose";
+  animateDocumentScroll(0, K2_INITIAL_SCROLL_DURATION, "in-out-cubic");
+
+  // The forward annotation fade-out occupies the first 420ms of the
+  // 720ms recomposition. Its reverse therefore begins in the final 420ms.
+  k2RecomposeTimer = window.setTimeout(() => {
+    k2Started.value = false;
+    k3Started.value = false;
+    k3Progress.value = 0;
+    k4Started.value = false;
+    k4Progress.value = 0;
+    k5Started.value = false;
+    k5Progress.value = 0;
+    k3Reversing.value = false;
+    lastScrollY = window.scrollY;
+  }, K2_RECOMPOSE_DURATION - K2_ANNOTATION_FADE_DURATION);
+
+  k2SettleTimer = window.setTimeout(() => {
+    k2Phase.value = "idle";
+    transitionPlayback.value = "idle";
+    lastScrollY = window.scrollY;
+  }, K2_RECOMPOSE_DURATION);
+}
+
 function handleWheel(event: WheelEvent) {
-  if (event.deltaY > 0 && !k2Started.value) {
+  // Trackpad pinch gestures are commonly exposed as Ctrl+wheel. Preserve
+  // browser zoom instead of consuming them as page-navigation input.
+  if (event.ctrlKey) return;
+
+  if (worksPlayback.value === "forward" || worksPlayback.value === "reverse") {
+    event.preventDefault();
+    return;
+  }
+
+  const worksBoundary = getWorksBoundaryY();
+  if (
+    worksPlayback.value === "complete" &&
+    worksBoundary !== null &&
+    event.deltaY < 0 &&
+    (window.scrollY <= worksBoundary + 1 || window.scrollY + event.deltaY <= worksBoundary)
+  ) {
+    event.preventDefault();
+    scrollToImmediately(worksBoundary);
+    lastScrollY = worksBoundary;
+    beginWorksReverse();
+    return;
+  }
+
+  if (
+    !prefersReducedMotion &&
+    worksPlayback.value === "idle" &&
+    introductionStarted.value &&
+    worksBoundary !== null &&
+    event.deltaY > 0 &&
+    (window.scrollY >= worksBoundary - 1 || window.scrollY + event.deltaY >= worksBoundary)
+  ) {
+    event.preventDefault();
+    scrollToImmediately(worksBoundary);
+    lastScrollY = worksBoundary;
+    beginWorksEntrance();
+    return;
+  }
+
+  if (transitionPlayback.value === "forward" || transitionPlayback.value === "reverse") {
+    event.preventDefault();
+    return;
+  }
+
+  if (
+    transitionPlayback.value === "complete" &&
+    event.deltaY < 0 &&
+    (window.scrollY <= heroHeight.value + 1 ||
+      window.scrollY + event.deltaY <= heroHeight.value)
+  ) {
+    event.preventDefault();
+    scrollToImmediately(heroHeight.value);
+    lastScrollY = heroHeight.value;
+    beginReverseInitialTransition();
+    return;
+  }
+
+  if (
+    transitionPlayback.value === "idle" &&
+    !k2Started.value &&
+    event.deltaY > 0
+  ) {
     event.preventDefault();
     beginK2();
+  } else if (pendingK2 && event.deltaY > 0) {
+    event.preventDefault();
   }
 }
 
 function handleTouchStart(event: TouchEvent) {
-  touchStartY = event.touches[0]?.clientY ?? null;
+  touchGestureActive = event.touches.length > 0;
+  // Do not treat a multi-touch gesture (for example, pinch zoom) as page
+  // navigation. A fresh single-finger gesture can begin after it ends.
+  if (event.touches.length !== 1) {
+    touchStartY = null;
+    touchLastY = null;
+    touchBlockedUntilEnd =
+      transitionPlayback.value === "forward" ||
+      transitionPlayback.value === "reverse" ||
+      worksPlayback.value === "forward" ||
+      worksPlayback.value === "reverse" ||
+      pendingK2;
+    return;
+  }
+  touchStartY = event.touches[0].clientY;
+  touchLastY = touchStartY;
+  touchBlockedUntilEnd =
+    transitionPlayback.value === "forward" ||
+    transitionPlayback.value === "reverse" ||
+    worksPlayback.value === "forward" ||
+    worksPlayback.value === "reverse" ||
+    pendingK2;
 }
 
 function handleTouchMove(event: TouchEvent) {
+  touchGestureActive = event.touches.length > 0;
+  if (event.touches.length !== 1) {
+    touchStartY = null;
+    touchLastY = null;
+    if (
+      transitionPlayback.value === "forward" ||
+      transitionPlayback.value === "reverse" ||
+      worksPlayback.value === "forward" ||
+      worksPlayback.value === "reverse" ||
+      pendingK2
+    ) {
+      touchBlockedUntilEnd = true;
+    }
+    return;
+  }
+
+  // Keep pinch zoom available, but do not let the remaining finger resume a
+  // page gesture that began while a transition was locked.
+  if (touchBlockedUntilEnd) {
+    event.preventDefault();
+    return;
+  }
+
   const currentY = event.touches[0]?.clientY;
+  if (currentY === undefined || touchStartY === null || touchLastY === null) return;
+
+  const delta = touchStartY - currentY;
+  const stepDelta = touchLastY - currentY;
+  touchLastY = currentY;
+
+  if (worksPlayback.value === "forward" || worksPlayback.value === "reverse") {
+    touchBlockedUntilEnd = true;
+    event.preventDefault();
+    return;
+  }
+
+  const worksBoundary = getWorksBoundaryY();
   if (
-    !k2Started.value &&
-    touchStartY !== null &&
-    currentY !== undefined &&
-    touchStartY - currentY > 8
+    worksPlayback.value === "complete" &&
+    worksBoundary !== null &&
+    stepDelta < -8 &&
+    window.scrollY + stepDelta <= worksBoundary
   ) {
     event.preventDefault();
+    scrollToImmediately(worksBoundary);
+    lastScrollY = worksBoundary;
+    beginWorksReverse();
+    touchBlockedUntilEnd = true;
+    return;
+  }
+
+  if (
+    !prefersReducedMotion &&
+    worksPlayback.value === "idle" &&
+    introductionStarted.value &&
+    worksBoundary !== null &&
+    stepDelta > 8 &&
+    window.scrollY + stepDelta >= worksBoundary
+  ) {
+    event.preventDefault();
+    scrollToImmediately(worksBoundary);
+    lastScrollY = worksBoundary;
+    beginWorksEntrance();
+    touchBlockedUntilEnd = true;
+    return;
+  }
+
+  if (transitionPlayback.value === "forward" || transitionPlayback.value === "reverse") {
+    touchBlockedUntilEnd = true;
+    event.preventDefault();
+    return;
+  }
+
+  if (transitionPlayback.value === "idle" && !k2Started.value && delta > 8) {
+    event.preventDefault();
     beginK2();
+    touchBlockedUntilEnd = true;
+    return;
+  }
+
+  if (
+    transitionPlayback.value === "complete" &&
+    delta < -8 &&
+    stepDelta < 0 &&
+    (window.scrollY <= heroHeight.value + 1 ||
+      window.scrollY + stepDelta <= heroHeight.value)
+  ) {
+    event.preventDefault();
+    scrollToImmediately(heroHeight.value);
+    lastScrollY = heroHeight.value;
+    beginReverseInitialTransition();
+    touchBlockedUntilEnd = true;
   }
 }
 
-function handleTouchEnd() {
+function handleTouchEnd(event: TouchEvent) {
+  touchGestureActive = event.touches.length > 0;
   touchStartY = null;
+  touchLastY = null;
+
+  if (event.touches.length > 0) {
+    if (
+      transitionPlayback.value === "forward" ||
+      transitionPlayback.value === "reverse" ||
+      worksPlayback.value === "forward" ||
+      worksPlayback.value === "reverse" ||
+      pendingK2
+    ) {
+      touchBlockedUntilEnd = true;
+    }
+    return;
+  }
+
+  touchBlockedUntilEnd = false;
 }
 
 function handleDocumentScroll() {
   const currentY = window.scrollY;
+
+  if (
+    transitionPlayback.value === "forward" ||
+    transitionPlayback.value === "reverse" ||
+    worksPlayback.value === "forward" ||
+    worksPlayback.value === "reverse"
+  ) {
+    if (Math.abs(currentY - lastScrollY) > 1) {
+      scrollToImmediately(lastScrollY);
+    }
+    return;
+  }
+
+  const movedUp = currentY < lastScrollY - 1;
   const movedDown = currentY > lastScrollY;
+  const worksBoundary = getWorksBoundaryY();
+
+  if (
+    worksPlayback.value === "complete" &&
+    movedUp &&
+    worksBoundary !== null &&
+    currentY < worksBoundary - 1
+  ) {
+    scrollToImmediately(worksBoundary);
+    lastScrollY = worksBoundary;
+    beginWorksReverse();
+    return;
+  }
+
+  if (
+    !prefersReducedMotion &&
+    worksPlayback.value === "idle" &&
+    introductionStarted.value &&
+    movedDown &&
+    worksBoundary !== null &&
+    currentY >= worksBoundary - 1
+  ) {
+    scrollToImmediately(worksBoundary);
+    lastScrollY = worksBoundary;
+    beginWorksEntrance();
+    return;
+  }
+  if (
+    transitionPlayback.value === "complete" &&
+    movedUp &&
+    currentY < heroHeight.value - 1
+  ) {
+    scrollToImmediately(heroHeight.value);
+    lastScrollY = heroHeight.value;
+    beginReverseInitialTransition();
+    return;
+  }
+
   lastScrollY = currentY;
-  if (movedDown && !k2Started.value) beginK2();
+  if (movedDown && !k2Started.value) {
+    scrollToImmediately(0);
+    lastScrollY = 0;
+    beginK2();
+  }
 }
 
 function isInteractiveTarget(target: EventTarget | null): boolean {
-  if (!(target instanceof HTMLElement)) return false;
+  if (!(target instanceof Element)) return false;
   return Boolean(target.closest("button, a, input, textarea, select, [contenteditable='true']"));
 }
 
@@ -629,27 +1246,84 @@ function handleKeydown(event: KeyboardEvent) {
     event.altKey ||
     event.ctrlKey ||
     event.metaKey ||
-    event.shiftKey ||
     isInteractiveTarget(event.target)
   ) {
     return;
   }
 
+  const scrollDown =
+    !event.shiftKey &&
+    (event.key === "ArrowDown" ||
+      event.key === "PageDown" ||
+      event.key === " " ||
+      event.key === "End");
+  const scrollUp =
+    event.key === "ArrowUp" ||
+    event.key === "PageUp" ||
+    event.key === "Home" ||
+    (event.key === " " && event.shiftKey);
+
+  if (!scrollDown && !scrollUp) return;
+
+  const key = getScrollKeyId(event);
+  pressedScrollKeys.add(key);
+  if (blockedScrollKeys.has(key)) {
+    event.preventDefault();
+    return;
+  }
+
   if (
-    event.key === "ArrowDown" ||
-    event.key === "PageDown" ||
-    event.key === " " ||
-    event.key === "End"
+    transitionPlayback.value === "forward" ||
+    transitionPlayback.value === "reverse" ||
+    worksPlayback.value === "forward" ||
+    worksPlayback.value === "reverse"
   ) {
-    if (!k2Started.value) {
-      event.preventDefault();
-      beginK2();
-    }
+    event.preventDefault();
+    blockedScrollKeys.add(key);
+    return;
+  }
+
+  const worksBoundary = getWorksBoundaryY();
+  if (
+    worksPlayback.value === "complete" &&
+    scrollUp &&
+    worksBoundary !== null &&
+    (event.key === "Home" ||
+      window.scrollY <= worksBoundary + 1 ||
+      (event.key === "PageUp" && window.scrollY - viewport.value.height <= worksBoundary))
+  ) {
+    event.preventDefault();
+    scrollToImmediately(worksBoundary);
+    lastScrollY = worksBoundary;
+    beginWorksReverse();
+    blockedScrollKeys.add(key);
+    return;
+  }
+
+  if (transitionPlayback.value === "idle" && !k2Started.value && scrollDown) {
+    event.preventDefault();
+    beginK2();
+    blockedScrollKeys.add(key);
+    return;
+  }
+
+  if (
+    transitionPlayback.value === "complete" &&
+    scrollUp &&
+    (event.key === "Home" ||
+      window.scrollY <= heroHeight.value + 1 ||
+      (event.key === "PageUp" && window.scrollY - viewport.value.height <= heroHeight.value))
+  ) {
+    event.preventDefault();
+    scrollToImmediately(heroHeight.value);
+    lastScrollY = heroHeight.value;
+    beginReverseInitialTransition();
+    blockedScrollKeys.add(key);
   }
 }
 
 function updateAnnotationBounds() {
-  if (!markSpaceRef.value || k2Started.value) return;
+  if (!markSpaceRef.value) return;
   if (titlePageRef.value) {
     const pageRect = titlePageRef.value.getBoundingClientRect();
     heroHeight.value = pageRect.height;
@@ -667,12 +1341,77 @@ function updateAnnotationBounds() {
 }
 
 function handleResize() {
-  if (titlePageRef.value) {
-    const pageRect = titlePageRef.value.getBoundingClientRect();
-    heroHeight.value = pageRect.height;
-    viewport.value = { width: pageRect.width, height: pageRect.height };
-  }
+  const previousHeroHeight = heroHeight.value;
+  const previousWorksBoundary = getWorksBoundaryY();
+  const currentScrollY = window.scrollY;
+  const hasActiveTransition =
+    transitionPlayback.value === "forward" ||
+    transitionPlayback.value === "reverse";
+  const previousScrollY = hasActiveTransition ? lastScrollY : currentScrollY;
+
   updateAnnotationBounds();
+
+  const nextWorksBoundary = getWorksBoundaryY();
+  if (
+    (worksPlayback.value === "forward" || worksPlayback.value === "reverse") &&
+    nextWorksBoundary !== null
+  ) {
+    scrollToImmediately(nextWorksBoundary);
+    lastScrollY = window.scrollY;
+    return;
+  }
+
+  if (
+    worksPlayback.value === "complete" &&
+    previousWorksBoundary !== null &&
+    nextWorksBoundary !== null
+  ) {
+    const worksOffset = Math.max(0, previousScrollY - previousWorksBoundary);
+    scrollToImmediately(nextWorksBoundary + worksOffset);
+    lastScrollY = window.scrollY;
+    return;
+  }
+
+  if (
+    transitionPlayback.value === "forward" ||
+    transitionPlayback.value === "reverse"
+  ) {
+    // Keep the in-flight choreography at the same normalized document
+    // position when the Hero height changes. Rebase an active scroll segment
+    // at its current progress so its easing continues without a restart.
+    const scale = previousHeroHeight > 0
+      ? heroHeight.value / previousHeroHeight
+      : 1;
+    const resizedScrollY = previousScrollY * scale;
+    scrollToImmediately(resizedScrollY);
+    const adjustedScrollY = window.scrollY;
+
+    if (activeScrollAnimation) {
+      activeScrollAnimation.startY = adjustedScrollY;
+      activeScrollAnimation.startEased = resolveScrollEasing(
+        activeScrollAnimation.easing,
+        activeScrollAnimation.progress,
+      );
+    }
+
+    lastScrollY = adjustedScrollY;
+    return;
+  }
+
+  // Preserve the reader's offset inside Part.01 when a viewport resize changes
+  // the Hero height. Otherwise a taller Hero could make a normal resize look
+  // like an upward gesture across the reverse boundary.
+  if (
+    transitionPlayback.value === "complete" &&
+    previousScrollY >= previousHeroHeight - 1
+  ) {
+    const contentOffset = Math.max(0, previousScrollY - previousHeroHeight);
+    scrollToImmediately(heroHeight.value + contentOffset);
+  }
+
+  // Ignore layout-induced scroll changes from resize before native scrolling
+  // resumes or a new K1 downward gesture is detected.
+  lastScrollY = window.scrollY;
 }
 
 function handleLogoRevealEnd() {
@@ -699,18 +1438,29 @@ onMounted(() => {
   window.addEventListener("touchend", handleTouchEnd, { passive: true, capture: true });
   window.addEventListener("touchcancel", handleTouchEnd, { passive: true, capture: true });
   window.addEventListener("keydown", handleKeydown, true);
+  window.addEventListener("keyup", handleKeyup, true);
+  window.addEventListener("blur", handleWindowBlur);
   window.addEventListener("scroll", handleDocumentScroll, { passive: true });
 });
 
 onBeforeUnmount(() => {
+  isUnmounting = true;
+  reverseIntroductionAnimations.forEach((animation) => animation.cancel());
   if (k2RecomposeTimer !== undefined) window.clearTimeout(k2RecomposeTimer);
   if (k2SettleTimer !== undefined) window.clearTimeout(k2SettleTimer);
   if (k2ExpandTimer !== undefined) window.clearTimeout(k2ExpandTimer);
   if (k3StartTimer !== undefined) window.clearTimeout(k3StartTimer);
   if (k3Frame !== undefined) window.cancelAnimationFrame(k3Frame);
   if (k4Frame !== undefined) window.cancelAnimationFrame(k4Frame);
-  if (scrollFrame !== undefined) window.cancelAnimationFrame(scrollFrame);
+  if (worksFrame !== undefined) window.cancelAnimationFrame(worksFrame);
+  if (scrollFrame !== undefined) {
+    window.cancelAnimationFrame(scrollFrame);
+    scrollFrame = undefined;
+  }
+  activeScrollAnimation = null;
+  restoreDocumentScrollBehavior();
   document.documentElement.classList.remove("k3-content-theme");
+  document.documentElement.classList.remove("k3-content-theme-reversing");
 
   window.removeEventListener("resize", handleResize);
   window.removeEventListener("wheel", handleWheel, true);
@@ -719,6 +1469,8 @@ onBeforeUnmount(() => {
   window.removeEventListener("touchend", handleTouchEnd, true);
   window.removeEventListener("touchcancel", handleTouchEnd, true);
   window.removeEventListener("keydown", handleKeydown, true);
+  window.removeEventListener("keyup", handleKeyup, true);
+  window.removeEventListener("blur", handleWindowBlur);
   window.removeEventListener("scroll", handleDocumentScroll);
 });
 </script>
@@ -801,7 +1553,7 @@ onBeforeUnmount(() => {
 
   <div
     class="title-page__framework-scroll-stage"
-    :class="{ 'is-k3': k3Started }"
+    :class="{ 'is-k3': k3Started, 'is-k3-reversing': k3Reversing }"
     :style="[frameworkScrollStageStyle, introductionStarted ? introductionStageStyle : undefined]"
   >
     <article
@@ -838,12 +1590,30 @@ onBeforeUnmount(() => {
         :style="{ '--intro-delay': introductionView.taglineDelay }"
       >{{ introductionView.tagline }}</p>
     </article>
+    <div
+      v-if="introductionStarted"
+      ref="worksBoundaryRef"
+      class="works-section-boundary"
+      aria-hidden="true"
+    ></div>
+    <div
+      v-if="introductionStarted"
+      class="works-section-stage"
+      :style="worksStageStyle"
+      :aria-hidden="worksProgress < 1"
+    >
+      <WorksSection />
+    </div>
   </div>
 
   <div
     v-if="annotationBounds.width"
     class="title-page__logo-annotation"
-    :class="{ 'is-visible': logoStage === 'crossfade' || logoStage === 'waiting', 'is-k3': k3Started }"
+    :class="{
+      'is-visible': logoStage === 'crossfade' || logoStage === 'waiting',
+      'is-k3': k3Started,
+      'is-k3-reversing': k3Reversing,
+    }"
     :style="annotationStyle"
     @transitionend.self="handleAnnotationFadeEnd"
   >
@@ -853,27 +1623,33 @@ onBeforeUnmount(() => {
       :k2-line-transforms="k2LineTransforms"
       :k2-line-delays="k2LineDelays"
       :k3-started="k3Started"
+      :k3-reversing="k3Reversing"
       :k5-started="k5Started"
       :k5-divider-copy-transform="k5DividerCopyTransform"
     />
     <div
-      v-if="k2Phase === 'titles'"
+      v-if="k2Phase === 'titles' || k2Phase === 'reverse-titles'"
       class="framework-vertical-line"
-      :class="{ 'is-k3': k3Started }"
+      :class="{ 'is-k3': k3Started, 'is-k3-reversing': k3Reversing }"
       :style="frameworkVerticalLeftStyle"
       aria-hidden="true"
     ></div>
     <div
-      v-if="k2Phase === 'titles'"
+      v-if="k2Phase === 'titles' || k2Phase === 'reverse-titles'"
       class="framework-vertical-line"
-      :class="{ 'is-k3': k3Started }"
+      :class="{ 'is-k3': k3Started, 'is-k3-reversing': k3Reversing }"
       :style="frameworkVerticalRightStyle"
       aria-hidden="true"
     ></div>
     <div
-      v-if="k2Phase === 'titles'"
+      v-if="k2Phase === 'titles' || k2Phase === 'reverse-titles'"
       class="framework-titles"
-      :class="{ 'is-k3': k3Started, 'is-k5': k5Started }"
+      :class="{
+        'is-k3': k3Started,
+        'is-k3-reversing': k3Reversing,
+        'is-k5': k5Started,
+        'is-reversing': k2Phase === 'reverse-titles',
+      }"
       :style="frameworkTitlesStyle"
       aria-hidden="true"
     >
@@ -887,7 +1663,10 @@ onBeforeUnmount(() => {
             v-for="(character, index) in part.split('')"
             :key="`${part}-${index}`"
             class="framework-title__character"
-            :style="{ '--character-delay': `${index * 36}ms` }"
+            :style="{
+              '--character-delay': `${index * 36}ms`,
+              '--character-reverse-delay': `${(frameworkMaxTitleLength - index - 1) * 36}ms`,
+            }"
           >{{ character === " " ? "\u00A0" : character }}</span>
         </span>
         <span
@@ -1053,6 +1832,20 @@ onBeforeUnmount(() => {
   transition: background-color 1500ms cubic-bezier(0.333333, 1, 0.666667, 1);
 }
 
+.works-section-boundary {
+  display: block;
+  width: 100%;
+  height: 0;
+  pointer-events: none;
+}
+
+.works-section-stage {
+  position: relative;
+  width: 100%;
+  transform-origin: top center;
+  backface-visibility: hidden;
+}
+
 .introduction-content {
   width: min(100%, 76rem);
   padding-block-end: clamp(4rem, 8vw, 7rem);
@@ -1088,7 +1881,7 @@ onBeforeUnmount(() => {
     transparent 90%
   );
   background-repeat: no-repeat;
-  background-position: 0 0.08em;
+  background-position: 0 -0.04em;
   background-size: 100% 100%;
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
@@ -1134,6 +1927,11 @@ onBeforeUnmount(() => {
   background: var(--site-page-background);
 }
 
+.title-page__framework-scroll-stage.is-k3-reversing {
+  background: var(--site-hero-background);
+  transition: background-color 1500ms cubic-bezier(0.333333, 0, 0.666667, 0);
+}
+
 .title-page__logo-annotation {
   position: absolute;
   z-index: 20;
@@ -1154,6 +1952,13 @@ onBeforeUnmount(() => {
   transition:
     opacity 700ms cubic-bezier(0.22, 0.7, 0.24, 1),
     color 1500ms cubic-bezier(0.333333, 1, 0.666667, 1);
+}
+
+.title-page__logo-annotation.is-k3-reversing {
+  color: var(--site-hero-foreground);
+  transition:
+    opacity 700ms cubic-bezier(0.22, 0.7, 0.24, 1),
+    color 1500ms cubic-bezier(0.333333, 0, 0.666667, 0);
 }
 
 .title-page__logo-annotation > .logo-annotation {
@@ -1181,6 +1986,11 @@ onBeforeUnmount(() => {
   color: var(--site-text-primary);
 }
 
+.framework-titles.is-k3-reversing {
+  color: var(--site-hero-foreground);
+  transition: color 1500ms cubic-bezier(0.333333, 0, 0.666667, 0);
+}
+
 .framework-vertical-line {
   position: fixed;
   z-index: 4;
@@ -1193,6 +2003,11 @@ onBeforeUnmount(() => {
 
 .framework-vertical-line.is-k3 {
   border-color: var(--site-framework-rule);
+}
+
+.framework-vertical-line.is-k3-reversing {
+  border-color: var(--site-hero-rule);
+  transition: border-color 1500ms cubic-bezier(0.333333, 0, 0.666667, 0);
 }
 
 .framework-title {
@@ -1224,7 +2039,7 @@ onBeforeUnmount(() => {
 .framework-titles.is-k5 .framework-title:not(:first-child) {
   transform:
     translateY(var(--framework-fall-offset, 0px))
-    scale(calc(var(--framework-title-scale, 1) * var(--framework-fall-scale, 1)));
+    scale(var(--framework-title-scale, 1));
 }
 
 .framework-title__text {
@@ -1256,6 +2071,23 @@ onBeforeUnmount(() => {
   transition: border-color 1500ms cubic-bezier(0.333333, 1, 0.666667, 1);
 }
 
+.framework-titles.is-k3-reversing .framework-title__cursor {
+  opacity: 1;
+  animation: none;
+  transition: border-color 1500ms cubic-bezier(0.333333, 0, 0.666667, 0);
+}
+
+.framework-titles.is-reversing .framework-title__cursor {
+  opacity: 0;
+  animation: none;
+  transition: opacity 420ms cubic-bezier(0.333333, 0, 0.666667, 0);
+}
+
+.framework-titles.is-reversing .framework-title__character {
+  animation: framework-character-exit 420ms cubic-bezier(0.333333, 0, 0.666667, 0) both;
+  animation-delay: var(--character-reverse-delay, 0ms);
+}
+
 .framework-titles.is-k3 .framework-title__cursor {
   border-color: var(--site-brand-text);
   animation: framework-cursor-decelerate 3200ms steps(1, end) forwards;
@@ -1280,6 +2112,18 @@ onBeforeUnmount(() => {
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes framework-character-exit {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(0.42em) scale(0.94);
   }
 }
 
