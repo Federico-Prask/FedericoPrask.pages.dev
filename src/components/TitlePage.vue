@@ -1496,7 +1496,9 @@ function handleDocumentScroll() {
     part02Playback.value === "reverse-expand" ||
     part02Playback.value === "reverse-recompose"
   ) {
-    lastScrollY = currentY;
+    if (Math.abs(currentY - lastScrollY) > 1) {
+      scrollToImmediately(lastScrollY);
+    }
     return;
   }
 
