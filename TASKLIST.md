@@ -183,17 +183,18 @@ The active application is a deliberately small Vue page. The old page compositio
 
 - [x] Start Part.01 expansion and the Parts 02–04 fall together after K3; there is only one 1250ms In Cubic timeline.
 - [x] Drive the position-only fall from the same progress value starting at the first frame; preserve Part.02–04 title font sizes and scales.
-- [x] Move the four lower horizontal rules with the falling Parts, far enough that the titles and rules leave the viewport.
+- [x] Move the four lower horizontal rules with the falling Parts; calculate their final position from the measured end of the Introduction so they remain aligned with the following content.
 - [x] Duplicate the shared Part.01/Part.02 rule at its exact pre-expansion position, close to the Part.01 title; keep that copy fixed while the original rule falls away.
-- [x] Skip the falling motion for reduced-motion users and retain Parts 02–04 in their compact positions.
-- [ ] Verify the acceleration, unchanged title scale, final off-screen displacement and duplicate rule position in the browser.
+- [x] Skip the falling interpolation for reduced-motion users and place Parts 02–04 directly after the measured Introduction end, retaining compact row heights.
+- [ ] Verify the shared acceleration, unchanged title scale, content-relative final position, no overlap with Works copy and duplicate rule position in the browser.
 - [x] Reveal Part.01 content from top to bottom and left to right.
 - [x] Reveal ordinary text in short phrase groups, with each complete group as one unit rather than character-by-character.
 - [x] Reveal each group through opacity 0→1 and an upward 0.42em translation (420ms Out Cubic), with a 58ms stagger; do not scale the text.
 - [x] Keep the Introduction in normal document flow so the page grows to fit the complete copy.
 - [x] Provide a reduced-motion presentation with all copy immediately readable.
 - [ ] Verify the complete reveal sequence and reading order in the browser.
-- [ ] Verify the content start position against the retained Part.01/Part.02 divider at desktop and mobile widths.
+- [x] Measure the Introduction end and align the Part.02 lower rule 32px after it; reserve the same gap before the Works boundary.
+- [ ] Verify the tagline-to-rule gap, Works boundary and absence of title overlap at desktop and mobile widths.
 
 ### 5.3 Introduction content
 
