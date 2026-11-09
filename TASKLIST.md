@@ -297,3 +297,7 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Hide duplicate Part.03/Part.04 document-flow headings while the shared four-title framework is being reassembled or pulled out.
 - [x] Fade shared Part.03/Part.04 framework labels out when Part.02 expansion begins so they cannot overlap Works content.
 - [ ] Browser-verify the reassembly frame contains exactly one copy of each Part title and that Part.03/Part.04 are absent during the Part.02 expansion.
+- [x] Keep the Part.01 compact divider copy visible during the Part.02 transition.
+- [x] Duplicate the Part.02 lower framework rule at its compact title-row position while the original line expands to the 60vh row boundary.
+- [x] Hide semantic Part.03/Part.04 headings directly during Part.02 reassembly and expansion; restore them after the transition.
+- [ ] Browser-verify both retained title dividers, the expanded Part.02 lower boundary, and the absence of duplicate/overlapping Part.03/Part.04 titles.
