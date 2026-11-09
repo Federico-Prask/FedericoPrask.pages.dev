@@ -501,13 +501,13 @@ function getWorksBoundaryY(): number | null {
 
 function getFinalPart02RowBottomY(): number {
   const compactRowHeight = k3Geometry.value.titleAreaHeight / 4;
-  // Five horizontal rules define four rows. The Part.02 lower rule is the
-  // second rule below the expanded Part.01 row, not the shared Part.01/02 rule.
+  // The Part.02 lower rule follows the expanded Part.01 row and one
+  // compact Part.02 row. The next compact row belongs to Part.03.
   return (
     heroHeight.value +
     k3Geometry.value.stageInset +
     viewport.value.height * K4_PART01_HEIGHT_RATIO +
-    compactRowHeight * 2
+    compactRowHeight
   );
 }
 
