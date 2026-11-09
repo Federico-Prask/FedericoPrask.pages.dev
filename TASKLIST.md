@@ -294,3 +294,10 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Lock directional input during the document-scroll transition and preserve its progress on viewport resize.
 - [ ] Browser-test the first-gesture dock, second-gesture whole-document entrance, reverse playback, boundary alignment, scrollbar/touch/keyboard input and responsive resizing.
 - [ ] Verify reduced-motion native scrolling and the Part.02 dock alignment in a browser.
+
+
+- [x] Keep the Part.02 entrance strip attached to the Introduction/Works boundary and preserve the whole-document upward cover transition.
+- [x] Hide Part.03 and Part.04 in the absolute opening overlay after K5 completes.
+- [x] Render Part.03 after Works and Part.04 after the Milestones section in normal document flow.
+- [ ] Add curated Milestones and Beyond content; their current sections are structural anchors only.
+- [ ] Browser-verify Part.02 cover motion and the Part.03/04 boundaries at desktop and mobile widths.
