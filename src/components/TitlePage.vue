@@ -592,7 +592,7 @@ async function updatePart02FrameworkPosition() {
   await nextTick();
 }
 
-function resolveScrollEasing(function resolveScrollEasing(
+function resolveScrollEasing(
   easing: ScrollEasing,
   progress: number,
 ): number {
@@ -1736,6 +1736,12 @@ onBeforeUnmount(() => {
   min-height: 100svh;
   background: var(--site-hero-background);
   transition: background-color 1500ms cubic-bezier(0.333333, 1, 0.666667, 1);
+}
+
+.page-scene {
+  position: relative;
+  width: 100%;
+  min-height: 100svh;
 }
 
 .part02-heading-spacer {
