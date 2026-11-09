@@ -1189,7 +1189,6 @@ function handleTouchMove(event: TouchEvent) {
     return;
   }
 
-  const worksBoundary = getWorksBoundaryY();
   const worksDockY = getWorksDockScrollY();
 
   if (worksPlayback.value === "docked") {
@@ -1303,7 +1302,6 @@ function handleDocumentScroll() {
 
   const movedUp = currentY < lastScrollY - 1;
   const movedDown = currentY > lastScrollY;
-  const worksBoundary = getWorksBoundaryY();
   const worksDockY = getWorksDockScrollY();
 
   if (worksPlayback.value === "docked") {
@@ -1322,18 +1320,6 @@ function handleDocumentScroll() {
       scrollToImmediately(lockedDocumentScrollY);
     }
     lastScrollY = lockedDocumentScrollY;
-    return;
-  }
-
-  if (
-    worksPlayback.value === "complete" &&
-    movedUp &&
-    worksBoundary !== null &&
-    currentY < worksBoundary - 1
-  ) {
-    scrollToImmediately(worksBoundary);
-    lastScrollY = window.scrollY;
-    beginWorksReverse();
     return;
   }
 
@@ -1405,7 +1391,6 @@ function handleKeydown(event: KeyboardEvent) {
     return;
   }
 
-  const worksBoundary = getWorksBoundaryY();
   const worksDockY = getWorksDockScrollY();
   if (worksPlayback.value === "docked") {
     if (scrollDown) {
