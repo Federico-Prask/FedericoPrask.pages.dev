@@ -2748,6 +2748,7 @@ onBeforeUnmount(() => {
   transform-origin: left center;
 }
 
+.framework-titles.is-part02-transition .framework-title.is-part02-hidden,
 .framework-title.is-part02-hidden {
   visibility: hidden;
   opacity: 0;
