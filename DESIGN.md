@@ -1483,3 +1483,14 @@ Part.03 is rendered in normal document flow immediately after the complete Works
 At the Part.02 dock, a dedicated fixed overlay exposes only its heading strip at the bottom edge of the viewport. The next downward gesture animates the overlay itself from `translateY(100% - peek)` to `translateY(0)` over 1150ms with In-Out Cubic easing. The Introduction remains stationary underneath; the document's `scrollY` is not animated during this cover transition.
 
 After the entrance, the body scroll is locked and the overlay's own content viewport becomes the active scroll container. Works, Milestones, and Beyond live inside this same overlay in document order. An upward gesture at the overlay's scroll origin reverses the overlay animation and restores the underlying Introduction. The previous absolute framework titles are hidden after K5 to avoid duplicating or overlapping the dedicated Part.02 heading.
+
+
+### 6.10 Part.02 geometry, persistent Part.01 title, and scroll ownership corrections
+
+The Part.02 dock is keyed to the **lower rule of the Part.02 row**. With five horizontal rules defining four rows, that boundary is after the expanded Part.01 row plus two compact rows. The measured drop distance must therefore include two compact row heights; aligning it after only one compact row places the Part.02 boundary one row too high and lets the dock appear before the end of the Introduction.
+
+After K5, Part.01's title remains visible. Only the fallen Part.02–04 titles in the opening overlay are hidden; the dedicated Part.02 dock/cover heading is rendered by the fixed overlay.
+
+The active overlay owns all scroll input. Both the document root and body are locked while it is active. Wheel and touch deltas are routed into the Works scroll container; an upward gesture reverses the cover only when that inner container is already at its top. A gesture that merely scrolls the content back to the top does not also reverse the cover. Keyboard scrolling uses the same inner container. The two page-edge vertical rules are recreated inside the overlay using K3's measured left/right insets.
+
+Reduced-motion users do not receive the fixed cover/dock interaction. Works, Milestones, and Beyond remain in ordinary document flow so the content is still reachable with native scrolling.
