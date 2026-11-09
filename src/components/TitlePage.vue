@@ -551,6 +551,7 @@ function beginWorksEntrance() {
   const overlay = worksOverlayRef.value;
   if (!overlay) return;
 
+  clearFreshWorksWheelGesture();
   worksPlayback.value = "forward";
   blockCurrentInputGestures();
   overlay.scrollTop = 0;
