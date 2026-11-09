@@ -322,6 +322,7 @@ const frameworkInset = computed(() =>
 
 const FRAMEWORK_RULE_STROKE_WIDTH = 0.35;
 const K4_PART01_HEIGHT_RATIO = 0.6;
+const K4_K5_TRANSITION_DURATION = 1250;
 
 const k3Geometry = computed(() => {
   const { width, height } = viewport.value;
@@ -643,7 +644,7 @@ const K2_LINE_EXPAND_DURATION = 1100;
 const K2_LINE_STAGGER = 65;
 const K3_GEOMETRY_DURATION = 1500;
 const K3_CURSOR_HOLD_CYCLES = 1;
-const K4_K5_TRANSITION_DURATION = 1250;
+
 
 function easeInOutCubic(value: number): number {
   return value < 0.5
