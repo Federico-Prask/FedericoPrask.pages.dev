@@ -1809,10 +1809,10 @@ onBeforeUnmount(() => {
     class="page-scene"
     :class="{
       'is-part02-transitioning':
-        part02Playback === "recompose" ||
-        part02Playback === "expand" ||
-        part02Playback === "reverse-expand" ||
-        part02Playback === "reverse-recompose",
+        part02Playback === 'recompose' ||
+        part02Playback === 'expand' ||
+        part02Playback === 'reverse-expand' ||
+        part02Playback === 'reverse-recompose',
     }"
   >
   <section
