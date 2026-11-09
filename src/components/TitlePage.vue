@@ -50,6 +50,7 @@ type WorksPlayback = "idle" | "docked" | "forward" | "complete" | "reverse";
 const worksPlayback = ref<WorksPlayback>("idle");
 const introductionContentRef = ref<HTMLElement | null>(null);
 const worksSpacerHeight = ref(0);
+const worksFrameworkDropDistance = ref(0);
 const worksBoundaryRef = ref<HTMLElement | null>(null);
 const transitionPlayback = ref<TransitionPlayback>("idle");
 const k3Reversing = ref(false);
@@ -283,13 +284,13 @@ const k4Geometry = computed(() => {
 });
 
 const k5Geometry = computed(() => {
-  const dropDistance =
-    viewport.value.height + k4Geometry.value.totalHeight + 48;
+  const dropDistance = worksFrameworkDropDistance.value;
 
   return {
     dropDistance,
-    dropOffset: dropDistance * k5Progress.value,
-
+    dropOffset: prefersReducedMotion
+      ? dropDistance
+      : dropDistance * k5Progress.value,
   };
 });
 
@@ -471,6 +472,7 @@ const K2_LINE_STAGGER = 65;
 const K3_GEOMETRY_DURATION = 1500;
 const K3_CURSOR_HOLD_CYCLES = 1;
 const K4_K5_TRANSITION_DURATION = 1250;
+const WORKS_PART02_GAP = 32;
 const WORKS_TRANSITION_DURATION = 1150;
 
 function easeInOutCubic(value: number): number {
@@ -493,12 +495,13 @@ function getWorksBoundaryY(): number | null {
   return marker.getBoundingClientRect().top + window.scrollY;
 }
 
-function getPart02RowBottomY(): number {
+function getFinalPart02RowBottomY(): number {
+  const compactRowHeight = k3Geometry.value.titleAreaHeight / 4;
   return (
     heroHeight.value +
     k3Geometry.value.stageInset +
-    k4Geometry.value.firstRowHeight +
-    k4Geometry.value.compactRowHeight
+    viewport.value.height * K4_PART01_HEIGHT_RATIO +
+    compactRowHeight
   );
 }
 
@@ -508,7 +511,13 @@ async function updateWorksSpacer() {
   if (!article) return;
 
   const articleBottom = article.getBoundingClientRect().bottom + window.scrollY;
-  worksSpacerHeight.value = Math.max(0, getPart02RowBottomY() - articleBottom);
+  const targetPart02Bottom = articleBottom + WORKS_PART02_GAP;
+
+  // Place the falling Part.02 row immediately after the actual Introduction
+  // end. A fixed viewport-sized offset lets its absolute title overlay Works.
+  worksFrameworkDropDistance.value =
+    targetPart02Bottom - getFinalPart02RowBottomY();
+  worksSpacerHeight.value = WORKS_PART02_GAP;
   await nextTick();
 }
 
@@ -690,23 +699,21 @@ function scrollImmediatelyToFramework() {
   lastScrollY = window.scrollY;
 }
 
-function beginK4() {
+async function beginK4() {
   if (k4Started.value) return;
   k4Started.value = true;
 
   // The divider copy is recomputed from the live viewport geometry.
   k5Started.value = true;
+  introductionStarted.value = true;
+  await updateWorksSpacer();
 
   if (prefersReducedMotion) {
     k4Progress.value = 1;
-    introductionStarted.value = true;
     transitionPlayback.value = "complete";
     lastScrollY = window.scrollY;
-    void updateWorksSpacer();
     return;
   }
-
-  introductionStarted.value = true;
 
   const startTime = performance.now();
   const frame = (now: number) => {
@@ -1941,7 +1948,7 @@ onBeforeUnmount(() => {
 
 .introduction-content {
   width: min(100%, 76rem);
-  padding-block-end: clamp(4rem, 8vw, 7rem);
+  padding-block-end: 0;
   color: var(--site-text-secondary);
   font-family: var(--font-body);
   font-size: clamp(0.94rem, 1vw, 1.075rem);
@@ -1996,6 +2003,7 @@ onBeforeUnmount(() => {
 .introduction-content__tagline {
   display: block;
   margin-block-start: clamp(2rem, 4vw, 3.25rem) !important;
+  margin-block-end: 0 !important;
   color: var(--site-text-primary);
   font-family: "SF Pro Display", var(--font-heading);
   font-size: clamp(1.25rem, 2.2vw, 1.85rem);
