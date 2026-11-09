@@ -3106,15 +3106,8 @@ onBeforeUnmount(() => {
   }
 
   .works-section__header,
-  .works-row,
-  .document-part-heading__text {
+  .works-row {
     opacity: 1;
-    transform: none;
-    transition: none;
-  }
-
-  .document-part-heading::before,
-  .document-part-heading::after {
     transform: none;
     transition: none;
   }
