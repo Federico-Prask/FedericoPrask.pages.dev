@@ -289,7 +289,6 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Implement the Part.02 framework reassembly and pull-out transition with reverse boundary handling.
 - [x] Keep ordinary reading on native `window` scrolling; do not add a nested scroll container or manually adjust wheel/touch deltas.
 - [x] Keep the page-edge vertical rails attached to the shared Scene.
-- [ ] Run `vp build` locally.
 - [ ] Run `vp build` locally and resolve any Vue/TypeScript/template errors.
 - [ ] Browser-test the four-title/five-rule reassembly, Part.01 exit, Part.02 row expansion and reverse animation.
 - [ ] Verify the Part.02 title stays at its original document coordinate and Works content starts after the expanded row plus 24px.
