@@ -1487,7 +1487,7 @@ After the entrance, the body scroll is locked and the overlay's own content view
 
 ### 6.10 Part.02 geometry, persistent Part.01 title, and scroll ownership corrections
 
-The Part.02 dock is keyed to the **lower rule of the Part.02 row**. With five horizontal rules defining four rows, that boundary is after the expanded Part.01 row plus two compact rows. The measured drop distance must therefore include two compact row heights; aligning it after only one compact row places the Part.02 boundary one row too high and lets the dock appear before the end of the Introduction.
+The Part.02 dock is keyed to the **lower rule of the Part.02 row**. With five horizontal rules defining four rows, that boundary is after the expanded Part.01 row plus two compact rows. The measured drop distance includes exactly one compact row after the expanded Part.01 row. Including two compact rows moves the Part.02 lower rule one row too far down and makes it appear before its intended dock point.
 
 After K5, Part.01's title remains visible. Only the fallen Part.02–04 titles in the opening overlay are hidden; the dedicated Part.02 dock/cover heading is rendered by the fixed overlay.
 
