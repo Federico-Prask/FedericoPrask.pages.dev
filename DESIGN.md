@@ -1467,6 +1467,8 @@ The page is implemented as one Vue page Scene, owned by `TitlePage.vue`. Introdu
 
 Part.02 reuses the second title row from the original four-Part framework. It does not create a separate title strip or duplicate title element: the same `.framework-title` markup, SF Pro Display typography, sizing, row alignment and original horizontal rules are used for Part.01 and Part.02.
 
+During the first reassembly stage, all four shared framework titles are visible, while the later semantic Part.03/Part.04 headings in document flow are temporarily hidden to prevent duplicate labels. At the start of the Part.02 expansion stage, the shared Part.03/Part.04 labels fade out; they must not remain in the expanded Part.02 row area or overlap the Works heading. Their semantic document-flow headings become visible again after the Part.02 transition completes.
+
 K5 measures the rendered end of the Introduction and translates the lower framework rows together. The lower rule of Part.02 is aligned after the Introduction by one compact framework row height plus a 24px breathing gap. The Part.02 title therefore begins 24px after the Introduction; a matching normal-flow spacer reserves the title row's full height. Part.03 and Part.04 retain their later document-flow headings until their own layouts are designed.
 
 The Part.02 pull-out is a dedicated two-stage transition inside the same framework. First, the four titles and five SVG rules reassemble in place. Second, the existing Part.01 expansion geometry expands the Part.02 row to 60vh while the document scrolls to its original row position, pushing Part.01 fully out of the viewport. Part.02 remains at its document position; its title is the same framework title node, not a copied heading.
