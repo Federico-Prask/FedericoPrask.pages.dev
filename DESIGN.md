@@ -1452,7 +1452,7 @@ The four current editorial groups are Development, Visual Design, Music Producti
 
 Until the user supplies the final curated media, each collage is represented by three overlapping, differently sized color fields. These are layout placeholders only, not portfolio images. Replace each field with a real work preview when its corresponding asset is available; preserve the collage geometry and varied aspect ratios rather than turning the media area into a uniform card grid.
 
-The section is placed after the Introduction in normal document flow as part of the single page Scene. The same DOM section temporarily switches to fixed positioning only for the dock and cover transition, then returns to normal flow for native page scrolling.
+The section is placed after the Introduction in normal document flow as part of the single page Scene. Its title is rendered by the shared second row of the four-Part framework; the Works content remains in normal document flow.
 
 
 ### 6.7 Part.02 as part of one page Scene
