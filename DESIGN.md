@@ -1466,7 +1466,7 @@ The section is placed after the Introduction in normal document flow as part of 
 
 The page is implemented as one Vue page Scene, owned by `TitlePage.vue`. Introduction, Works, Milestones and Beyond are part of the same page-level document structure. Works content is inline in that Scene; it is not a separately mounted page or an independent nested-scroll component.
 
-Part.02 is in normal document flow at its actual position immediately after the Introduction. Only at the Part.02 entrance boundary does that same DOM section temporarily switch to fixed positioning. A temporary `100svh` flow slot preserves its original place in the document while the section is fixed.
+Part.02 is in normal document flow at its actual position immediately after the Introduction. Its dock clearance is measured from the actual Introduction bottom and equals the responsive Part.02 heading-strip height plus 24px, so the tagline remains fully visible above the strip. Only at the Part.02 entrance boundary does that same DOM section temporarily switch to fixed positioning. A temporary `100svh` flow slot preserves its original place in the document while the section is fixed.
 
 The first downward gesture that reaches the dock only stops at the Part.02 boundary and exposes the heading strip at the viewport bottom. A separate downward gesture, after the current wheel burst has ended, starts the 1150ms In-Out Cubic cover animation. The Part.02 Scene moves upward over the stationary Part.01 content. When the cover finishes, the document position is transferred to the Part.02 start while the cover still obscures the change; the temporary flow slot is removed and the same Part.02 element returns to normal document flow.
 
