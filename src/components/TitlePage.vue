@@ -54,7 +54,8 @@ const worksFrameworkDropDistance = ref(0);
 const worksBoundaryRef = ref<HTMLElement | null>(null);
 const worksOverlayRef = ref<HTMLElement | null>(null);
 let worksOverlayAnimation: Animation | null = null;
-let bodyOverflowBeforeWorks: string | null = null;
+let documentOverflowBeforeWorks: { root: string; body: string } | null = null;
+let lockedDocumentScrollY = 0;
 const transitionPlayback = ref<TransitionPlayback>("idle");
 const k3Reversing = ref(false);
 const heroNameInset = ref(0);
@@ -500,11 +501,13 @@ function getWorksBoundaryY(): number | null {
 
 function getFinalPart02RowBottomY(): number {
   const compactRowHeight = k3Geometry.value.titleAreaHeight / 4;
+  // Five horizontal rules define four rows. The Part.02 lower rule is the
+  // second rule below the expanded Part.01 row, not the shared Part.01/02 rule.
   return (
     heroHeight.value +
     k3Geometry.value.stageInset +
     viewport.value.height * K4_PART01_HEIGHT_RATIO +
-    compactRowHeight
+    compactRowHeight * 2
   );
 }
 
@@ -525,6 +528,12 @@ async function updateWorksSpacer() {
 }
 
 function getWorksDockScrollY(): number | null {
+  if (
+    !introductionStarted.value ||
+    transitionPlayback.value !== "complete" ||
+    (!prefersReducedMotion && k5Progress.value < 1)
+  ) return null;
+
   const boundary = getWorksBoundaryY();
   if (boundary === null) return null;
   return Math.max(0, boundary - viewport.value.height);
@@ -566,26 +575,40 @@ function beginWorksEntrance() {
   };
 }
 
+function getWorksScrollContainer(): HTMLElement | null {
+  return worksOverlayRef.value?.querySelector<HTMLElement>(".works-overlay__scroll") ?? null;
+}
+
 function activateWorksOverlay() {
   const overlay = worksOverlayRef.value;
   if (!overlay) return;
-  bodyOverflowBeforeWorks = document.body.style.overflow;
+
+  documentOverflowBeforeWorks = {
+    root: document.documentElement.style.overflow,
+    body: document.body.style.overflow,
+  };
+  lockedDocumentScrollY = window.scrollY;
+  document.documentElement.style.overflow = "hidden";
   document.body.style.overflow = "hidden";
   overlay.classList.add("is-active");
-  overlay.scrollTop = 0;
+  const scroller = getWorksScrollContainer();
+  if (scroller) scroller.scrollTop = 0;
 }
 
 function deactivateWorksOverlay() {
   const overlay = worksOverlayRef.value;
   overlay?.classList.remove("is-active");
-  document.body.style.overflow = bodyOverflowBeforeWorks ?? "";
-  bodyOverflowBeforeWorks = null;
+  if (documentOverflowBeforeWorks) {
+    document.documentElement.style.overflow = documentOverflowBeforeWorks.root;
+    document.body.style.overflow = documentOverflowBeforeWorks.body;
+  }
+  documentOverflowBeforeWorks = null;
 }
 
 function beginWorksReverse() {
   if (worksPlayback.value !== "complete") return;
   const overlay = worksOverlayRef.value;
-  const scroller = overlay?.querySelector<HTMLElement>(".works-overlay__scroll");
+  const scroller = getWorksScrollContainer();
   if (!overlay || !scroller || scroller.scrollTop > 1) return;
 
   worksPlayback.value = "reverse";
@@ -1033,12 +1056,31 @@ function reverseK2StageA() {
 
 function handleWheel(event: WheelEvent) {
   if (event.ctrlKey) return;
+
   if (worksPlayback.value === "forward" || worksPlayback.value === "reverse") {
     event.preventDefault();
     return;
   }
 
-  const worksBoundary = getWorksBoundaryY();
+  if (worksPlayback.value === "complete") {
+    const scroller = getWorksScrollContainer();
+    if (!scroller || event.deltaY === 0) return;
+
+    event.preventDefault();
+    const maxScroll = Math.max(0, scroller.scrollHeight - scroller.clientHeight);
+    const nextScroll = Math.max(0, Math.min(maxScroll, scroller.scrollTop + event.deltaY));
+
+    // A gesture that merely reaches the top finishes scrolling the Works
+    // content. A subsequent upward gesture at the top reverses the cover.
+    if (event.deltaY < 0 && scroller.scrollTop <= 1) {
+      beginWorksReverse();
+      return;
+    }
+
+    scroller.scrollTop = nextScroll;
+    return;
+  }
+
   const worksDockY = getWorksDockScrollY();
 
   if (worksPlayback.value === "docked") {
@@ -1048,16 +1090,6 @@ function handleWheel(event: WheelEvent) {
     } else if (event.deltaY < 0) {
       worksPlayback.value = "idle";
     }
-    return;
-  }
-
-  if (
-    worksPlayback.value === "complete" &&
-    event.deltaY < 0 &&
-    worksOverlayRef.value?.querySelector<HTMLElement>(".works-overlay__scroll")?.scrollTop === 0
-  ) {
-    event.preventDefault();
-    beginWorksReverse();
     return;
   }
 
@@ -1100,7 +1132,6 @@ function handleWheel(event: WheelEvent) {
     event.preventDefault();
   }
 }
-
 
 function handleTouchStart(event: TouchEvent) {
   touchGestureActive = event.touches.length > 0;
@@ -1172,14 +1203,25 @@ function handleTouchMove(event: TouchEvent) {
     return;
   }
 
-  if (
-    worksPlayback.value === "complete" &&
-    worksOverlayRef.value?.querySelector<HTMLElement>(".works-overlay__scroll")?.scrollTop === 0 &&
-    stepDelta < -8
-  ) {
+  if (worksPlayback.value === "complete") {
+    const scroller = getWorksScrollContainer();
+    if (!scroller) return;
+
     event.preventDefault();
-    beginWorksReverse();
-    touchBlockedUntilEnd = true;
+    if (stepDelta < -8 && scroller.scrollTop <= 1) {
+      beginWorksReverse();
+      touchBlockedUntilEnd = true;
+      return;
+    }
+
+    const maxScroll = Math.max(0, scroller.scrollHeight - scroller.clientHeight);
+    const previousTop = scroller.scrollTop;
+    scroller.scrollTop = Math.max(0, Math.min(maxScroll, previousTop + stepDelta));
+
+    // Do not turn the same swipe that reaches scrollTop=0 into a page reversal.
+    if (stepDelta < -8 && previousTop > 1 && scroller.scrollTop <= 1) {
+      touchBlockedUntilEnd = true;
+    }
     return;
   }
 
@@ -1276,7 +1318,10 @@ function handleDocumentScroll() {
   }
 
   if (worksPlayback.value === "complete") {
-    lastScrollY = currentY;
+    if (Math.abs(currentY - lockedDocumentScrollY) > 1) {
+      scrollToImmediately(lockedDocumentScrollY);
+    }
+    lastScrollY = lockedDocumentScrollY;
     return;
   }
 
@@ -1374,8 +1419,7 @@ function handleKeydown(event: KeyboardEvent) {
   }
 
   if (worksPlayback.value === "complete") {
-    const overlay = worksOverlayRef.value;
-    const scroller = overlay?.querySelector<HTMLElement>(".works-overlay__scroll");
+    const scroller = getWorksScrollContainer();
     if (scrollUp && scroller?.scrollTop === 0) {
       event.preventDefault();
       beginWorksReverse();
@@ -1749,6 +1793,16 @@ onBeforeUnmount(() => {
     :class="{ 'is-docked': worksPlayback === 'docked' || worksPlayback === 'forward' || worksPlayback === 'reverse', 'is-active': worksPlayback === 'complete' }"
     :aria-hidden="worksPlayback !== 'complete' && worksPlayback !== 'docked' && worksPlayback !== 'forward' && worksPlayback !== 'reverse'"
   >
+    <span
+      class="works-overlay__vertical-rule works-overlay__vertical-rule--left"
+      :style="frameworkVerticalLeftStyle"
+      aria-hidden="true"
+    ></span>
+    <span
+      class="works-overlay__vertical-rule works-overlay__vertical-rule--right"
+      :style="{ right: k3Geometry.boundaryInset + 'px' }"
+      aria-hidden="true"
+    ></span>
     <header class="works-overlay__heading">
       <span>Part.02 Works</span>
       <span class="works-overlay__rule" aria-hidden="true"></span>
@@ -2057,6 +2111,15 @@ onBeforeUnmount(() => {
   background: var(--site-framework-rule);
 }
 
+.works-overlay__vertical-rule {
+  position: absolute;
+  z-index: 4;
+  inset-block: 0;
+  width: 0;
+  border-inline-start: 0.35px solid var(--site-framework-rule);
+  pointer-events: none;
+}
+
 .works-overlay__scroll {
   flex: 1 1 auto;
   min-height: 0;
@@ -2242,7 +2305,7 @@ onBeforeUnmount(() => {
 
 /* Parts 03 and 04 leave the opening overlay after K5. Their document-flow
    headings are placed after the complete preceding sections. */
-.framework-titles.is-k5-complete .framework-title {
+.framework-titles.is-k5-complete .framework-title:not(:first-child) {
   visibility: hidden;
 }
 
