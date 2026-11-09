@@ -1376,16 +1376,26 @@ function handleKeydown(event: KeyboardEvent) {
     return;
   }
 
-  if (
-    worksPlayback.value === "complete" &&
-    scrollUp &&
-    worksOverlayRef.value?.scrollTop === 0
-  ) {
-    event.preventDefault();
-    scrollToImmediately(worksBoundary);
-    lastScrollY = window.scrollY;
-    beginWorksReverse();
-    blockedScrollKeys.add(key);
+  if (worksPlayback.value === "complete") {
+    const overlay = worksOverlayRef.value;
+    const scroller = overlay?.querySelector<HTMLElement>(".works-overlay__scroll");
+    if (scrollUp && scroller?.scrollTop === 0) {
+      event.preventDefault();
+      beginWorksReverse();
+      blockedScrollKeys.add(key);
+      return;
+    }
+    if (scroller) {
+      event.preventDefault();
+      const amount =
+        event.key === "Home" ? -scroller.scrollTop :
+        event.key === "End" ? scroller.scrollHeight :
+        event.key === "PageDown" || event.key === "PageUp" || event.key === " " ?
+          Math.sign(scrollDown ? 1 : -1) * scroller.clientHeight * 0.85 :
+          Math.sign(scrollDown ? 1 : -1) * 64;
+      scroller.scrollBy({ top: amount, behavior: "auto" });
+      blockedScrollKeys.add(key);
+    }
     return;
   }
 
@@ -1458,6 +1468,11 @@ async function handleResize() {
     transitionPlayback.value === "forward" ||
     transitionPlayback.value === "reverse";
   const previousScrollY = hasActiveTransition ? lastScrollY : currentScrollY;
+
+  if (worksPlayback.value === "complete") {
+    updateAnnotationBounds();
+    return;
+  }
 
   updateAnnotationBounds();
   await updateWorksSpacer();
