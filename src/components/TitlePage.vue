@@ -55,6 +55,8 @@ const worksBoundaryRef = ref<HTMLElement | null>(null);
 const worksOverlayRef = ref<HTMLElement | null>(null);
 let worksOverlayAnimation: Animation | null = null;
 let documentOverflowBeforeWorks: { root: string; body: string } | null = null;
+let worksWheelReleaseTimer: number | undefined;
+let worksNeedsFreshWheelGesture = false;
 let lockedDocumentScrollY = 0;
 const transitionPlayback = ref<TransitionPlayback>("idle");
 const k3Reversing = ref(false);
@@ -579,6 +581,25 @@ function getWorksScrollContainer(): HTMLElement | null {
   return worksOverlayRef.value?.querySelector<HTMLElement>(".works-overlay__scroll") ?? null;
 }
 
+function armFreshWorksWheelGesture() {
+  worksNeedsFreshWheelGesture = true;
+  if (worksWheelReleaseTimer !== undefined) {
+    window.clearTimeout(worksWheelReleaseTimer);
+  }
+  worksWheelReleaseTimer = window.setTimeout(() => {
+    worksNeedsFreshWheelGesture = false;
+    worksWheelReleaseTimer = undefined;
+  }, 240);
+}
+
+function clearFreshWorksWheelGesture() {
+  worksNeedsFreshWheelGesture = false;
+  if (worksWheelReleaseTimer !== undefined) {
+    window.clearTimeout(worksWheelReleaseTimer);
+    worksWheelReleaseTimer = undefined;
+  }
+}
+
 function activateWorksOverlay() {
   const overlay = worksOverlayRef.value;
   if (!overlay) return;
@@ -618,6 +639,7 @@ function beginWorksReverse() {
     deactivateWorksOverlay();
     overlay.style.transform = "";
     worksPlayback.value = "docked";
+    clearFreshWorksWheelGesture();
     lastScrollY = window.scrollY;
   };
 
@@ -702,6 +724,7 @@ function animateDocumentScroll(
 ) {
   worksOverlayAnimation?.cancel();
   worksOverlayAnimation = null;
+  clearFreshWorksWheelGesture();
   if (scrollFrame !== undefined) {
     window.cancelAnimationFrame(scrollFrame);
     scrollFrame = undefined;
@@ -1067,8 +1090,13 @@ function handleWheel(event: WheelEvent) {
     if (!scroller || event.deltaY === 0) return;
 
     event.preventDefault();
+    const wheelDelta = event.deltaMode === WheelEvent.DOM_DELTA_LINE
+      ? event.deltaY * 16
+      : event.deltaMode === WheelEvent.DOM_DELTA_PAGE
+        ? event.deltaY * scroller.clientHeight
+        : event.deltaY;
     const maxScroll = Math.max(0, scroller.scrollHeight - scroller.clientHeight);
-    const nextScroll = Math.max(0, Math.min(maxScroll, scroller.scrollTop + event.deltaY));
+    const nextScroll = Math.max(0, Math.min(maxScroll, scroller.scrollTop + wheelDelta));
 
     // A gesture that merely reaches the top finishes scrolling the Works
     // content. A subsequent upward gesture at the top reverses the cover.
@@ -1086,8 +1114,14 @@ function handleWheel(event: WheelEvent) {
   if (worksPlayback.value === "docked") {
     if (event.deltaY > 0) {
       event.preventDefault();
+      if (worksNeedsFreshWheelGesture) {
+        armFreshWorksWheelGesture();
+        return;
+      }
+      clearFreshWorksWheelGesture();
       beginWorksEntrance();
     } else if (event.deltaY < 0) {
+      clearFreshWorksWheelGesture();
       worksPlayback.value = "idle";
     }
     return;
@@ -1106,6 +1140,7 @@ function handleWheel(event: WheelEvent) {
     scrollToImmediately(worksDockY);
     worksPlayback.value = "docked";
     lastScrollY = window.scrollY;
+    armFreshWorksWheelGesture();
     return;
   }
 
@@ -1420,7 +1455,6 @@ function handleKeydown(event: KeyboardEvent) {
           Math.sign(scrollDown ? 1 : -1) * scroller.clientHeight * 0.85 :
           Math.sign(scrollDown ? 1 : -1) * 64;
       scroller.scrollBy({ top: amount, behavior: "auto" });
-      blockedScrollKeys.add(key);
     }
     return;
   }
