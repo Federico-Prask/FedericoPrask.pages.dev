@@ -319,3 +319,5 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Route wheel, touch, and keyboard scrolling into the overlay's own content scroller; reverse only at its top boundary.
 - [x] Keep Works/Milestones/Beyond in normal flow for reduced-motion users.
 - [ ] Browser-test the four interaction states and desktop/mobile boundary alignment.
+
+- [x] Require a fresh wheel gesture after the docking gesture; continuous wheel bursts cannot immediately trigger the cover.
