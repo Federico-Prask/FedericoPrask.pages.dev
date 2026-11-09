@@ -1700,6 +1700,26 @@ onBeforeUnmount(() => {
     >
       <WorksSection />
     </div>
+
+    <section
+      v-if="introductionStarted"
+      id="milestones-section"
+      class="document-part-section"
+      aria-labelledby="milestones-heading"
+    >
+      <h2 id="milestones-heading" class="document-part-heading">Part.03 Milestones</h2>
+      <div class="document-part-content" aria-hidden="true"></div>
+    </section>
+
+    <section
+      v-if="introductionStarted"
+      id="beyond-section"
+      class="document-part-section"
+      aria-labelledby="beyond-heading"
+    >
+      <h2 id="beyond-heading" class="document-part-heading">Part.04 Beyond</h2>
+      <div class="document-part-content" aria-hidden="true"></div>
+    </section>
   </div>
 
   <div
@@ -1744,15 +1764,17 @@ onBeforeUnmount(() => {
         'is-k3': k3Started,
         'is-k3-reversing': k3Reversing,
         'is-k5': k5Started,
+        'is-k5-complete': transitionPlayback === 'complete',
         'is-reversing': k2Phase === 'reverse-titles',
       }"
       :style="frameworkTitlesStyle"
       aria-hidden="true"
     >
       <div
-        v-for="part in frameworkParts"
+        v-for="(part, partIndex) in frameworkParts"
         :key="part"
         class="framework-title"
+        :class="{ 'is-flow-replaced': partIndex >= 2 }"
       >
         <span class="framework-title__text">
           <span
@@ -1946,6 +1968,30 @@ onBeforeUnmount(() => {
   width: 100%;
 }
 
+.document-part-section {
+  position: relative;
+  width: 100%;
+}
+
+.document-part-heading {
+  display: flex;
+  min-height: clamp(4.5rem, 9vw, 8rem);
+  align-items: center;
+  margin: 0;
+  padding-inline: clamp(1.5rem, 4.2vw, 4.5rem);
+  border-block: 0.35px solid var(--site-framework-rule);
+  color: var(--site-text-primary);
+  font-family: "SF Pro Display", var(--font-heading);
+  font-size: clamp(1.7rem, 3.4vw, 3.4rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1;
+}
+
+.document-part-content {
+  min-height: 0;
+}
+
 .introduction-content {
   width: min(100%, 76rem);
   padding-block-end: 0;
@@ -2090,6 +2136,12 @@ onBeforeUnmount(() => {
 .framework-titles.is-k3-reversing {
   color: var(--site-hero-foreground);
   transition: color 1500ms cubic-bezier(0.333333, 0, 0.666667, 0);
+}
+
+/* Parts 03 and 04 leave the opening overlay after K5. Their document-flow
+   headings are placed after the complete preceding sections. */
+.framework-titles.is-k5-complete .framework-title.is-flow-replaced {
+  visibility: hidden;
 }
 
 .framework-vertical-line {
@@ -2265,6 +2317,12 @@ onBeforeUnmount(() => {
 
   .framework-title {
     letter-spacing: -0.025em;
+  }
+
+  .document-part-heading {
+    min-height: 4.5rem;
+    padding-inline: 1.25rem;
+    font-size: clamp(1.5rem, 7vw, 2.1rem);
   }
 
   .introduction-content {
