@@ -1984,6 +1984,7 @@ onBeforeUnmount(() => {
       </section>
         <section id="milestones-section" class="document-part-section" aria-labelledby="milestones-heading">
           <h2 id="milestones-heading" class="document-part-heading" :class="{ 'is-part02-temporarily-hidden':
+            transitionPlayback !== 'complete' ||
             part02Playback === 'recompose' ||
             part02Playback === 'expand' ||
             part02Playback === 'reverse-expand' ||
@@ -1991,6 +1992,7 @@ onBeforeUnmount(() => {
         </section>
         <section id="beyond-section" class="document-part-section" aria-labelledby="beyond-heading">
           <h2 id="beyond-heading" class="document-part-heading" :class="{ 'is-part02-temporarily-hidden':
+            transitionPlayback !== 'complete' ||
             part02Playback === 'recompose' ||
             part02Playback === 'expand' ||
             part02Playback === 'reverse-expand' ||
