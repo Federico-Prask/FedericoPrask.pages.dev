@@ -1487,10 +1487,15 @@ After the entrance, the body scroll is locked and the overlay's own content view
 
 ### 6.10 Part.02 geometry, persistent Part.01 title, and scroll ownership corrections
 
-The Part.02 dock is keyed to the **lower rule of the Part.02 row**. With five horizontal rules defining four rows, that boundary is after the expanded Part.01 row plus two compact rows. The measured drop distance includes exactly one compact row after the expanded Part.01 row. Including two compact rows moves the Part.02 lower rule one row too far down and makes it appear before its intended dock point.
+The Part.02 dock is keyed to the **lower rule of the Part.02 row**. With five horizontal rules defining four rows, that boundary is after the expanded Part.01 row plus exactly one compact Part.02 row. Including two compact rows moves the Part.02 lower rule one row too far down and makes it appear before its intended dock point.
 
 After K5, Part.01's title remains visible. Only the fallen Part.02–04 titles in the opening overlay are hidden; the dedicated Part.02 dock/cover heading is rendered by the fixed overlay.
 
 The active overlay owns all scroll input. Both the document root and body are locked while it is active. Wheel and touch deltas are routed into the Works scroll container; an upward gesture reverses the cover only when that inner container is already at its top. A gesture that merely scrolls the content back to the top does not also reverse the cover. Keyboard scrolling uses the same inner container. The two page-edge vertical rules are recreated inside the overlay using K3's measured left/right insets.
 
 Reduced-motion users do not receive the fixed cover/dock interaction. Works, Milestones, and Beyond remain in ordinary document flow so the content is still reachable with native scrolling.
+
+
+### 6.11 Separate wheel gestures at the Part.02 dock
+
+The wheel event that reaches the Part.02 dock only places the page at rest and reveals the strip. Further wheel events in the same continuous burst are consumed. A 240ms idle interval is required before a fresh downward wheel gesture can start the fixed-overlay cover animation. Touch input uses the end of the current touch gesture as its boundary; keyboard input uses key release. This prevents a high-resolution trackpad burst from being interpreted as both the docking gesture and the separate entrance gesture.
