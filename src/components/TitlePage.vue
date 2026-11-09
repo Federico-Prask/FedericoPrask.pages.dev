@@ -1788,7 +1788,16 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="page-scene">
+  <div
+    class="page-scene"
+    :class="{
+      'is-part02-transitioning':
+        part02Playback === "recompose" ||
+        part02Playback === "expand" ||
+        part02Playback === "reverse-expand" ||
+        part02Playback === "reverse-recompose",
+    }"
+  >
   <section
     id="title-page"
     ref="titlePageRef"
@@ -2012,6 +2021,8 @@ onBeforeUnmount(() => {
           part02Playback === 'expand' ||
           part02Playback === 'reverse-expand' ||
           part02Playback === 'reverse-recompose',
+        'is-part02-expanding':
+          part02Playback === 'expand' || part02Playback === 'reverse-expand',
         'is-part02-complete': part02Playback === 'complete',
         'is-reversing': k2Phase === 'reverse-titles',
       }"
@@ -2626,18 +2637,37 @@ onBeforeUnmount(() => {
   transition: color 1500ms cubic-bezier(0.333333, 0, 0.666667, 0);
 }
 
-/* Parts 03 and 04 rejoin the shared framework during the Part.02 transition,
-   then return to their later document-flow headings. */
-.framework-titles.is-k5-complete .framework-title:nth-child(n + 3) {
+/* During reassembly all four shared labels are visible. Once Part.02 starts
+   expanding, Parts 03/04 leave the framework layer so they cannot collide with
+   the Works content that follows the expanded Part.02 row. */
+.framework-titles.is-k5-complete .framework-title:nth-child(n + 3),
+.framework-titles.is-part02-complete .framework-title:nth-child(n + 3) {
   visibility: hidden;
 }
 
-.framework-titles.is-part02-transition .framework-title,
-.framework-titles.is-part02-transition .framework-title:nth-child(n + 3) {
+.framework-titles.is-part02-transition .framework-title {
   visibility: visible;
 }
 
-.framework-titles.is-part02-complete .framework-title:nth-child(n + 3) {
+.framework-title:nth-child(n + 3) {
+  opacity: 1;
+  transition:
+    opacity 180ms cubic-bezier(0.22, 0.7, 0.24, 1),
+    visibility 0s linear;
+}
+
+.framework-titles.is-part02-expanding .framework-title:nth-child(n + 3) {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 180ms cubic-bezier(0.22, 0.7, 0.24, 1),
+    visibility 0s linear 180ms;
+}
+
+/* The later semantic headings for Parts 03/04 remain in document flow, but
+   are suppressed while those same labels are temporarily shown in the shared
+   framework during the Part.02 reassembly. */
+.page-scene.is-part02-transitioning .document-part-heading {
   visibility: hidden;
 }
 
