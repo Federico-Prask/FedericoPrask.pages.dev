@@ -1476,3 +1476,10 @@ At the Works start boundary, upward input returns the document to the dock along
 The K2–K5 opening framework still introduces all four Part titles together. After K5 completes, Part.03 and Part.04 are hidden in the absolute opening overlay so they cannot float over Works content. Part.02 remains attached to the Introduction/Works boundary and participates in the whole-document upward cover transition.
 
 Part.03 is rendered in normal document flow immediately after the complete Works section. Part.04 is rendered in normal document flow after the Milestones section. Their positions are determined by the actual preceding section heights, not by a shared fixed offset or the opening framework grid. Milestones and Beyond are currently structural anchors only; no placeholder copy or fabricated milestones are added.
+
+
+### 6.9 Part.02 is a fixed overlay, not document scrolling
+
+At the Part.02 dock, a dedicated fixed overlay exposes only its heading strip at the bottom edge of the viewport. The next downward gesture animates the overlay itself from `translateY(100% - peek)` to `translateY(0)` over 1150ms with In-Out Cubic easing. The Introduction remains stationary underneath; the document's `scrollY` is not animated during this cover transition.
+
+After the entrance, the body scroll is locked and the overlay's own content viewport becomes the active scroll container. Works, Milestones, and Beyond live inside this same overlay in document order. An upward gesture at the overlay's scroll origin reverses the overlay animation and restores the underlying Introduction. The previous absolute framework titles are hidden after K5 to avoid duplicating or overlapping the dedicated Part.02 heading.
