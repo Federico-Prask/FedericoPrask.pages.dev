@@ -1469,3 +1469,10 @@ The Works section remains in normal document flow; it is never translated indepe
 The first downward gesture that reaches the dock only snaps to that position. A second, distinct downward gesture starts a 1150ms In-Out Cubic document-scroll animation from the dock to the Works start. The complete page moves together, including the framework title strip, horizontal rule, background, Part.01 and Works content. The scroll distance is one viewport height. During the animation, wheel, touch, keyboard, native document-scroll and scrollbar input are locked; Ctrl+wheel zoom and multi-touch remain untouched.
 
 At the Works start boundary, upward input returns the document to the dock along the same In-Out Cubic trajectory. From the dock, upward input resumes ordinary Part.01 reading navigation. Reduced-motion users do not dock or animate; they use native document scrolling with the Works section in normal flow.
+
+
+### 6.8 Part heading ownership and document-flow boundaries
+
+The K2–K5 opening framework still introduces all four Part titles together. After K5 completes, Part.03 and Part.04 are hidden in the absolute opening overlay so they cannot float over Works content. Part.02 remains attached to the Introduction/Works boundary and participates in the whole-document upward cover transition.
+
+Part.03 is rendered in normal document flow immediately after the complete Works section. Part.04 is rendered in normal document flow after the Milestones section. Their positions are determined by the actual preceding section heights, not by a shared fixed offset or the opening framework grid. Milestones and Beyond are currently structural anchors only; no placeholder copy or fabricated milestones are added.
