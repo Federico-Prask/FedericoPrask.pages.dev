@@ -219,7 +219,7 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Reuse the Part.01 60vh expansion geometry and expand the Part.02 row.
 - [x] Scroll the document together with Part.02 expansion so Part.01 leaves the viewport while Part.02 stays in its normal document position.
 - [x] Reverse the two-stage transition at the Part.02 top boundary after a separate upward gesture.
-- [ ] Define separate entrance behavior for Parts 03 and 04; do not assume they share Part.02's motion.
+- [x] Define separate entrance behavior for Parts 03 and 04; draw their own paired rules and reveal their semantic headings on entry.
 - [ ] Curate Development projects.
 - [ ] Curate Graphic Design works.
 - [x] Establish a distinctive editorial composition with three overlapping, differently sized color placeholders per collage.
@@ -303,5 +303,7 @@ The active application is a deliberately small Vue page. The old page compositio
 - [ ] Browser-verify both retained title dividers, the expanded Part.02 lower boundary, and the absence of duplicate/overlapping Part.03/Part.04 titles.
 - [x] Place the Works introduction inside the expanded Part.02 row; keep the Work list after the expanded lower rule.
 - [x] Add viewport-triggered entrance animation to the Works introduction, each editorial row, and the Part.03/Part.04 headings with their top/bottom rules.
+- [x] Reserve one compact Part.01 row after the Introduction before the Part.02 title row, preventing the Part.01 title from overlapping the closing tagline.
+- [x] Hide the original Part.03/Part.04 SVG divider rules during Part.02 expansion and completion; their semantic sections draw their own rules after Works.
 - [ ] Browser-verify the Works introduction is vertically centered between the Part.02 title divider and the expanded lower rule, and that the work collage list begins after that rule.
 - [ ] Browser-verify Part.03/Part.04 titles reveal on entry, with both horizontal rules drawing outward and no duplicate framework titles.
