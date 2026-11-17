@@ -2075,6 +2075,7 @@ onBeforeUnmount(() => {
       :k5-started="k5Started"
       :k5-divider-copy-transform="k5DividerCopyTransform"
       :part02-divider-copy-transform="part02DividerCopyTransform"
+      :part02-playback="part02Playback"
     />
     <div
       v-if="k2Phase === 'titles' || k2Phase === 'reverse-titles'"
