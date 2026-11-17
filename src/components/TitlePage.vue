@@ -604,6 +604,7 @@ const frameworkTitlesStyle = computed(() => {
       : k4Geometry.value.totalHeight + "px",
     "--framework-title-size": geometry.titleFontSize + "px",
     "--framework-title-scale": geometry.compression,
+    "--framework-title-inset": geometry.titleInset + "px",
     "--framework-first-row-height": firstRowHeight + "px",
     "--framework-part02-row-height": secondRowHeight + "px",
     "--framework-compact-row-height": compactRowHeight + "px",
@@ -2114,6 +2115,12 @@ onBeforeUnmount(() => {
         'is-k3-reversing': k3Reversing,
         'is-k5': k5Started && part02Playback === 'idle',
         'is-k5-complete': transitionPlayback === 'complete',
+        'is-part01-masking':
+          (k5Started && transitionPlayback !== 'complete') ||
+          part02Playback === 'recompose' ||
+          part02Playback === 'expand' ||
+          part02Playback === 'reverse-expand' ||
+          part02Playback === 'reverse-recompose',
         'is-part02-transition':
           part02Playback === 'recompose' ||
           part02Playback === 'expand' ||
@@ -2811,6 +2818,34 @@ onBeforeUnmount(() => {
   color: var(--site-hero-foreground);
   pointer-events: none;
   transition: color 1500ms cubic-bezier(0.333333, 1, 0.666667, 1);
+}
+
+/* The Part.01 row is an opaque moving mask: its page-colored surface fully
+   covers the Introduction while the title crosses it. Narrow transparent
+   bands preserve the original horizontal rules beneath the mask. */
+.framework-titles.is-part01-masking::before {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  left: calc(-1 * var(--framework-title-inset, 0px));
+  width: calc(100% + 2 * var(--framework-title-inset, 0px));
+  height: calc(
+    var(--framework-first-row-height, 0px) +
+    var(--framework-fall-offset, 0px)
+  );
+  background: linear-gradient(
+    to bottom,
+    transparent 0 1px,
+    var(--site-hero-background) 1px
+      calc(var(--framework-compact-row-height, 0px) - 1px),
+    transparent calc(var(--framework-compact-row-height, 0px) - 1px)
+      calc(var(--framework-compact-row-height, 0px) + 1px),
+    var(--site-hero-background) calc(var(--framework-compact-row-height, 0px) + 1px)
+      calc(100% - 1px),
+    transparent calc(100% - 1px) 100%
+  );
+  content: "";
+  pointer-events: none;
 }
 
 .framework-titles.is-k3 {
