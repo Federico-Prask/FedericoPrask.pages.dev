@@ -309,3 +309,5 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Hide the original Part.03/Part.04 SVG divider rules during Part.02 expansion and completion; their semantic sections draw their own rules after Works.
 - [ ] Browser-verify the Works introduction is vertically centered between the Part.02 title divider and the expanded lower rule, and that the work collage list begins after that rule.
 - [ ] Browser-verify Part.03/Part.04 titles reveal on entry, with both horizontal rules drawing outward and no duplicate framework titles.
+- [x] Add a full-width opaque Part.01 row mask above the Introduction during K4/K5 and Part.02 pull-out; keep the moving title above it and preserve the framework rule bands.
+- [ ] Browser-verify the mask completely hides every Introduction paragraph during the moving transition, preserves the three horizontal rules, and disappears after K5 settles.
