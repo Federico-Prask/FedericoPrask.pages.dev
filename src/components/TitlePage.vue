@@ -969,6 +969,15 @@ function beginPart02Transition() {
 
   blockCurrentInputGestures();
   clearPart02ReverseGestureGate();
+
+  // Parts 03/04 must reveal after Works, not during the earlier K5 layout.
+  // Reset their one-shot reveal state and observe them again after Part.02 settles.
+  pageContentObserver?.disconnect();
+  pageContentObserver = null;
+  document.querySelectorAll<HTMLElement>(".document-part-heading").forEach((heading) => {
+    heading.classList.remove("is-visible");
+  });
+
   part02Playback.value = "recompose";
   part02RecomposeProgress.value = 0;
   part02ExpansionProgress.value = 0;
