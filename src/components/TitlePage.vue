@@ -376,7 +376,6 @@ const k4Geometry = computed(() => {
 const PART_TITLE_CONTENT_GAP = 24;
 const PART02_RECOMPOSE_DURATION = 760;
 const PART02_EXPANSION_DURATION = K4_K5_TRANSITION_DURATION;
-const PART02_TRIGGER_VIEWPORT_RATIO = 0.36;
 const part02ExpansionExtra = computed(() =>
   Math.max(
     0,
@@ -400,7 +399,9 @@ const worksSectionStyle = computed(() => ({
 const part02TriggerY = computed(() =>
   Math.max(
     heroHeight.value,
-    part02RowTop.value - viewport.value.height * PART02_TRIGGER_VIEWPORT_RATIO,
+    part02RowTop.value +
+      k4Geometry.value.compactRowHeight -
+      viewport.value.height,
   ),
 );
 
