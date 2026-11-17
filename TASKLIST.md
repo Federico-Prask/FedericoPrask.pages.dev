@@ -292,7 +292,9 @@ The active application is a deliberately small Vue page. The old page compositio
 - [x] Keep the page-edge vertical rails attached to the shared Scene.
 - [ ] Run `vp build` locally and resolve any Vue/TypeScript/template errors.
 - [ ] Browser-test the four-title/five-rule reassembly, Part.01 exit, Part.02 row expansion and reverse animation.
+- [x] Trigger the Part.02 pull-out with the compact title row's lower divider aligned to the viewport bottom.
 - [ ] Verify the Part.02 title stays at its original document coordinate and Works content starts after the expanded row plus 24px.
+- [x] Preserve the duplicate compact Part.02 divider, then hide the original expanded lower rule when the animation completes.
 - [ ] Test wheel/trackpad, touch, keyboard, scrollbar, resize, light/dark themes and reduced-motion behavior.
 - [x] Hide duplicate Part.03/Part.04 document-flow headings directly while the shared framework is in K2–K5 or Part.02 transition states; restore them after the framework is complete.
 - [x] Hide shared Part.03/Part.04 framework labels immediately when Part.02 expansion begins so they cannot overlap Works content.
