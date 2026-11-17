@@ -353,6 +353,14 @@ function k2PathStyle(id: string) {
   transition: opacity 180ms cubic-bezier(0.22, 0.7, 0.24, 1);
 }
 
+/* The original Part.02 lower rule becomes the expanded row's distant edge.
+   Keep the duplicate at the compact title row, then remove the travelling
+   original once the pull-out is complete. */
+.logo-annotation.is-part02-complete #guide-mono-h-06 {
+  opacity: 0;
+  transition: opacity 180ms cubic-bezier(0.22, 0.7, 0.24, 1);
+}
+
 .logo-annotation.is-k3 .axis-guides path[data-k2-persistent="true"] {
   stroke: var(--site-framework-rule);
   transition:
