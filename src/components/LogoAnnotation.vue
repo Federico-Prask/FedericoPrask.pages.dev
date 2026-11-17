@@ -69,6 +69,7 @@ function k2PathStyle(id: string) {
       'is-k3-reversing': props.k3Reversing,
       'is-part02-recompose': props.part02Playback === 'recompose',
       'is-part02-expand': props.part02Playback === 'expand',
+      'is-part02-complete': props.part02Playback === 'complete',
       'is-part02-reverse-expand': props.part02Playback === 'reverse-expand',
       'is-part02-reverse-recompose': props.part02Playback === 'reverse-recompose',
     }"
@@ -340,6 +341,16 @@ function k2PathStyle(id: string) {
     transform 760ms cubic-bezier(0.333333, 0, 0.666667, 0),
     stroke 420ms ease,
     stroke-width 420ms ease;
+}
+
+/* Parts 03/04 get their own section rules after Works. Do not leave the
+   original third/fourth framework dividers running through the work list. */
+.logo-annotation.is-part02-expand #guide-mono-h-07,
+.logo-annotation.is-part02-expand #guide-plate-h-02,
+.logo-annotation.is-part02-complete #guide-mono-h-07,
+.logo-annotation.is-part02-complete #guide-plate-h-02 {
+  opacity: 0;
+  transition: opacity 180ms cubic-bezier(0.22, 0.7, 0.24, 1);
 }
 
 .logo-annotation.is-k3 .axis-guides path[data-k2-persistent="true"] {
