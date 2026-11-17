@@ -388,8 +388,10 @@ const part02RowHeight = computed(
 );
 // The title row itself stays compact. The remaining 60vh expansion is
 // occupied by the Works introduction, not by an empty flow spacer.
+// Reserve a compact Part.01 row after the Introduction, then the
+// compact Part.02 title row and its breathing gap before the Works intro.
 const part02HeadingSpacerHeight = computed(
-  () => k4Geometry.value.compactRowHeight + PART_TITLE_CONTENT_GAP,
+  () => 2 * (k4Geometry.value.compactRowHeight + PART_TITLE_CONTENT_GAP),
 );
 const worksSectionStyle = computed(() => ({
   "--works-expanded-row-height": part02RowHeight.value + "px",
@@ -740,7 +742,10 @@ async function updatePart02FrameworkPosition() {
   if (!article) return;
 
   const articleBottom = article.getBoundingClientRect().bottom + window.scrollY;
-  part02RowTop.value = articleBottom + PART_TITLE_CONTENT_GAP;
+  part02RowTop.value =
+    articleBottom +
+    k4Geometry.value.compactRowHeight +
+    PART_TITLE_CONTENT_GAP;
   const targetPart02Bottom =
     part02RowTop.value + k4Geometry.value.compactRowHeight;
   worksFrameworkDropDistance.value =
