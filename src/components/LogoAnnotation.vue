@@ -11,6 +11,14 @@ type K2Phase =
   | "reverse-expand"
   | "reverse-recompose";
 
+type Part02Playback =
+  | "idle"
+  | "recompose"
+  | "expand"
+  | "complete"
+  | "reverse-expand"
+  | "reverse-recompose";
+
 const props = withDefaults(
   defineProps<{
     k2Started?: boolean;
@@ -22,6 +30,7 @@ const props = withDefaults(
     k5Started?: boolean;
     k5DividerCopyTransform?: string;
     part02DividerCopyTransform?: string;
+    part02Playback?: Part02Playback;
   }>(),
   {
     k2Started: false,
@@ -33,6 +42,7 @@ const props = withDefaults(
     k5Started: false,
     k5DividerCopyTransform: "",
     part02DividerCopyTransform: "",
+    part02Playback: "idle",
   },
 );
 
@@ -57,6 +67,10 @@ function k2PathStyle(id: string) {
       'is-k2-reverse-recompose': props.k2Phase === 'reverse-recompose',
       'is-k3': props.k3Started,
       'is-k3-reversing': props.k3Reversing,
+      'is-part02-recompose': props.part02Playback === 'recompose',
+      'is-part02-expand': props.part02Playback === 'expand',
+      'is-part02-reverse-expand': props.part02Playback === 'reverse-expand',
+      'is-part02-reverse-recompose': props.part02Playback === 'reverse-recompose',
     }"
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 256 256"
@@ -294,6 +308,36 @@ function k2PathStyle(id: string) {
 .logo-annotation.is-k2-reverse-recompose .axis-guides path[data-k2-persistent="true"] {
   transition:
     transform 720ms cubic-bezier(0.333333, 0, 0.666667, 0),
+    stroke 420ms ease,
+    stroke-width 420ms ease;
+}
+
+/* Part.02 runs after K2 has settled, so its own playback state must drive
+   the five persistent SVG rules rather than relying on the K2 phase class. */
+.logo-annotation.is-part02-recompose .axis-guides path[data-k2-persistent="true"] {
+  transition:
+    transform 760ms cubic-bezier(0.22, 0.7, 0.24, 1),
+    stroke 420ms ease,
+    stroke-width 420ms ease;
+}
+
+.logo-annotation.is-part02-expand .axis-guides path[data-k2-persistent="true"] {
+  transition:
+    transform 1250ms cubic-bezier(0.333333, 1, 0.666667, 1),
+    stroke 420ms ease,
+    stroke-width 420ms ease;
+}
+
+.logo-annotation.is-part02-reverse-expand .axis-guides path[data-k2-persistent="true"] {
+  transition:
+    transform 1250ms cubic-bezier(0.333333, 0, 0.666667, 0),
+    stroke 420ms ease,
+    stroke-width 420ms ease;
+}
+
+.logo-annotation.is-part02-reverse-recompose .axis-guides path[data-k2-persistent="true"] {
+  transition:
+    transform 760ms cubic-bezier(0.333333, 0, 0.666667, 0),
     stroke 420ms ease,
     stroke-width 420ms ease;
 }
